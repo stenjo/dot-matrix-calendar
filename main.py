@@ -53,4 +53,4 @@ while loop > 0:
     for i in range(10):
         pulse(led, 50)
 
-    # loop -= 1
+    loop -= 1

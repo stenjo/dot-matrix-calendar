@@ -9,6 +9,7 @@ load_env()
 def do_connect():
     sta_if = network.WLAN(network.STA_IF)
     if not sta_if.isconnected():
+        print("")
         print("--------------------------------")
         print("connecting to network...")
         sta_if.active(True)
