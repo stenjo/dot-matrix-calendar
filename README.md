@@ -6,12 +6,12 @@ Displaying a marquee list of events from a google calendar on a Wemos D1 mini an
 
 Add a env.json in the format:
 
-´´´json
+```json
 {
     "WIFI_SSID":"<network ssid>",
     "WIFI_PASSWD":"<network password>"
 }
-´´´
+```
 
 ## Credits
 
