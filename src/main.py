@@ -19,6 +19,7 @@ class Matrix8x8Ext(Matrix8x8):
             self.text(s, x)
             self.show()
             sleep_ms(ms_delay)
+            self.show()
         return s_width
 
 
@@ -33,7 +34,7 @@ display = Matrix8x8Ext(spi, ss, 4)
 
 sta_if = network.WLAN(network.STA_IF)
 display.scroll_text(sta_if.ifconfig()[0], 50)
-display.show()
+# display.show()
 sleep(2)
 
 pulse(led, 50)
@@ -49,7 +50,7 @@ msg = "Finally, this works!"
 loop = 100
 while loop > 0:
     display.scroll_text(msg, 50)
-    display.show()
+    # display.show()
     for i in range(10):
         pulse(led, 50)
 

@@ -23,7 +23,7 @@
 import os
 import io
 import json
-from .msgpack import serialize, deserialize
+from msgpack import serialize, deserialize
 
 __version__ = "0.2.0"
 
