@@ -1,9 +1,11 @@
 # base modules
 include("$(PORT_DIR)/boards/manifest.py")
-freeze("modules", "max7219.py")
-freeze("modules", "mpy_env.py")
-freeze("modules", "msgpack.py")
-freeze("modules", "getopt.py")
+freeze("../../modules", "max7219.py")
+freeze("../../modules", "mpy_env.py")
+freeze("../../modules", "msgpack.py")
+freeze("../../modules", "getopt.py")
+freeze("../../modules", "datetime.py")
+freeze("../../modules", "scroller.py")
 
 
 # asyncio
