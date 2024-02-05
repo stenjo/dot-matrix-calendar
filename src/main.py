@@ -1,7 +1,7 @@
 from machine import Pin, SPI, PWM
 from time import sleep
 from scroller import Scroller
-from dateHandling import dayText
+from modules.dateHandling import dayText
 
 
 # from google_auth_oauthlib.flow import InstalledAppFlow

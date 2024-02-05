@@ -324,6 +324,10 @@ def _format_offset(off, sep=':'):
                 s += '.%06d' % ss.microseconds
     return s
 
+def _strftime(format, timetuple):
+    
+    return format.replace('%d', str(timetuple.tm_mday)).replace('%m', str(timetuple.tm_mon))
+
 def _wrap_strftime(object, format, timetuple):
     # Don't call utcoffset() or tzname() unless actually needed.
     freplace = None  # the string to use for %f
@@ -388,7 +392,7 @@ def _wrap_strftime(object, format, timetuple):
         else:
             push(ch)
     newformat = "".join(newformat)
-    return time.strftime(newformat, timetuple)
+    return _strftime(newformat, timetuple)
 
 class date:
     def __init__(self, year, month, day):
@@ -715,6 +719,7 @@ class time:
                      0, 1, -1)
         return _wrap_strftime(self, format, timetuple)
 
+_time_class = time  # so functions w/ args named "time" can get at the class
 
 time.min = time(0)
 time.max = time(23, 59, 59, 999_999)
