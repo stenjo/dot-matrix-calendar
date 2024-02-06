@@ -1,5 +1,6 @@
 from modules.dateHandling import isNowInTimePeriod, dayText
-from modules.datetime import datetime, timezone
+from modules.DateTimeExt import DateTimeExt as datetime
+from modules.datetime import timezone, timedelta
 
 
 def test_isNowInTimePeriod():
@@ -13,7 +14,6 @@ def test_isNowInTimePeriod():
     assert isNowInTimePeriod(startTime, endTime, before) == False
     assert isNowInTimePeriod(startTime, endTime, after) == False
 
-today = datetime(2023,10,23,10,12).replace(tzinfo=timezone.utc)
 
 def test_dayText_tomorrow():
     event = {
@@ -22,6 +22,7 @@ def test_dayText_tomorrow():
         },
         'summary': 'Event summary'
     }
+    today = datetime(2023,10,23,10,12).replace(tzinfo=timezone.utc)
     
     assert dayText(event, today) == "I morgen: Event summary"
 
@@ -32,6 +33,8 @@ def test_dayText_today():
         },
         'summary': 'Event summary'
     }
+    today = datetime(2023,10,23,10,12)
+    today = today.replace(tzinfo=timezone.utc)
     
     assert dayText(event, today) == "I dag: Event summary"
     
@@ -43,6 +46,7 @@ def test_dayText_today_with_time():
         },
         'summary': 'Event summary'
     }
+    today = datetime(2023,10,23,10,12).replace(tzinfo=timezone.utc)
     
     assert dayText(event, today) == "I dag: Event summary kl. 10:22"
     
@@ -53,6 +57,7 @@ def test_dayText_friday():
         },
         'summary': 'Event summary'
     }
+    today = datetime(2023,10,23,10,12).replace(tzinfo=timezone.utc)
     
     assert dayText(event, today) == "Fredag: Event summary"
     
@@ -63,6 +68,7 @@ def test_dayText_friday_plus_one_week():
         },
         'summary': 'Event summary'
     }
+    today = datetime(2023,10,23,10,12).replace(tzinfo=timezone.utc)
     
     assert dayText(event, today) == "Fredag 03/11: Event summary"
 
@@ -74,7 +80,7 @@ def test_dayText_today_with_time_and_timezone():
         },
         'summary': 'Event summary'
     }
-    today = datetime.strptime("2023-10-23T10:12 +0100", "%Y-%m-%dT%H:%M %z")
+    today = datetime(2023,10,23,10,12,tzinfo=timezone(timedelta(hours=1)))
     # print(today)
     # dt:  2023-11-09 13:15:00+01:00
     # today:  2023-11-04 18:54:37.512734

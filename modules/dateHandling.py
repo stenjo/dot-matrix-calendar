@@ -1,4 +1,5 @@
-from datetime import datetime, timezone, timedelta
+from datetime import timezone, timedelta
+from modules.DateTimeExt import DateTimeExt as datetime
 
 def isNowInTimePeriod(startTime, endTime, nowTime): 
     if startTime < endTime: 
