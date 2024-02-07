@@ -1,6 +1,6 @@
 from modules.dateHandling import isNowInTimePeriod, dayText
-from modules.DateTimeExt import DateTimeExt as datetime
-from modules.datetime import timezone, timedelta
+from modules.DateTimeExt import datetime, timedelta
+from datetime import timezone
 
 
 def test_isNowInTimePeriod():

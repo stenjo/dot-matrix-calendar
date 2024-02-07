@@ -1,10 +1,10 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
-class DateTimeExt(datetime):
+class timedelta(timedelta):
+    pass
     
-    def __init__(self,year, month, day, hour=0, minute=0, second=0, microsecond=0, tzinfo=None, *, fold=0):
-        super().__init__(year, month, day, hour, minute, second, microsecond, tzinfo, fold=fold)
-
+class datetime(datetime):
+    
     def strftime(self, format):
         """
         Format using strftime().

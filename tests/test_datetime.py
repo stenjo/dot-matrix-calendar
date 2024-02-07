@@ -1,5 +1,5 @@
-from modules.DateTimeExt import DateTimeExt as datetime
-from datetime import timedelta, timezone
+from modules.DateTimeExt import timedelta, datetime
+from datetime import timezone
 import datetime as _datetime
 
 def test_strftime():
