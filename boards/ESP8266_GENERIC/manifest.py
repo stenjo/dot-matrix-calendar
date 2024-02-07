@@ -22,3 +22,6 @@ require("upysh")
 # micropython-lib: umqtt
 require("umqtt.simple")
 require("umqtt.robust")
+
+require("datetime")
+require("urllib.urequest")
