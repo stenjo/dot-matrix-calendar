@@ -1,4 +1,4 @@
-from DateTimeExt import timedelta, datetime
+from datetime_ext import timedelta, datetime
 from datetime import timezone
 
 

@@ -1,7 +1,16 @@
-from getopt import GetoptError
+import sys
+import unittest
+from modules.getopt import GetoptError
 
+class TestGetOpt(unittest.TestCase):
+    def test_getOpt(self):
+        e = GetoptError("test")
+        
+        assert e.msg == "test"
+        
+if __name__ == '__main__':
+    # Add the path to MicroPython in lib/micropython to sys.path
+    sys.path.insert(0, 'lib')
 
-def test_getOpt():
-    e = GetoptError("test")
-    
-    assert e.msg == "test"
+    # Run the tests
+    unittest.main()
