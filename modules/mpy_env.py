@@ -66,7 +66,7 @@ class _Env:
             file_path = cls._select_exist_file(cwd + "/env.json")
             if file_path is None:
                 if cls.verbose:
-                    print("'env.josn' is not exist at root.")
+                    print("'env.json' does not exist at root.")
                     return
             f = io.open(file_path, mode="r+", encoding="utf-8")
             env_dict = json.load(f)
