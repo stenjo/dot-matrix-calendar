@@ -1,21 +1,34 @@
 
-import unittest
-from unittest.mock import patch
 import sys
-# from datetime_ext import *
-import _datetime
+import os
+import time as mod_time
+import datetime as mod_datetime
+from datetime import MAXYEAR, MINYEAR, datetime, date, time, timedelta, timezone, tzinfo
+import unittest
 
-sys.modules['datetime'] = _datetime
 
-# def timetuple():
-#     return (2024,3,4,5,6,0)
-# Your test cases for main_module.py
+# See localtz.patch
+try:
+    datetime.fromtimestamp(0)
+    LOCALTZ = True
+except NotImplementedError:
+    LOCALTZ = False
+
+
+if hasattr(datetime, "EPOCH"):
+    EPOCH = datetime.EPOCH
+else:
+    EPOCH = datetime(*mod_time.gmtime(0)[:6], tzinfo=timezone.utc)
+
+
+def eval_mod(s):
+    return eval(s.replace("datetime.", "mod_datetime."))
+
+
 class TestDateTime(unittest.TestCase):
-    # @patch("datetime_ext.datetime")
     def test_strftime(self):
-        # with patch('datetime.datetime', _datetime.datetime):
-        from datetime_ext import datetime, timedelta, date
-        # mock_datetime.timetuple = timetuple
+        
+        assert datetime(2023, 12, 31).year == 2023
         assert datetime(2023, 12, 31).strftime("%Y-%m-%d") == "2023-12-31"
     
     
