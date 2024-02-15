@@ -1,8 +1,8 @@
 # base modules
 include("$(PORT_DIR)/boards/manifest.py")
 freeze("../../modules", "dateHandling.py")
-freeze("../../modules", "datetime_ext.py")
-# freeze("../../modules", "getopt.py")
+freeze("../../modules", "datetime.py")
+freeze("../../modules", "time.py")
 freeze("../../modules", "max7219.py")
 freeze("../../modules", "mpy_env.py")
 freeze("../../modules", "msgpack.py")
@@ -23,6 +23,5 @@ require("upysh")
 require("umqtt.simple")
 require("umqtt.robust")
 
-require("datetime")
 require("urllib.urequest")
 require("ssl")
