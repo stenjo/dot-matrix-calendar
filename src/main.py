@@ -12,6 +12,11 @@ ss = Pin(15, Pin.OUT)
 display = Scroller(spi, ss, 4)
 # wdt = WDT()
 
+# If modifying these scopes, delete the file token.json.
+SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
+
+
+
 sta_if = network.WLAN(network.STA_IF)
 display.scroll_text(sta_if.ifconfig()[0])
 
