@@ -42,11 +42,11 @@ firmware:
 
 deploy: $(FWBIN)
 	$(ECHO) "Writing $< to the board"
-	$(Q)esptool --port $(PORT) --baud $(BAUD) write_flash --verify --flash_size=$(FLASH_SIZE) --flash_mode=$(FLASH_MODE) 0 $<
+	$(Q)esptool.py --port $(PORT) --baud $(BAUD) write_flash --verify --flash_size=$(FLASH_SIZE) --flash_mode=$(FLASH_MODE) 0 $<
 
 erase:
 	$(ECHO) "Erase flash"
-	$(Q)esptool --port $(PORT) --baud $(BAUD) erase_flash
+	$(Q)esptool.py --port $(PORT) --baud $(BAUD) erase_flash
 
 reset:
 	echo -e "\r\nimport machine; machine.reset()\r\n" >$(PORT)
