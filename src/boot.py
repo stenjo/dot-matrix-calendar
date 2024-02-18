@@ -12,6 +12,10 @@ gc.collect()
 # boot.py -- run on boot-up
 import network
 import mpy_env
+
+import ntptime
+import time
+
 # from mpy_env import load_env, get_env, put_env
 
 mpy_env.load_env()
@@ -31,3 +35,14 @@ def do_connect():
     print("network config:", sta_if.ifconfig())
 
 do_connect()
+
+#if needed, overwrite default time server
+ntptime.host = "1.europe.pool.ntp.org"
+
+try:
+    print("Local time before synchronization：%s" %str(time.localtime()))
+    #make sure to have internet connection
+    ntptime.settime()
+    print("Local time after synchronization：%s" %str(time.localtime()))
+except:
+    print("Error syncing time")
