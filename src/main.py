@@ -22,7 +22,7 @@ display.brightness(1)  # adjust brightness 1 to 15
 filename = "version.txt"
 f = open(filename, "r")
 version = f.read().replace("\n", "")
-display.scroll_text("Version: " + version)
+# display.scroll_text("Version: " + version)
 
 event = {"start": {"date": "2024-02-19T06:57:22.665"}, "summary": "Event summary"}
 dt = datetime.fromisoformat(
@@ -34,9 +34,9 @@ print(dayText(event))
 
 event = {
     'start': {
-        'date': '2024-02-19'
+        'date': '2024-02-25'
     },
-    'summary': 'Event summary'
+    'summary': 'Vi jobber med låglønnsnæring'
 }
 display.scroll_text(dayText(event))
 
@@ -44,7 +44,7 @@ display.scroll_text(dayText(event))
 sleep(1)
 # wdt.feed()
 
-msg = "Under development!"
+msg = "I A i Åsane har vi både færøymål, låglønnsnæring og skjærgårdsøl"
 loop = 100
 while loop > 0:
     # wdt.feed()
