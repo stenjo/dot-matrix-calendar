@@ -7,6 +7,8 @@ from dateHandling import dayText
 from datetime import datetime
 import network
 
+import urequests as requests
+
 spi = SPI(1, baudrate=115000)
 ss = Pin(15, Pin.OUT)
 display = Scroller(spi, ss, 4)
