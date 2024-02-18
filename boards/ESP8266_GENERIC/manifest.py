@@ -23,5 +23,5 @@ require("upysh")
 require("umqtt.simple")
 require("umqtt.robust")
 
-require("urllib.urequest")
+require("urequests")
 require("ssl")
