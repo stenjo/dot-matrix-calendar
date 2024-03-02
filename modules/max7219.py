@@ -25,7 +25,7 @@ GLYPHS = {
         [0, 0, 0, 1, 0, 1, 1, 0],  # ___#_##_
         [0, 1, 1, 1, 1, 1, 1, 0],  # _######_
         [1, 1, 0, 1, 0, 0, 0, 0],  # ##_#____
-        [0, 1, 1, 1, 1, 1, 0, 0],  # _#####__
+        [0, 1, 1, 1, 1, 1, 1, 0],  # _######_
         [0, 0, 0, 0, 0, 0, 0, 0],  # ________
     ],
     "ø": [
@@ -163,19 +163,16 @@ class Matrix8x8(FrameBuffer):
         self._write(_DISPLAYTEST, int(enable))
 
 
-    def scroll_text(self, s, ms_delay=200):
-        # self._buffer = bytearray(8 * self._num)
-        # super().__init__(self._buffer, 8 * self._num, 8, MONO_HLSB)
+    def scroll_text(self, s, ms_delay=20):
         s_width = len(s) * 8
         n_pixels = self._num * 8
-
-        self.zero()
-        self.text_from_glyph(s, GLYPHS)
-        for x in range(n_pixels, -s_width, -1):
-            self.scroll(-1, 0)
-            self.show()
-            sleep_ms(ms_delay)
-        return s_width
+        while True:
+            for x in range(n_pixels, -s_width, -1):
+                self.zero()
+                self.text_from_glyph(s, GLYPHS, x)
+                self.show()
+                sleep_ms(ms_delay)        
+            return s_width
 
     def show_text(self, s):
         self.zero()
