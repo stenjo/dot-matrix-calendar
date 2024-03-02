@@ -1,6 +1,6 @@
 from machine import Pin, SPI, PWM, WDT
-from time import sleep
-from scroller import Scroller
+from time import sleep, sleep_ms
+from scroller2 import Scroller2 as Scroller
 import sys
 
 from dateHandling import dayText
@@ -52,8 +52,9 @@ sleep(1)
 # wdt.feed()
 
 msg = "I A i Åsane har vi både færøymål, låglønnsnæring og skjærgårdsøl"
-loop = 100
-while loop > 0:
-    # wdt.feed()
-    display.scroll_text(msg)
-    loop -= 1
+display.scroll_text(msg)
+
+while True:
+    display.display_text(datetime.now().strftime("%H:%M:%S"))
+    print(datetime.now().strftime("%H:%M:%S"))
+    sleep_ms(200)
