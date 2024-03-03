@@ -6,7 +6,6 @@ freeze("../../modules", "time.py")
 freeze("../../modules", "max7219.py")
 freeze("../../modules", "mpy_env.py")
 freeze("../../modules", "msgpack.py")
-freeze("../../modules", "scroller.py")
 freeze("../../modules", "uoauth2.py")
 
 
