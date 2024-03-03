@@ -37,6 +37,7 @@ jobs:
         echo "$HOME/espressif/xtensa-lx106-elf/bin" >> $GITHUB_PATH
         chmod +x $HOME/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc
         $HOME/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc -v
+        ln -s $HOME/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc xtensa-lx106-elf-gcc
         make
 
     - name: Check output
