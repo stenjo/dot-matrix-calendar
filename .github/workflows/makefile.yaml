@@ -22,7 +22,10 @@ jobs:
         tar zxvf xtensa-lx106-elf-standalone.tar.gz
         rm xtensa-lx106-elf/bin/esptool.py
         echo "$HOME/espressif/xtensa-lx106-elf/bin/" >> $GITHUB_PATH
+        cd ..
         ln -s $HOME/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc xtensa-lx106-elf-gcc
+        find . -type l -ls
+        
 
     - name: update repos
       run: |
