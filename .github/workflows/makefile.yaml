@@ -37,6 +37,8 @@ jobs:
       run: |
         ls -al espressif/xtensa-lx106-elf/bin
         ln -s ./espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc xtensa-lx106-elf-gcc
+        ./xtensa-lx106-elf-gcc -v
+        echo $GITHUB_PATH
         make
 
     - name: Check output
