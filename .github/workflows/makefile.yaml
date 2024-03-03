@@ -35,11 +35,8 @@ jobs:
         
     - name: Compile firmware
       run: |
-        ls -al
         ls -al espressif/xtensa-lx106-elf/bin
         ln -s ./espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc xtensa-lx106-elf-gcc
-        find . -type l -ls
-        ./xtensa-lx106-elf-gcc
         make
 
     - name: Check output
