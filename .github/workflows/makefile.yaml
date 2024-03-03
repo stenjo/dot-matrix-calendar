@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Exporting xtensa gcc path
       run: echo "ESP_ESPRESSIF_ROOT=/usr/lib/espressif" >> $GITHUB_ENV
@@ -25,12 +25,12 @@ jobs:
         sudo rm /usr/lib/espressif/xtensa-lx106-elf/bin/esptool.py
         pip install esptool
         
-    - name: update repos
+    - name: Update repos
       run: |
         git submodule update --init lib/micropython
         make -C lib/micropython/mpy-cross
         
-    - name: make submodules    
+    - name: Make submodules    
       working-directory: lib/micropython
       run: make -C ports/esp8266 submodules
         
