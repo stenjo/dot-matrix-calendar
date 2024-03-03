@@ -18,7 +18,7 @@ jobs:
       uses: addnab/docker-run-action@v3
       with:
         image: larsks/esp-open-sdk
-        options: -v ${{github.workspace}}:/
+        options: -v ${{github.workspace}}:/usr
         run: /
             git submodule update --init lib/micropython
             make -C lib/micropython/mpy-cross
