@@ -16,12 +16,12 @@ jobs:
 
     - name: Install tools
       run: |
-        mkdir ~/espressif
-        cd ~/espressif
+        mkdir espressif
+        cd espressif
         wget https://github.com/jepler/esp-open-sdk/releases/download/2018-06-10/xtensa-lx106-elf-standalone.tar.gz
         tar zxvf xtensa-lx106-elf-standalone.tar.gz
         rm xtensa-lx106-elf/bin/esptool.py
-        echo "~/espressif/xtensa-lx106-elf/bin/" >> $GITHUB_PATH
+        echo "$HOME/espressif/xtensa-lx106-elf/bin/" >> $GITHUB_PATH
 
     - name: update repos
       run: |
