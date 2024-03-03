@@ -25,7 +25,7 @@ jobs:
         cd ..
         ln -s $HOME/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc xtensa-lx106-elf-gcc
         find . -type l -ls
-        
+
 
     - name: update repos
       run: |
@@ -38,6 +38,7 @@ jobs:
   
     - name: Compile firmware
       run: |
+        ./xtensa-lx106-elf-gcc
         make
 
     - name: Check output
