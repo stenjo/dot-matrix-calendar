@@ -57,6 +57,6 @@ display.scroll_text(msg)
 
 while True:
     ntptime.settime()
-    display.show_text(datetime.now().strftime("%H:%M:%S"))
+    display.show_text(datetime.now().strftime("%H%M"))
     print(datetime.now().strftime("%H%M"))
     sleep_ms(200)
