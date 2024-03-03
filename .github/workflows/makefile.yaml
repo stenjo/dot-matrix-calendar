@@ -20,10 +20,10 @@ jobs:
     - name: Install tools
       run: |
         sudo mkdir /usr/lib/espressif
-        # wget https://dl.espressif.com/dl/xtensa-lx106-elf-gcc8_4_0-esp-2020r3-linux-amd64.tar.gz
         wget https://github.com/jepler/esp-open-sdk/releases/download/2018-06-10/xtensa-lx106-elf-standalone.tar.gz
         sudo tar zxvf xtensa-lx106-elf-standalone.tar.gz -C /usr/lib/espressif
         sudo rm /usr/lib/espressif/xtensa-lx106-elf/bin/esptool.py
+        pip install esptool
         
     - name: update repos
       run: |
