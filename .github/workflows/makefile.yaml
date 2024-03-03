@@ -14,16 +14,16 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Exporting xtensa gcc path
+      run: echo "ESP_ESPRESSIF_ROOT=/usr/lib/espressif" >> $GITHUB_ENV
+
     - name: Install tools
       run: |
-        mkdir $HOME/espressif
-        cd $HOME/espressif
-        wget https://dl.espressif.com/dl/xtensa-lx106-elf-gcc8_4_0-esp-2020r3-linux-amd64.tar.gz
-        # wget https://github.com/jepler/esp-open-sdk/releases/download/2018-06-10/xtensa-lx106-elf-standalone.tar.gz
-        # tar zxvf xtensa-lx106-elf-standalone.tar.gz
-        tar zxvf xtensa-lx106-elf-gcc8_4_0-esp-2020r3-linux-amd64.tar.gz
-        # rm xtensa-lx106-elf/bin/esptool.py
-        
+        sudo mkdir /usr/lib/espressif
+        # wget https://dl.espressif.com/dl/xtensa-lx106-elf-gcc8_4_0-esp-2020r3-linux-amd64.tar.gz
+        wget https://github.com/jepler/esp-open-sdk/releases/download/2018-06-10/xtensa-lx106-elf-standalone.tar.gz
+        sudo tar zxvf xtensa-lx106-elf-standalone.tar.gz -C /usr/lib/espressif
+        sudo rm /usr/lib/espressif/xtensa-lx106-elf/bin/esptool.py
         
     - name: update repos
       run: |
@@ -36,10 +36,10 @@ jobs:
         
     - name: Compile firmware
       run: |
-        echo "$HOME/espressif/xtensa-lx106-elf/bin" >> $GITHUB_PATH
-        chmod +x $HOME/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc
-        $HOME/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc -v
-        ln -s $HOME/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc xtensa-lx106-elf-gcc
+        echo ${{ env.ESP_ESPRESSIF_ROOT}}/xtensa-lx106-elf/bin" >> $GITHUB_PATH
+        # chmod +x $HOME/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc
+        xtensa-lx106-elf-gcc -v
+        # ln -s $HOME/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc xtensa-lx106-elf-gcc
         make
 
     - name: Check output
