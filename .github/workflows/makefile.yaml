@@ -21,7 +21,6 @@ jobs:
         wget https://github.com/jepler/esp-open-sdk/releases/download/2018-06-10/xtensa-lx106-elf-standalone.tar.gz
         tar zxvf xtensa-lx106-elf-standalone.tar.gz
         rm xtensa-lx106-elf/bin/esptool.py
-        echo "$HOME/espressif/xtensa-lx106-elf/bin/" >> $GITHUB_PATH
         
         
     - name: update repos
@@ -35,9 +34,9 @@ jobs:
         
     - name: Compile firmware
       run: |
-        ls -al espressif/xtensa-lx106-elf/bin
         ln -s ./espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc xtensa-lx106-elf-gcc
         ./xtensa-lx106-elf-gcc -v
+        echo "$HOME/espressif/xtensa-lx106-elf/bin/" >> $GITHUB_PATH
         echo $GITHUB_PATH
         make
 
