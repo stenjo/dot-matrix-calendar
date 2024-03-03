@@ -22,26 +22,25 @@ jobs:
         tar zxvf xtensa-lx106-elf-standalone.tar.gz
         rm xtensa-lx106-elf/bin/esptool.py
         echo "$HOME/espressif/xtensa-lx106-elf/bin/" >> $GITHUB_PATH
-        cd ..
         
         
-        - name: update repos
-        run: |
+    - name: update repos
+      run: |
         git submodule update --init lib/micropython
         make -C lib/micropython/mpy-cross
         
-        - name: make submodules    
-        working-directory: lib/micropython
-        run: make -C ports/esp8266 submodules
+    - name: make submodules    
+      working-directory: lib/micropython
+      run: make -C ports/esp8266 submodules
         
-        - name: Compile firmware
-          run: |
-            ls -al
-            ls -al espressif
-            ln -s $HOME/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc xtensa-lx106-elf-gcc
-            find . -type l -ls
-            ./xtensa-lx106-elf-gcc
-            make
+    - name: Compile firmware
+      run: |
+        ls -al
+        ls -al espressif
+        ln -s $HOME/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc xtensa-lx106-elf-gcc
+        find . -type l -ls
+        ./xtensa-lx106-elf-gcc
+        make
 
     - name: Check output
       run: ls -al build/firmware.bin
