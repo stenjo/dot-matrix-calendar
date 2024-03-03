@@ -14,16 +14,30 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Compile in docker container
-      uses: addnab/docker-run-action@v3
-      with:
-        image: larsks/esp-open-sdk
-        options: -v ${{github.workspace}}:/usr
-        run: /
-            git submodule update --init lib/micropython
-            make -C lib/micropython/mpy-cross
-            make -C ports/esp8266 submodules
-            make
+    - name: Install tools
+      run: /
+        mkdir espressif
+        cd ~/espressif
+        wget https://github.com/jepler/esp-open-sdk/releases/download/2018-06-10/xtensa-lx106-elf-standalone.tar.gz
+        tar zxvf xtensa-lx106-elf-standalone.tar.gz
+        rm xtensa-lx106-elf/bin/esptool.py
+        export "PATH=$HOME/espressif/xtensa-lx106-elf/bin/:$PATH"
+
+    - name: update repos
+      run: /
+        git submodule update --init lib/micropython
+        make -C lib/micropython/mpy-cross
+    
+    - name: make submodules    
+      working-directory: lib/micropython
+      run: make -C ports/esp8266 submodules
+  
+    - name: Compile firmware
+      run: /
+        git submodule update --init lib/micropython
+        make -C lib/micropython/mpy-cross
+        make -C ports/esp8266 submodules
+        make
 
     - name: Check output
       run: ls -al build/firmware.bin
