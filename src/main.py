@@ -1,5 +1,6 @@
 from machine import Pin, SPI, PWM, WDT
 from time import sleep, sleep_ms
+import ntptime
 from max7219 import Matrix8x8
 import sys
 
@@ -55,6 +56,7 @@ msg = "I A i Åsane har vi både færøymål, låglønnsnæring og skjærgårds�
 display.scroll_text(msg)
 
 while True:
-    display.display_text(datetime.now().strftime("%H:%M:%S"))
-    print(datetime.now().strftime("%H:%M:%S"))
+    ntptime.settime()
+    display.show_text(datetime.now().strftime("%H:%M:%S"))
+    print(datetime.now().strftime("%H%M"))
     sleep_ms(200)
