@@ -39,11 +39,11 @@ jobs:
         echo "${{ env.ESP_ESPRESSIF_ROOT}}/xtensa-lx106-elf/bin" >> $GITHUB_PATH
         # chmod +x $HOME/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc
         /usr/lib/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc -v
-        echo $GITHUB_PATH
-        ln -s /usr/lib/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc xtensa-lx106-elf-gcc
-        xtensa-lx106-elf-gcc -v
+        # echo $GITHUB_PATH
+        # ln -s /usr/lib/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc xtensa-lx106-elf-gcc
+        # xtensa-lx106-elf-gcc -v
         # ln -s $HOME/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc xtensa-lx106-elf-gcc
-        make
+        make CROSS_COMPILE=/usr/lib/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-
 
     - name: Check output
       run: ls -al build/firmware.bin
