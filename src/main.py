@@ -1,6 +1,6 @@
 from machine import Pin, SPI, PWM, WDT
 from time import sleep, sleep_ms
-from scroller2 import Scroller2 as Scroller
+from max7219 import Matrix8x8
 import sys
 
 from dateHandling import dayText
@@ -11,7 +11,7 @@ import urequests as requests
 
 spi = SPI(1, baudrate=115000)
 ss = Pin(15, Pin.OUT)
-display = Scroller(spi, ss, 4)
+display = Matrix8x8(spi, ss, 4)
 # wdt = WDT()
 
 # If modifying these scopes, delete the file token.json.
