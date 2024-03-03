@@ -35,7 +35,7 @@ jobs:
     - name: Compile firmware
       run: |
         echo "$HOME/espressif/xtensa-lx106-elf/bin/" >> $GITHUB_PATH
-        chmod +c $HOME/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc
+        chmod +x $HOME/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc
         xtensa-lx106-elf-gcc -v
         make
 
