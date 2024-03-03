@@ -1,6 +1,6 @@
 from machine import Pin, SPI, PWM, WDT
-from time import sleep, sleep_ms
 import ntptime
+from time import sleep, sleep_ms, localtime
 from max7219 import Matrix8x8
 import sys
 
@@ -44,7 +44,7 @@ event = {
     'start': {
         'date': '2024-02-25'
     },
-    'summary': 'Vi jobber med låglønnsnæring'
+    'summary': 'Låglønnsnæring'
 }
 display.scroll_text(dayText(event))
 
@@ -52,11 +52,14 @@ display.scroll_text(dayText(event))
 sleep(1)
 # wdt.feed()
 
-msg = "I A i Åsane har vi både færøymål, låglønnsnæring og skjærgårdsøl"
+msg = "abc 123 ÆØÅ æøå"
 display.scroll_text(msg)
 
+ntptime.host = "1.europe.pool.ntp.org"
+
 while True:
-    ntptime.settime()
-    display.show_text(datetime.now().strftime("%H%M"))
+    print("Local time after synchronization：%s" %str(localtime()))
+    # ntptime.settime()
+    display.show_text(datetime(localtime).strftime("%H%M"))
     print(datetime.now().strftime("%H%M"))
-    sleep_ms(200)
+    sleep_ms(2000)
