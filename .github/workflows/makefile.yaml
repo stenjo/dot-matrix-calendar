@@ -15,8 +15,8 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Install tools
-      run: /
-        mkdir espressif
+      run: |
+        mkdir ~/espressif
         cd ~/espressif
         wget https://github.com/jepler/esp-open-sdk/releases/download/2018-06-10/xtensa-lx106-elf-standalone.tar.gz
         tar zxvf xtensa-lx106-elf-standalone.tar.gz
@@ -24,7 +24,7 @@ jobs:
         export "PATH=$HOME/espressif/xtensa-lx106-elf/bin/:$PATH"
 
     - name: update repos
-      run: /
+      run: |
         git submodule update --init lib/micropython
         make -C lib/micropython/mpy-cross
     
@@ -33,7 +33,7 @@ jobs:
       run: make -C ports/esp8266 submodules
   
     - name: Compile firmware
-      run: /
+      run: |
         git submodule update --init lib/micropython
         make -C lib/micropython/mpy-cross
         make -C ports/esp8266 submodules
