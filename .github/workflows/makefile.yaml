@@ -1,0 +1,50 @@
+name: Makefile CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Exporting xtensa gcc path
+      run: echo "ESP_ESPRESSIF_ROOT=/usr/lib/espressif" >> $GITHUB_ENV
+
+    - name: Install tools
+      run: |
+        sudo mkdir /usr/lib/espressif
+        wget https://github.com/jepler/esp-open-sdk/releases/download/2018-06-10/xtensa-lx106-elf-standalone.tar.gz
+        sudo tar zxvf xtensa-lx106-elf-standalone.tar.gz -C /usr/lib/espressif
+        sudo rm /usr/lib/espressif/xtensa-lx106-elf/bin/esptool.py
+        pip install esptool
+        
+    - name: Update repos
+      run: |
+        git submodule update --init lib/micropython
+        make -C lib/micropython/mpy-cross
+        
+    - name: Make submodules    
+      working-directory: lib/micropython
+      run: make -C ports/esp8266 submodules
+        
+    - name: Compile firmware
+      run: |
+        echo "${{ env.ESP_ESPRESSIF_ROOT}}/xtensa-lx106-elf/bin" >> $GITHUB_PATH
+        /usr/lib/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc -v
+        make CROSS_COMPILE=/usr/lib/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-
+
+    - name: Check output
+      run: ls -al build/firmware.bin
+
+    - name: Save binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: esp8266-binary
+        path: build/firmware.bin
