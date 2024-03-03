@@ -40,7 +40,7 @@ jobs:
         # chmod +x $HOME/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc
         /usr/lib/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc -v
         echo $GITHUB_PATH
-        ls -s /usr/lib/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc xtensa-lx106-elf-gcc
+        ln -s /usr/lib/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc xtensa-lx106-elf-gcc
         xtensa-lx106-elf-gcc -v
         # ln -s $HOME/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc xtensa-lx106-elf-gcc
         make
