@@ -33,4 +33,4 @@ jobs:
           git config --global user.email 'github-actions@github.com'
           git add src/version.txt
           git commit -m "chore: update version.txt to $VERSION"
-          git -c http.extraheader="AUTHORIZATION: bearer ${{ secrets.RELEASE_PLEASE }}" push origin main
+          git -c http.extraheader="AUTHORIZATION: bearer ${{ secrets.PERSONAL_ACCESS_TOKEN }}" push origin main
