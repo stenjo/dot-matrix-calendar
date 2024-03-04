@@ -13,6 +13,12 @@ jobs:
           token: ${{secrets.RELEASE_PLEASE}}
 
       # Additional step that updates version.txt in the src/ subfolder
+      - name: Checkout repo
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Update version.txt
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
