@@ -11,3 +11,20 @@ jobs:
         with:
           release-type: simple
           token: ${{secrets.RELEASE_PLEASE}}
+
+      # Additional step that updates version.txt in the src/ subfolder
+      - name: Update version.txt
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          # Extract the version number from the latest git tag
+          VERSION=$(git describe --tags $(git rev-list --tags --max-count=1))
+          
+          # Update version.txt with the new version in the src/ subfolder
+          echo $VERSION > src/version.txt
+          
+          # Optionally commit and push version.txt to the repo
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add src/version.txt
+          git commit -m "chore: update version.txt to $VERSION"
+          git push
