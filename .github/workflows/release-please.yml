@@ -18,6 +18,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       - name: Update version.txt
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -29,8 +30,9 @@ jobs:
           echo $VERSION > src/version.txt
           
           # Optionally commit and push version.txt to the repo
+          git config --global credential.helper '!f() { sleep 1; echo "username=git token=${{ secrets.PERSONAL_ACCESS_TOKEN }}"; }; f'
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
           git add src/version.txt
           git commit -m "chore: update version.txt to $VERSION"
-          git -c http.extraheader="AUTHORIZATION: bearer ${{ secrets.PERSONAL_ACCESS_TOKEN }}" push origin main
+          git push
