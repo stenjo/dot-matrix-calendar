@@ -25,4 +25,4 @@ require("umqtt.robust")
 
 require("urequests")
 require("ssl")
-require("uICAL")
+require("ics")
