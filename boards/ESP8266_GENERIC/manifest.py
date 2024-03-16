@@ -7,7 +7,7 @@ freeze("../../modules", "max7219.py")
 freeze("../../modules", "mpy_env.py")
 freeze("../../modules", "msgpack.py")
 freeze("../../modules", "uoauth2.py")
-package("ics", base_path="../../modules")
+package("ics", base_path="../../modules/ics")
 
 
 # asyncio
