@@ -28,16 +28,23 @@ jobs:
     - name: Update repos
       run: |
         git submodule update --init lib/micropython
+        git submodule update --init lib/usermod/uICAL
         make -C lib/micropython/mpy-cross
         
     - name: Make submodules    
       working-directory: lib/micropython
       run: make -C ports/esp8266 submodules
-        
-    - name: Compile firmware
+
+    - name: Make user modules
+      working-directory: lib/micropython/ports/esp8266
       run: |
         echo "${{ env.ESP_ESPRESSIF_ROOT}}/xtensa-lx106-elf/bin" >> $GITHUB_PATH
         /usr/lib/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc -v
+        make USER_C_MODULES=../../../usermod/ all
+        make USER_C_MODULES=../../../usermod CFLAGS_EXTRA=-DMODULE_UICAL_ENABLED=1 all
+        
+    - name: Compile firmware
+      run: |
         make CROSS_COMPILE=/usr/lib/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-
 
     - name: Check output
