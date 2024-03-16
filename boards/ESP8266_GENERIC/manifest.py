@@ -9,6 +9,7 @@ freeze("../../modules", "msgpack.py")
 freeze("../../modules", "uoauth2.py")
 add_library("ics", "../../modules/ics")
 
+package("ics", base_path="../../modules")
 
 # asyncio
 include("$(MPY_DIR)/extmod/asyncio")
