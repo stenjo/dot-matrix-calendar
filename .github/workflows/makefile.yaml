@@ -40,8 +40,8 @@ jobs:
       run: |
         echo "${{ env.ESP_ESPRESSIF_ROOT}}/xtensa-lx106-elf/bin" >> $GITHUB_PATH
         /usr/lib/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc -v
-        make USER_C_MODULES=../../../usermod/ all
-        make USER_C_MODULES=../../../usermod CFLAGS_EXTRA=-DMODULE_UICAL_ENABLED=1 all
+        make CROSS_COMPILE=/usr/lib/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf- USER_C_MODULES=../../../usermod/ all
+        make CROSS_COMPILE=/usr/lib/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf- USER_C_MODULES=../../../usermod CFLAGS_EXTRA=-DMODULE_UICAL_ENABLED=1 all
         
     - name: Compile firmware
       run: |
