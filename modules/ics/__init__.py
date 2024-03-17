@@ -68,7 +68,13 @@ def dump_converters():
 
 
 __all__ = [
-    *all_alarms,
+    "BaseAlarm",
+    "AudioAlarm",
+    "CustomAlarm",
+    "DisplayAlarm",
+    "EmailAlarm",
+    "NoneAlarm",
+    "get_type_from_action",
     "Attendee",
     "Calendar",
     "Component",

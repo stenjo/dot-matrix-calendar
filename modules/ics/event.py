@@ -202,7 +202,9 @@ class CalendarEntryAttrs(Component):
             https://github.com/ics-py/ics-py/blob/main/doc/event-cmp.rst#ordering
             https://icspy.readthedocs.io/en/main/event-cmp.html
         """
-        return (*self.timespan.cmp_tuple(), self.summary or "")
+        begin, end =self.timespan.cmp_tuple()
+        return (begin, end, self.summary or "")
+        # return (*self.timespan.cmp_tuple(), self.summary or "")
 
     def __lt__(self, other: Any) -> bool:
         """self < other"""

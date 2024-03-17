@@ -1,12 +1,7 @@
-import functools
 import re
 import sys
-from collections import UserString
 from contextlib import contextmanager
 from textwrap import TextWrapper
-from typing import List, MutableSequence, Tuple, Union
-
-import attr
 
 from ics.types import (
     ContainerItem,
@@ -19,7 +14,7 @@ from ics.utils import limit_str_length, validate_truthy
 DEFAULT_LINE_WRAP = TextWrapper(
     width=75,
     initial_indent="",
-    subsequent_indent=" ",
+    subsequent_indent="",
     break_long_words=True,
     break_on_hyphens=True,
     expand_tabs=False,
@@ -27,7 +22,6 @@ DEFAULT_LINE_WRAP = TextWrapper(
     fix_sentence_endings=False,
     drop_whitespace=False,
 )
-
 
 @contextmanager
 def contentline_set_wrap(width):
@@ -42,13 +36,14 @@ def contentline_set_wrap(width):
         DEFAULT_LINE_WRAP.width = oldwidth
 
 
-@attr.s(slots=True, frozen=True, auto_exc=True)  # type: ignore[misc]
 class ParseError(Exception):
-    msg: str = attr.ib()
-    line_nr: int = attr.ib(default=-1)
-    col: Union[int, Tuple[int, int]] = attr.ib(default=-1)
-    line: str = attr.ib(default=None)
-    state: str = attr.ib(default=None)
+    def __init__(self, msg, line_nr=-1, col=-1, line=None, state=None):
+        super().__init__(msg)
+        self.msg = msg
+        self.line_nr = line_nr
+        self.col = col
+        self.line = line
+        self.state = state
 
     def __str__(self):
         strs = ["Line"]
@@ -71,26 +66,27 @@ class ParseError(Exception):
         return "".join(strs)
 
 
-class QuotedParamValue(UserString):
+class QuotedParamValue():
     @classmethod
-    def maybe_unquote(cls, txt: str) -> Union["QuotedParamValue", str]:
+    def maybe_unquote(cls, txt):
         if not txt:
             return txt
         if txt[0] == Patterns.DQUOTE:
             assert len(txt) >= 2
             assert txt[-1] == Patterns.DQUOTE
-            return cls(txt[1:-1])
+            return txt[1:-1]  # Unquoted
         else:
             return txt
 
 
-def escape_param(string: Union[str, QuotedParamValue]) -> str:
-    return str(string).translate(
-        {ord('"'): "^'", ord("^"): "^^", ord("\n"): "^n", ord("\r"): ""}
-    )
+def escape_param(string):
+    if isinstance(string, str):
+        return string.translate({ord('"'): "^'", ord("^"): "^^", ord("\n"): "^n", ord("\r"): ""})
+    else:
+        raise TypeError("Expected str instance, got {0}".format(type(string).__name__))
 
 
-def unescape_param(string: str) -> str:
+def unescape_param(string):
     def repl(match):
         g = match.group(1)
         if g == "n":
@@ -101,18 +97,18 @@ def unescape_param(string: str) -> str:
             return '"'
         elif len(g) == 0:
             raise ParseError(
-                f"parameter value '{string}' may not end with an escape sequence"
+                "parameter value '%s' may not end with an escape sequence" % string
             )
         else:
             raise ParseError(
-                f"invalid escape sequence ^{g} in parameter value '{string}'"
+                "invalid escape sequence ^%s in parameter value '%s'" % (g, string)
             )
 
     return re.sub(r"\^(.?)", repl, string)
 
 
 class Patterns:
-    CONTROL = "\x00-\x08\x0A-\x1F\x7F"  # All the controls except HTAB
+    CONTROL = "\x00-\x08\x0A-\x1F\x7F"
     DQUOTE = '"'
     LINEBREAK = "\r?\n|\r"
     LINEFOLD = "(" + LINEBREAK + ")[ \t]"
@@ -120,7 +116,6 @@ class Patterns:
     SAFE_CHARS = "[^" + CONTROL + DQUOTE + ",:;]*"
     VALUE_CHARS = "[^" + CONTROL + "]*"
     IDENTIFIER = "[a-zA-Z0-9-]+"
-
     PVAL = "(?P<pval>" + DQUOTE + QSAFE_CHARS + DQUOTE + "|" + SAFE_CHARS + ")"
     PVALS = PVAL + "(," + PVAL + ")*"
     PARAM = "(?P<pname>" + IDENTIFIER + ")=(?P<pvals>" + PVALS + ")"
@@ -129,24 +124,12 @@ class Patterns:
     )
 
 
-@attr.s(slots=True)
 class ContentLine(RuntimeAttrValidation):
-    """
-    Represents one property line.
-
-    For example:
-
-    ``FOO;BAR=1:YOLO`` is represented by
-
-    ``ContentLine('FOO', {'BAR': ['1']}, 'YOLO'))``
-    """
-
-    name: str = attr.ib(converter=str.upper)  # type: ignore[misc]
-    params: ExtraParams = attr.ib(factory=lambda: ExtraParams(dict()))
-    value: str = attr.ib(default="")
-
-    # TODO store value type for jCal
-    line_nr: int = attr.ib(default=-1, eq=False)
+    def __init__(self, name, params=None, value="", line_nr=-1):
+        self.name = str(name).upper()
+        self.params = params or {}
+        self.value = value
+        self.line_nr = line_nr
 
     def serialize(self, newline=False, wrap=DEFAULT_LINE_WRAP):
         if wrap is None:
@@ -178,11 +161,6 @@ class ContentLine(RuntimeAttrValidation):
                 if nr > 0:
                     yield ","
                 if isinstance(pval, QuotedParamValue) or re.search("[:;,]", pval):
-                    # Property parameter values that contain the COLON, SEMICOLON, or COMMA character separators
-                    # MUST be specified as quoted-string text values.
-                    # TODO The DQUOTE character is used as a delimiter for parameter values that contain
-                    #  restricted characters or URI text.
-                    # TODO Property parameter values that are not in quoted-strings are case-insensitive.
                     yield f'"{escape_param(pval)}"'
                 else:
                     yield escape_param(pval)
@@ -191,129 +169,37 @@ class ContentLine(RuntimeAttrValidation):
         if newline:
             yield "\r\n"
 
-    def __getitem__(self, item):
-        return self.params[item]
 
-    def __setitem__(self, item, values):
-        self.params[item] = list(values)
+class Container():
+    def __init__(self, name, data=None):
+        self.name = str(name).upper()
+        self.data = data or []
+        self.check_items(self.data)
 
-    def clone(self):
-        """Makes a copy of itself"""
-        return attr.evolve(self, params=copy_extra_params(self.params))
+    def _check_item(self, item):
+        # Custom implementation of validation that doesn't rely on 'attr' or 'functools'
+        pass
 
-    def __str__(self):
-        return f"{self.name}{self.params or ''}='{limit_str_length(self.value)}'"
+    def check_items(self, *items):
+        for item in items:
+            self._check_item(item)
 
+    def __getitem__(self, index):
+        return self.data[index]
 
-def _wrap_list_func(list_func):
-    @functools.wraps(list_func)
-    def wrapper(self, *args, **kwargs):
-        return list_func(self.data, *args, **kwargs)
+    def __setitem__(self, index, value):
+        self._check_item(value)
+        self.data[index] = value
 
-    return wrapper
+    def __delitem__(self, index):
+        del self.data[index]
 
-
-@attr.s(slots=True, repr=False)
-class Container(MutableSequence[ContainerItem]):
-    """Represents an iCalendar object.
-    Contains a list of ContentLines or Containers.
-
-    Args:
-
-        name: the name of the object (VCALENDAR, VEVENT etc.)
-        items: Containers or ContentLines
-    """
-
-    name: str = attr.ib(converter=str.upper, validator=validate_truthy)  # type:ignore
-    data: List[ContainerItem] = attr.ib(
-        converter=list,
-        default=[],
-        validator=lambda inst, attr, value: inst.check_items(*value),
-    )
-
-    def __str__(self):
-        return f"{self.name}[{', '.join(str(cl) for cl in self.data)}]"
-
-    def __repr__(self):
-        return f"{type(self).__name__}({self.name!r}, {repr(self.data)})"
-
-    @property
-    def line_nr(self):
-        if self.data:
-            return self.data[0].line_nr
-        return -1
-
-    def serialize(self, newline=False, wrap=DEFAULT_LINE_WRAP):
-        return "".join(self.serialize_iter(newline, wrap))
-
-    def serialize_iter(self, newline=False, wrap=DEFAULT_LINE_WRAP):
-        yield "BEGIN:"
-        yield self.name
-        yield "\r\n"
-        for line in self:
-            yield from line.serialize_iter(newline=True, wrap=wrap)
-        yield "END:"
-        yield self.name
-        if newline:
-            yield "\r\n"
-
-    def clone(self, items=None, deep=False):
-        """Makes a copy of itself"""
-        if items is None:
-            items = self.data
-        if deep:
-            items = (item.clone() for item in items)
-        return attr.evolve(self, data=items)
-
-    @staticmethod
-    def check_items(*items):
-        from ics.utils import check_is_instance
-
-        if len(items) == 1:
-            check_is_instance("item", items[0], (ContentLine, Container))
-        else:
-            for nr, item in enumerate(items):
-                check_is_instance(f"item {nr}", item, (ContentLine, Container))
+    def __len__(self):
+        return len(self.data)
 
     def insert(self, index, value):
-        self.check_items(value)
+        self._check_item(value)
         self.data.insert(index, value)
 
-    def append(self, value):
-        self.check_items(value)
-        self.data.append(value)
 
-    def extend(self, values):
-        self.data.extend(values)
-        attr.validate(self)
-
-    def __getitem__(self, i):
-        if isinstance(i, str):
-            return tuple(cl for cl in self.data if cl.name == i)
-        elif isinstance(i, slice):
-            return attr.evolve(self, data=self.data[i])
-        else:
-            return self.data[i]
-
-    def __delitem__(self, i):
-        if isinstance(i, str):
-            self.data = [cl for cl in self.data if cl.name != i]
-        else:
-            del self.data[i]
-
-    def __setitem__(
-        self, index, value
-    ):  # index might be slice and value might be iterable
-        self.data.__setitem__(index, value)
-        attr.validate(self)
-
-    __contains__ = _wrap_list_func(list.__contains__)
-    __iter__ = _wrap_list_func(list.__iter__)
-    __len__ = _wrap_list_func(list.__len__)
-    __reversed__ = _wrap_list_func(list.__reversed__)
-    clear = _wrap_list_func(list.clear)
-    count = _wrap_list_func(list.count)
-    index = _wrap_list_func(list.index)
-    pop = _wrap_list_func(list.pop)
-    remove = _wrap_list_func(list.remove)
-    reverse = _wrap_list_func(list.reverse)
+# You may need to manually implement other MutableSequence abstract methods.

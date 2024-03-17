@@ -1,79 +1,38 @@
-from typing import ClassVar, Dict, List, Optional, Type, TypeVar, Union
+# from typing import Dict, List, TypeVar, Union
 
-import attr
-from attr.validators import instance_of
 
 from ics.contentline import Container
-from ics.types import ContextDict, ExtraParams, RuntimeAttrValidation
 
-ComponentType = TypeVar("ComponentType", bound="Component")
-ComponentExtraParams = Dict[str, Union[ExtraParams, List[ExtraParams]]]
+# ComponentType = TypeVar("ComponentType", bound="Component")
+# ComponentExtraParams = Dict[str, Union[ExtraParams, List[ExtraParams]]]
 
 
-@attr.s
-class Component(RuntimeAttrValidation):
-    NAME: ClassVar[str] = "ABSTRACT-COMPONENT"
-    SUBTYPES: ClassVar[List[Type["Component"]]] = []
+class Component:
+    NAME = "ABSTRACT-COMPONENT"
+    SUBTYPES = []
 
-    extra: Container = attr.ib(
-        init=False, validator=instance_of(Container), metadata={"ics_ignore": True}
-    )
-    extra_params: ComponentExtraParams = attr.ib(
-        init=False,
-        factory=dict,
-        validator=instance_of(dict),
-        metadata={"ics_ignore": True},
-    )
-
-    def __attrs_post_init__(self):
-        super().__attrs_post_init__()
-        object.__setattr__(self, "extra", Container(self.NAME))
-
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-        Component.SUBTYPES.append(cls)
+    def __init__(self):
+        self_EXTRA_ATTR_NAME = 'extra' # Rename this if necessary to avoid conflicts
+        self.EXTRA_PARAMS_ATTR_NAME = 'extra_params' # Rename this if necessary to avoid conflicts
+        self.__dict__[self_EXTRA_ATTR_NAME] = Container(self.NAME)
+        self.__dict__[self.EXTRA_PARAMS_ATTR_NAME] = {}
+        Component.SUBTYPES.append(self.__class__)
 
     @classmethod
-    def from_container(
-        cls: Type[ComponentType],
-        container: Container,
-        context: Optional[ContextDict] = None,
-    ) -> ComponentType:
-        from ics import initialize_converters
+    def from_container(cls, container, context=None):
+        raise NotImplementedError("from_container must be implemented by subclasses")
 
-        initialize_converters()
-        from ics.converter.component import ComponentMeta
+    def populate(self, container, context=None):
+        raise NotImplementedError("populate must be implemented by subclasses")
 
-        return ComponentMeta.BY_TYPE[cls].load_instance(container, context)
+    def to_container(self, context=None):
+        raise NotImplementedError("to_container must be implemented by subclasses")
 
-    def populate(self, container: Container, context: Optional[ContextDict] = None):
-        from ics import initialize_converters
+    def serialize(self, context=None):
+        container = self.to_container(context)
+        return container.serialize() if hasattr(container, 'serialize') else str(container)
 
-        initialize_converters()
-        from ics.converter.component import ComponentMeta
-
-        ComponentMeta.BY_TYPE[type(self)].populate_instance(self, container, context)
-
-    def to_container(self, context: Optional[ContextDict] = None) -> Container:
-        from ics import initialize_converters
-
-        initialize_converters()
-        from ics.converter.component import ComponentMeta
-
-        return ComponentMeta.BY_TYPE[type(self)].serialize_toplevel(self, context)
-
-    def serialize(self, context: Optional[ContextDict] = None) -> str:
-        """Creates a serialized string fit for file write."""
-
-        return self.to_container(context).serialize()
-
-    def strip_extras(
-        self,
-        all_extras=False,
-        extra_properties=None,
-        extra_params=None,
-        property_merging=None,
-    ):
+    def strip_extras(self, all_extras=False, extra_properties=None, extra_params=None, property_merging=None):
         if extra_properties is None:
             extra_properties = all_extras
         if extra_params is None:
@@ -83,17 +42,17 @@ class Component(RuntimeAttrValidation):
         if not any([extra_properties, extra_params, property_merging]):
             raise ValueError("need to strip at least one thing")
         if extra_properties:
-            self.extra.clear()
+            self.__dict__[self_EXTRA_ATTR_NAME].clear()
         if extra_params:
-            self.extra_params.clear()
+            self.__dict__[self.EXTRA_PARAMS_ATTR_NAME].clear()
         elif property_merging:
-            for val in self.extra_params.values():
+            for val in self.__dict__[self.EXTRA_PARAMS_ATTR_NAME].values():
                 if not isinstance(val, list):
                     continue
                 for v in val:
                     v.pop("__merge_next", None)
 
     def clone(self):
-        """Returns an exact (shallow) copy of self"""
-        # TODO deep copies?
-        return attr.evolve(self)
+        from copy import deepcopy
+        # Depending on what deep copy does in MicroPython, this may have unintended side effects
+        return deepcopy(self)

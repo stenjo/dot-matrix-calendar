@@ -129,41 +129,39 @@ class DatetimeConverterMixin:
             return dt
 
 
-class DatetimeConverterClass(DatetimeConverterMixin, ValueConverter[datetime]):
-    FORMATS = {
-        **DatetimeConverterMixin.FORMATS,
-        11: "%Y%m%dT%H",
-        13: "%Y%m%dT%H%M",
-        15: "%Y%m%dT%H%M%S",
-    }
+class DatetimeConverterClass(DatetimeConverterMixin):
+    # Manually merge the FORMAT dictionaries without using dictionary unpacking
+    FORMATS = DatetimeConverterMixin.FORMATS.copy()
+    FORMATS.append("%Y%m%dT%H")
+    FORMATS.append("%Y%m%dT%H%M")
+    FORMATS.append("%Y%m%dT%H%M%S")
 
+    # Removed the type hints from the properties
     @property
-    def ics_type(self) -> str:
+    def ics_type(self):
         return "DATE-TIME"
 
     @property
-    def python_type(self) -> Type[datetime]:
-        return datetime
+    def python_type(self):
+        return datetime  # Assume `datetime` has been imported from the `datetime` module
 
-    def serialize(
-        self,
-        value: datetime,
-        params: ExtraParams = EmptyParams,
-        context: ContextDict = EmptyContext,
-    ) -> str:
+    # Removed the type hints from method definitions and set default arguments to None
+    def serialize(self, value, params=None, context=None):
+        if params is None:
+            params = EmptyParams  # Assuming EmptyParams is properly defined
+        if context is None:
+            context = EmptyContext  # Assuming EmptyContext is properly defined
         return self._serialize_dt(value, params, context)
 
-    def parse(
-        self,
-        value: str,
-        params: ExtraParams = EmptyParams,
-        context: ContextDict = EmptyContext,
-    ) -> datetime:
+    def parse(self, value, params=None, context=None):
+        if params is None:
+            params = EmptyParams
+        if context is None:
+            context = EmptyContext
         return self._parse_dt(value, params, context)
 
-
+# Instantiate the converter class
 DatetimeConverter = DatetimeConverterClass()
-
 
 class DateConverterClass(DatetimeConverterMixin, ValueConverter[date]):
     @property

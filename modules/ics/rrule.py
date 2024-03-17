@@ -15,17 +15,17 @@ __all__ = [
 ]
 
 
-def rrule_to_dict(self: dateutil.rrule.rrule):
-    return {
-        "interval": self._interval,  # type: ignore[attr-defined]
-        "count": self._count,  # type: ignore[attr-defined]
-        "dtstart": self._dtstart,  # type: ignore[attr-defined]
-        "freq": self._freq,  # type: ignore[attr-defined]
-        "until": self._until,  # type: ignore[attr-defined]
-        "wkst": self._wkst,  # type: ignore[attr-defined]
-        **self._original_rule,  # type: ignore[attr-defined]
+def rrule_to_dict(rrule):
+    result = {
+        "interval": rrule._interval,
+        "count": rrule._count,
+        "dtstart": rrule._dtstart,
+        "freq": rrule._freq,
+        "until": rrule._until,
+        "wkst": rrule._wkst,
     }
-
+    result.update(rrule._original_rule)
+    return result
 
 def rrule_to_ContentLine(self: dateutil.rrule.rrule):
     val = str(self).splitlines()
@@ -45,8 +45,11 @@ def rrule_hash(self: dateutil.rrule.rrule):
     return hash(tuple(rrule_to_dict(self).items()))
 
 
-def rrule_repr(self: dateutil.rrule.rrule):
-    return f"rrule({', '.join(f'{k}={v!r}' for k, v in rrule_to_dict(self).items())})"
+def rrule_repr(rrule):
+    components = []
+    for k, v in rrule_to_dict(rrule).items():
+        components.append("{}={!r}".format(k, v))
+    return "rrule({})".format(", ".join(components))
 
 
 def rruleset_eq(self: dateutil.rrule.rruleset, other: dateutil.rrule.rruleset):
