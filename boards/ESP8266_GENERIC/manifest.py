@@ -6,10 +6,11 @@ freeze("../../modules", "time.py")
 freeze("../../modules", "max7219.py")
 freeze("../../modules", "mpy_env.py")
 freeze("../../modules", "msgpack.py")
-freeze("../../modules", "uoauth2.py")
+freeze("../../modules", "uuid.py")
 
 require("contextlib")
-require("textwrap")
+require("warnings")
+# require("collections")
 
 # asyncio
 include("$(MPY_DIR)/extmod/asyncio")

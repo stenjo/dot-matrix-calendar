@@ -1,25 +1,19 @@
-from typing import Dict, NamedTuple, Tuple, Union, overload
 
 
-class Geo(NamedTuple):
-    latitude: float
-    longitude: float
-
-
-@overload
-def make_geo(value: None) -> None:
-    ...
-
-
-@overload
-def make_geo(value: Union[Dict[str, float], Tuple[float, float]]) -> "Geo":
-    ...
-
+class Geo():
+    latitude = None
+    longitude = None
+    
+    def __init__(self, latitude, longitude):
+        self.latitude = latitude
+        self.longitude = longitude
 
 def make_geo(value):
-    if isinstance(value, dict):
-        return Geo(**value)
-    elif isinstance(value, tuple):
-        return Geo(*value)
-    else:
+    if value is None:
         return None
+    elif isinstance(value, dict):
+        return Geo(latitude=value.get('latitude'), longitude=value.get('longitude'))
+    elif isinstance(value, tuple):
+        return Geo(latitude=value[0], longitude=value[1])
+    else:
+        raise ValueError("Invalid type for geo value")

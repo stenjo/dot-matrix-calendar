@@ -1,22 +1,38 @@
-from typing import Any, Dict, Generic, Iterable, List, TypeVar
+class ValueConverter:  # Simplified ValueConverter base class
+    @staticmethod
+    def serialize(value):
+        return str(value)
 
-import attr
-
-from ics.utils import check_is_instance
-from ics.valuetype.base import ValueConverter
-from ics.valuetype.generic import BooleanConverter, URIConverter
-from ics.valuetype.text import RawTextConverter
-
-T = TypeVar("T")
+    @staticmethod
+    def parse(value):
+        return value
 
 
-@attr.s(frozen=True)
-class PersonProperty(Generic[T]):
-    name: str = attr.ib()
-    converter: ValueConverter[T] = attr.ib(default=RawTextConverter)
-    default: Any = attr.ib(default=None)
+class RawTextConverter(ValueConverter):
+    pass
 
-    def __get__(self, instance: "Person", owner) -> T:
+
+class BooleanConverter(ValueConverter):
+    @staticmethod
+    def parse(value):
+        return value.lower() in ['true', 't', 'yes', 'y', '1']
+
+    @staticmethod
+    def serialize(value):
+        return 'TRUE' if value else 'FALSE'
+
+
+class URIConverter(ValueConverter):
+    pass
+
+
+class PersonProperty:
+    def __init__(self, name, converter=RawTextConverter, default=None):
+        self.name = name
+        self.converter = converter
+        self.default = default
+
+    def __get__(self, instance, owner):
         if self.name not in instance.extra:
             return self.default
         value = instance.extra[self.name]
@@ -25,90 +41,61 @@ class PersonProperty(Generic[T]):
         elif len(value) == 1:
             return self.converter.parse(value[0])
         else:
-            raise ValueError(
-                f"Expected at most one value for property {self.name!r}, got {value!r}!"
-            )
+            raise ValueError("Expected at most one value for property {}, got {!r}!".format(self.name, value))
 
-    def __set__(self, instance: "Person", value: T):
+    def __set__(self, instance, value):
         instance.extra[self.name] = [self.converter.serialize(value)]
 
-    def __delete__(self, instance: "Person"):
+    def __delete__(self, instance):
         instance.extra.pop(self.name, None)
 
 
-@attr.s(frozen=True)
-class PersonMultiProperty(Generic[T]):
-    name: str = attr.ib()
-    converter: ValueConverter[T] = attr.ib(default=RawTextConverter)
-    default: Any = attr.ib(default=None)
+class PersonMultiProperty:
+    def __init__(self, name, converter=RawTextConverter, default=None):
+        self.name = name
+        self.converter = converter
+        self.default = default
 
-    def __get__(self, instance: "Person", owner) -> List[T]:
+    def __get__(self, instance, owner):
         if self.name not in instance.extra:
             return self.default
         return [self.converter.parse(v) for v in instance.extra[self.name]]
 
-    def __set__(self, instance: "Person", value: Iterable[T]):
+    def __set__(self, instance, value):
         instance.extra[self.name] = [self.converter.serialize(v) for v in value]
 
-    def __delete__(self, instance: "Person"):
+    def __delete__(self, instance):
         instance.extra.pop(self.name, None)
 
 
-@attr.s
-class PersonAttrs:
-    email: str = attr.ib()
-    extra: Dict[str, List[str]] = attr.ib(factory=dict)
-
-
-class Person(PersonAttrs):
-    """Abstract class for Attendee and Organizer."""
-
+class Person:
+    # Abstract class for Attendee and Organizer.
     NAME = "ABSTRACT-PERSON"
 
+    sent_by = PersonProperty("SENT-BY", URIConverter)
+    common_name = PersonProperty("CN", RawTextConverter)
+    directory = PersonProperty("DIR", URIConverter)
+
     def __init__(self, email, extra=None, **kwargs):
-        if extra is None:
-            extra = dict()
-        else:
-            check_is_instance("extra", extra, dict)
-        super().__init__(email, extra)
+        self.email = email
+        self.extra = extra if extra is not None else {}
         for key, val in kwargs.items():
             setattr(self, key, val)
 
-    sent_by = PersonProperty("SENT-BY", URIConverter)
-    common_name = PersonProperty[str]("CN")
-    directory = PersonProperty("DIR", URIConverter)
-
 
 class Organizer(Person):
-    """Organizer of an event or todo."""
-
+    # Organizer of an event or todo.
     NAME = "ORGANIZER"
 
 
 class Attendee(Person):
-    """Attendee of an event or todo.
-
-    Possible values according to iCalendar standard, first value is default:
-        user_type = INDIVIDUAL | GROUP | RESOURCE | ROOM | UNKNOWN
-        member = Person
-        role = REQ-PARTICIPANT | CHAIR | OPT-PARTICIPANT | NON-PARTICIPANT
-        rsvp = False | True
-        delegated_to = Person
-        delegated_from = Person
-
-        Depending on the Component, different status are possible.
-        Event:
-        status = NEEDS-ACTION | ACCEPTED | DECLINED | TENTATIVE | DELEGATED
-        Todo:
-        status = NEEDS-ACTION | ACCEPTED | DECLINED | TENTATIVE | DELEGATED | COMPLETED | IN-PROCESS
-    """
-
+    # Attendee of an event or todo.
     NAME = "ATTENDEE"
 
-    user_type = PersonProperty[str]("CUTYPE", default="INDIVIDUAL")
-    member = PersonMultiProperty("MEMBER", converter=URIConverter)
-    role = PersonProperty[str]("ROLE", default="REQ-PARTICIPANT")
-    status = PersonProperty[str]("PARTSTAT", default="NEEDS-ACTION")
-    rsvp = PersonProperty("RSVP", converter=BooleanConverter, default=False)
-    delegated_to = PersonMultiProperty("DELEGATED-TO", converter=URIConverter)
-    delegated_from = PersonMultiProperty("DELEGATED-FROM", converter=URIConverter)
+    user_type = PersonProperty("CUTYPE", default="INDIVIDUAL")
+    member = PersonMultiProperty("MEMBER", URIConverter)
+    role = PersonProperty("ROLE", default="REQ-PARTICIPANT")
+    status = PersonProperty("PARTSTAT", default="NEEDS-ACTION")
+    rsvp = PersonProperty("RSVP", BooleanConverter, default=False)
+    delegated_to = PersonMultiProperty("DELEGATED-TO", URIConverter)
+    delegated_from = PersonMultiProperty("DELEGATED-FROM", URIConverter)

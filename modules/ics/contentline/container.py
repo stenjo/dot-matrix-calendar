@@ -1,26 +1,88 @@
 import re
 import sys
 from contextlib import contextmanager
-from textwrap import TextWrapper
 
-from ics.types import (
-    ContainerItem,
-    ExtraParams,
-    RuntimeAttrValidation,
-    copy_extra_params,
-)
-from ics.utils import limit_str_length, validate_truthy
 
-DEFAULT_LINE_WRAP = TextWrapper(
-    width=75,
-    initial_indent="",
-    subsequent_indent="",
-    break_long_words=True,
-    break_on_hyphens=True,
-    expand_tabs=False,
-    replace_whitespace=False,
-    fix_sentence_endings=False,
-    drop_whitespace=False,
+# You may need to manually implement other MutableSequence abstract methods.
+
+class CustomTextWrapper:
+    def __init__(self, width=75, initial_indent="", subsequent_indent=" ",
+                 break_long_words=True, break_on_hyphens=True):
+        self.width = width
+        self.initial_indent = initial_indent
+        self.subsequent_indent = subsequent_indent
+        self.break_long_words = break_long_words
+        self.break_on_hyphens = break_on_hyphens
+
+    def _wrap_long_word(self, word, current_line):
+        wrapped_lines = []
+        space_left = self.width - len(current_line.rstrip())
+        
+        # If the word is already longer than the width of a line, it will
+        # be placed on a new line (or multiple lines as needed).
+        if self.break_long_words and len(word) > self.width:
+            if current_line.strip():  # If there's any content already, start a new line
+                wrapped_lines.append(current_line.rstrip())
+                current_line = self.subsequent_indent
+
+            while len(word) > self.width:
+                wrapped_lines.append(word[:self.width])
+                word = word[self.width:]
+            current_line += word
+        else:
+            # The word fits in the space left, or is allowed to exceed line length
+            current_line += word[:space_left]
+            word = word[space_left:]  # Remainder is considered a "new word" and processed again
+
+        return wrapped_lines, current_line
+
+    def wrap(self, text):
+        wrapped_lines = []  # This will be the list of wrapped lines.
+        current_line = self.initial_indent  # Start the first line with initial_indent
+
+        for word in text.split():
+            hyphenated_parts = [word]  # Default: no hyphenation
+            if self.break_on_hyphens and '-' in word:
+                # Split the word by hyphens into parts
+                hyphenated_parts = word.split('-')
+
+            for i, part in enumerate(hyphenated_parts):
+                # Add back the hyphen if it's not the last part
+                if i < len(hyphenated_parts) - 1:
+                    part += '-'
+
+                # Check if the current part plus a space can fit on the current line
+                if len(current_line) + len(part) + (1 if current_line.strip() else 0) > self.width:
+                    # Wrap to next line if no space is left
+                    wrapped_lines.append(current_line.rstrip())
+                    current_line = self.subsequent_indent + part
+                else:
+                    # If the current line has other content on it, add a space before the word
+                    if current_line.strip():
+                        current_line += ' '
+                    current_line += part
+
+                # Check if the wrapped text needs to wrap again
+                while len(current_line) > self.width:
+                    additional_lines, current_line = self._wrap_long_word(current_line, '')
+                    wrapped_lines.extend(additional_lines)
+                    
+        # After the loop, add the remaining content to the list of wrapped lines
+        if current_line.strip():
+            wrapped_lines.append(current_line)
+
+        return wrapped_lines
+    
+DEFAULT_LINE_WRAP = CustomTextWrapper(
+    # width=75,
+    # initial_indent="",
+    # subsequent_indent=" ",
+    # break_long_words=True,
+    # break_on_hyphens=False,
+    # # # expand_tabs=False,
+    # # replace_whitespace=False,
+    # # fix_sentence_endings=False,
+    # # drop_whitespace=False,
 )
 
 @contextmanager
@@ -124,7 +186,7 @@ class Patterns:
     )
 
 
-class ContentLine(RuntimeAttrValidation):
+class ContentLine:
     def __init__(self, name, params=None, value="", line_nr=-1):
         self.name = str(name).upper()
         self.params = params or {}
@@ -202,4 +264,11 @@ class Container():
         self.data.insert(index, value)
 
 
-# You may need to manually implement other MutableSequence abstract methods.
+
+# Example usage of CustomTextWrapper:
+# wrapper = CustomTextWrapper(width=30, initial_indent="* ", subsequent_indent="- ")
+# text = "The quick brown fox jumps over-the-lazy dog. The quick brown-fox jumps over the-lazy dog."
+# wrapped_lines = wrapper.wrap(text)
+
+# for line in wrapped_lines:
+#     print(repr(line))
