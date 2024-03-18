@@ -10,11 +10,17 @@
     "python.testing.pytestEnabled": false,
     "python.testing.unittestEnabled": true,
     "python.analysis.extraPaths": [
-        "modules"
+        "./modules",
+        "./modules/ics"
     ],
     "cSpell.words": [
+        "icalendar",
         "micropython"
     ],
     "python.languageServer": "Pylance",
-    "coverage-gutters.coverageReportFileName": "coverage.lcov"
+    "coverage-gutters.coverageReportFileName": "coverage.lcov",
+    "terminal.integrated.env.windows": {
+        "PYTHONPATH": "C:/Users/sten.johnsen/git/dot-matrix-calendar/modules;${env:PYTHONPATH}",
+        "PATH": "C:/Users/sten.johnsen/git/dot-matrix-calendar/modules;${env:PATH}"  
+    }
 }

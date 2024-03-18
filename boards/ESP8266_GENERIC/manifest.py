@@ -6,8 +6,11 @@ freeze("../../modules", "time.py")
 freeze("../../modules", "max7219.py")
 freeze("../../modules", "mpy_env.py")
 freeze("../../modules", "msgpack.py")
-freeze("../../modules", "uoauth2.py")
+freeze("../../modules", "uuid.py")
 
+require("contextlib")
+require("warnings")
+# require("collections")
 
 # asyncio
 include("$(MPY_DIR)/extmod/asyncio")
@@ -24,3 +27,5 @@ require("umqtt.robust")
 
 require("urequests")
 require("ssl")
+
+package("ics", base_path="../../modules")
