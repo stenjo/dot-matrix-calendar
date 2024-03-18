@@ -1,4 +1,7 @@
+from contentline import lines_to_containers, string_to_containers
+from contentline.container import Container
 from ics.component import Component
+from ics.timeline import Timeline
 
 
 class Calendar(Component):
@@ -15,7 +18,7 @@ class Calendar(Component):
     DEFAULT_VERSION = "2.0"
     DEFAULT_PRODID = "ics.py - https://github.com/ics-py/ics-py"
     
-    def __init__(self, version=None, prodid=None, scale=None, method=None, events=None, todos=None, *args, **kwargs):
+    def __init__(self, imports = None, version=None, prodid=None, scale=None, method=None, events=None, todos=None, *args, **kwargs):
         self.version = version or self.DEFAULT_VERSION
         self.prodid = prodid or self.DEFAULT_PRODID
         self.scale = scale
@@ -27,7 +30,32 @@ class Calendar(Component):
             setattr(self, key, val)
         
         # Additional initialization tasks.
-    
+        super().__init__(events=events, todos=todos, **kwargs)  # type: ignore[arg-type]
+        self.timeline = Timeline(self, None)
+            
+        if imports is not None:
+            if isinstance(imports, Container):
+                self.populate(imports)
+            else:
+                if isinstance(imports, str):
+                    containers = iter(string_to_containers(imports))
+                else:
+                    containers = iter(lines_to_containers(imports))
+                try:
+                    container = next(containers)
+                    if not isinstance(container, Container):
+                        raise ValueError(f"can't populate from {type(container)}")
+                    self.populate(container)
+                except StopIteration:
+                    raise ValueError("string didn't contain any ics data")
+                try:
+                    next(containers)
+                    raise ValueError(
+                        "Multiple calendars in one file are not supported by this method."
+                        "Use ics.Calendar.parse_multiple()"
+                    )
+                except StopIteration:
+                    pass
     @classmethod
     def parse_multiple(cls, string):
         """
