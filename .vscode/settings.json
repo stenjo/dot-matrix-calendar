@@ -14,13 +14,34 @@
         "./modules/ics"
     ],
     "cSpell.words": [
+        "ICAL",
         "icalendar",
-        "micropython"
+        "micropython",
+        "rrule"
     ],
     "python.languageServer": "Pylance",
     "coverage-gutters.coverageReportFileName": "coverage.lcov",
     "terminal.integrated.env.windows": {
         "PYTHONPATH": "C:/Users/sten.johnsen/git/dot-matrix-calendar/modules;${env:PYTHONPATH}",
         "PATH": "C:/Users/sten.johnsen/git/dot-matrix-calendar/modules;${env:PATH}"  
-    }
+    },
+    "C_Cpp.default.compilerArgs": [
+        "-I lib/micropython"
+    ],
+    "files.associations": {
+        "obj.h": "c",
+        "rruleiter.h": "c",
+        "rrule.h": "c",
+        "binary.h": "c",
+        "nlr.h": "c",
+        "mphal.h": "c",
+        "mpconfig.h": "c",
+        "base.h": "c",
+        "runtime.h": "c",
+        "iosfwd": "cpp",
+        "mpstate.h": "c",
+        "pystack.h": "c"
+    },
+    "cmake.configureOnOpen": false,
+    "idf.port": "/dev/cu.usbserial-0001"
 }
