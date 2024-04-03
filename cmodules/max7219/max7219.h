@@ -57,6 +57,13 @@ extern "C" {
 #define MAX7219_MAX_CASCADE_SIZE 8
 #define MAX7219_MAX_BRIGHTNESS   15
 
+#define DEFAULT_SCROLL_DELAY 50
+#define DEFAULT_CASCADE_SIZE 8
+#define DEFAULT_PIN_NUM_MOSI 19
+#define DEFAULT_PIN_NUM_CLK 18
+#define DEFAULT_PIN_CS 5
+
+
 /**
  * Display descriptor
  */
@@ -66,6 +73,7 @@ typedef struct
     spi_device_handle_t spi_dev;
     uint8_t digits;              //!< Accessible digits in 7seg. Up to cascade_size * 8
     uint8_t cascade_size;        //!< Up to `MAX7219_MAX_CASCADE_SIZE` MAX721xx cascaded
+    uint8_t *frameBuffer;
     bool mirrored;               //!< true for horizontally mirrored displays
     bool bcd;
 } max7219_t;

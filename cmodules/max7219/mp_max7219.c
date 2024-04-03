@@ -2,6 +2,26 @@
 #include "py/runtime.h"
 #include "max7219.h"
 
+static const uint64_t symbols[] = {
+    0x383838fe7c381000, // arrows
+    0x10387cfe38383800,
+    0x10307efe7e301000,
+    0x1018fcfefc181000,
+    0x10387cfefeee4400, // heart
+    0x105438ee38541000, // sun
+
+    0x7e1818181c181800, // digits
+    0x7e060c3060663c00,
+    0x3c66603860663c00,
+    0x30307e3234383000,
+    0x3c6660603e067e00,
+    0x3c66663e06663c00,
+    0x1818183030667e00,
+    0x3c66663c66663c00,
+    0x3c66607c66663c00,
+    0x3c66666e76663c00
+};
+
 typedef struct _max7219_obj_t {
     mp_obj_base_t base;
     max7219_t descriptor;
@@ -19,9 +39,9 @@ STATIC mp_obj_t max7219_make_new(const mp_obj_type_t *type, size_t n_args, size_
 
    // Configure SPI bus
     spi_bus_config_t cfg = {
-       .mosi_io_num = 19,
+       .mosi_io_num = DEFAULT_PIN_NUM_MOSI,
        .miso_io_num = -1,
-       .sclk_io_num = 18,
+       .sclk_io_num = DEFAULT_PIN_NUM_CLK,
        .quadwp_io_num = -1,
        .quadhd_io_num = -1,
        .max_transfer_sz = 0,
@@ -30,7 +50,7 @@ STATIC mp_obj_t max7219_make_new(const mp_obj_type_t *type, size_t n_args, size_
     ESP_ERROR_CHECK(spi_bus_initialize(SPI2_HOST, &cfg, 1));
 
     // Configure device
-    self->descriptor.cascade_size = MAX7219_MAX_CASCADE_SIZE;
+    self->descriptor.cascade_size = DEFAULT_CASCADE_SIZE;
     self->descriptor.digits = 0;
     self->descriptor.mirrored = true;
 
@@ -39,17 +59,41 @@ STATIC mp_obj_t max7219_make_new(const mp_obj_type_t *type, size_t n_args, size_
         clock_speed_hz = mp_obj_get_int(args[1]);
     }
 
-    mp_uint_t cs_pin = 15;
+    mp_uint_t cs_pin = DEFAULT_PIN_CS;
     if (n_args > 2) {
         cs_pin = mp_obj_get_int(args[2]);
     }
 
     max7219_init_desc(&(self->descriptor), SPI2_HOST, clock_speed_hz, cs_pin);
-    mp_printf(&mp_plat_print, "max7219 package new or init.f\n");
+    mp_printf(&mp_plat_print, "max7219 init cascade: %d, clock: %d, CS: %d, \n", self->descriptor.cascade_size, clock_speed_hz, cs_pin);
+
+    max7219_init(&(self->descriptor));
 
     // The make_new function always returns self.
     return MP_OBJ_FROM_PTR(self);
 }
+
+STATIC mp_obj_t mp_max7219_test(mp_obj_t self_in) {
+    static const size_t symbols_size = sizeof(symbols) - sizeof(uint64_t) * DEFAULT_CASCADE_SIZE;
+    max7219_obj_t *self = MP_OBJ_TO_PTR(self_in);
+    size_t offs = 0;
+    uint repeats = 10;
+    while (repeats)
+    {
+        mp_printf(&mp_plat_print, "%d ---------- draw\n", repeats - 1);
+
+        for (uint8_t c = 0; c < DEFAULT_CASCADE_SIZE; c ++)
+            max7219_draw_image_8x8(&(self->descriptor), c * 8, (uint8_t *)symbols + c * 8 + offs);
+        vTaskDelay(pdMS_TO_TICKS(DEFAULT_SCROLL_DELAY));
+
+        if (++offs == symbols_size)
+            offs = 0;
+
+        repeats--;
+    }
+    return mp_const_none;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_1(max7219_test_obj, mp_max7219_test);
 
 STATIC mp_obj_t mp_max7219_free(mp_obj_t self_in) {
     max7219_obj_t *self = MP_OBJ_TO_PTR(self_in);
@@ -128,6 +172,7 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_3(max7219_draw8x8_obj, mp_max7219_draw8x8);
 
 
 STATIC const mp_rom_map_elem_t max7219_locals_dict_table[] = {
+    { MP_ROM_QSTR(MP_QSTR_test), MP_ROM_PTR(&max7219_test_obj) },
     { MP_ROM_QSTR(MP_QSTR_free), MP_ROM_PTR(&max7219_free_obj) },
     { MP_ROM_QSTR(MP_QSTR_clear), MP_ROM_PTR(&max7219_clear_obj) },
     { MP_ROM_QSTR(MP_QSTR_init), MP_ROM_PTR(&max7219_init_obj) },
