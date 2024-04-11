@@ -40,7 +40,10 @@
         "runtime.h": "c",
         "iosfwd": "cpp",
         "mpstate.h": "c",
-        "pystack.h": "c"
+        "pystack.h": "c",
+        "regex": "c",
+        "modmachine.h": "c",
+        "max7219.h": "c"
     },
     "cmake.configureOnOpen": false,
     "idf.port": "/dev/cu.usbserial-0001"

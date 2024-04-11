@@ -40,7 +40,8 @@
 #include "max7219.h"
 #include <string.h>
 #include <esp_log.h>
-
+#include <esp_timer.h> // Include the header for ESP timer functions
+#include "matrix.h"
 #include "max7219_priv.h"
 
 static const char *TAG = "max7219";
@@ -112,6 +113,15 @@ inline static uint8_t get_char(max7219_t *dev, char c)
     return font_7seg[(c - 0x20) & 0x7f];
 }
 
+void _printBuffer(max7219_t *dev)
+{
+    printf("fB:");
+    for (int y = 0; y < dev->cascade_size * 8; y++)
+	{
+        printf(" %02x", dev->frameBuffer[y]);
+	}
+    printf("\n");
+} 
 ///////////////////////////////////////////////////////////////////////////////
 
 esp_err_t max7219_init_desc(max7219_t *dev, spi_host_device_t host, uint32_t clock_speed_hz, gpio_num_t cs_pin)
@@ -166,6 +176,8 @@ esp_err_t max7219_init(max7219_t *dev)
     // Wake up
     CHECK(max7219_set_shutdown_mode(dev, false));
 
+    // dev->frameBuffer = malloc(dev->cascade_size*8);
+    clear(dev);
     return ESP_OK;
 }
 
@@ -260,4 +272,236 @@ esp_err_t max7219_draw_image_8x8(max7219_t *dev, uint8_t pos, const void *image)
         max7219_set_digit(dev, i, *((uint8_t *)image + offs));
 
     return ESP_OK;
+}
+
+uint8_t * _getBufferPointer(max7219_t *dev, int16_t x, int16_t y)
+{
+ 	if (y < 0 || y >= 8) return NULL;
+
+    if (x < 0 || x >= (8 * dev->cascade_size)) return NULL;
+
+	uint16_t B = (uint16_t)x >> 3;
+
+	return dev->frameBuffer + y*dev->cascade_size + B;   
+}
+
+void setPixel(max7219_t *dev, int16_t x, int16_t y, bool enabled)
+{
+	uint8_t* p = _getBufferPointer(dev, x, y);
+	if (!p)
+		return;
+
+	uint16_t b = 7 - (x & 7);		//bit
+
+	if (enabled)
+		*p |=  (1<<b);
+	else
+		*p &= ~(1<<b);
+}
+
+bool getPixel(max7219_t *dev, int16_t x, int16_t y)
+{
+	uint8_t* p = _getBufferPointer(dev, x, y);
+	if (!p)
+		return false;
+
+	uint16_t b = 7 - (x & 7);		//bit
+
+	return *p & (1 << b);
+}
+
+void setColumn(max7219_t *dev, int16_t x, uint8_t value)
+{
+	//no need to check x, will be checked by setPixel
+	for (uint8_t y = 0; y < 8; ++y)
+	{
+        // printf("setColumn; x: %d , val: %d, y: %d\n", x, value, y);
+
+		setPixel(dev, x, y, value & 1);
+		value >>= 1;
+	}
+}
+
+// A helper function used to reverse bits in a byte
+static void reverse(uint8_t *b) {
+    if (!b) return; // Add NULL check for safety
+    *b = (*b & 0xF0) >> 4 | (*b & 0x0F) << 4;
+    *b = (*b & 0xCC) >> 2 | (*b & 0x33) << 2;
+    *b = (*b & 0xAA) >> 1 | (*b & 0x55) << 1;
+}
+
+void _displayRow(max7219_t *dev, uint8_t row)
+{
+// Calculates row address based on flags
+    // Ensure we can store enough data for all cascaded devices
+    uint16_t tx_data[MAX7219_MAX_CASCADE_SIZE] = { 0 };
+
+    uint8_t address_row =( dev->flags & INVERT_Y) ? 7 - row : row;
+
+    bool display_x_inverted = dev->flags & INVERT_DISPLAY_X;
+    bool segment_x_inverted = dev->flags & INVERT_SEGMENT_X;
+
+    // For x inverted display change iterating order
+    // Inverting segments may still be needed!
+    int16_t from = display_x_inverted ? dev->cascade_size - 1 : 0;   // start from ...
+    int16_t to = display_x_inverted ? -1 : dev->cascade_size;        // where to stop
+    int16_t step = display_x_inverted ? -1 : 1;                // direction
+
+    for (int16_t chip = from; (step == 1) ? (chip < to) : (chip > to); chip += step) {
+        uint8_t d = chip;
+        uint8_t data = dev->frameBuffer[d + row * dev->cascade_size];
+
+        if (segment_x_inverted) {
+            reverse(&data);
+        }
+
+        // Prepare each segment's display data by combining row address and display data
+        uint16_t cmd = ((address_row + 1) << 8) | data;
+
+        tx_data[(step == 1) ? chip : (dev->cascade_size - 1 - chip)] = cmd;
+    }
+    
+    spi_transaction_t t;
+    memset(&t, 0, sizeof(t)); // Clear all fields in the transaction structure
+
+    // Set the transaction parameters
+    t.length = dev->cascade_size * 16;  // Transaction length in bits
+    t.tx_buffer = tx_data;              // Set the pointer to our buffer
+    
+    // Perform the transaction
+    spi_device_transmit(dev->spi_dev, &t);  // SPI API function to send the data
+
+}
+uint8_t getSegments(max7219_t *dev)  {return dev->cascade_size;}		
+uint8_t* getFrameBuffer(max7219_t *dev)  {return dev->frameBuffer;}
+void displayRow(max7219_t *dev, uint8_t row) {_displayRow(dev, row);}
+void clear(max7219_t *dev) {memset(dev->frameBuffer, 0, 8*dev->cascade_size);}
+
+void display(max7219_t *dev)
+{
+	for (uint8_t y = 0; y < 8; y++)
+	{
+		_displayRow(dev,y);
+	}
+}
+
+void scroll(max7219_t *dev, scrollDirection_t direction, bool wrap)
+{
+
+	switch( direction )
+	{
+		case scrollUp:
+		{
+			uint8_t tmp[dev->cascade_size];							//space for extra row
+			if (wrap)
+				memcpy(tmp, dev->frameBuffer, dev->cascade_size);		//save the first row
+			else
+				memset(tmp, 0, dev->cascade_size);					//or zero the memory
+			
+			memmove(dev->frameBuffer, dev->frameBuffer + dev->cascade_size, 7*dev->cascade_size);	//shift 7 rows
+			memcpy(dev->frameBuffer + 7*dev->cascade_size, tmp, dev->cascade_size);		//last row is zeros or copy of the first row
+			break;
+		}
+
+		case scrollDown:
+		{
+			uint8_t tmp[dev->cascade_size];
+			if (wrap) 
+				memcpy(tmp, dev->frameBuffer + 7*dev->cascade_size, dev->cascade_size);
+			else
+				memset(tmp, 0, dev->cascade_size);
+			
+			memmove(dev->frameBuffer+dev->cascade_size, dev->frameBuffer, 7*dev->cascade_size);
+			memcpy(dev->frameBuffer, tmp, dev->cascade_size);
+			break;
+		}
+
+        case scrollRight:
+            // Scrolling right needs to be done by bit shifting every uint8_t in the frame buffer
+            // Carry is reset between rows
+
+            for (int y = 0; y < 8; y++)
+            {
+                uint8_t carry = 0x00;
+                for (int x = 0; x < dev->cascade_size; x++)
+                {
+                    uint8_t *v = &dev->frameBuffer[y*dev->cascade_size+x];
+                    uint8_t newCarry = *v & 1;
+                    *v = (carry << 7) | (*v >> 1);
+                    carry = newCarry;
+                }
+                if (wrap) setPixel(dev, 0, y, carry);
+            }
+            break;
+
+		case scrollLeft:
+			// Scrolling left needs to be done by bit shifting every uint8_t in the frame buffer
+			// Carry is reset between rows
+			for (int y = 0; y < 8; y++)
+			{
+
+				uint8_t carry = 0x00;
+				for (int x = dev->cascade_size-1; x >= 0; x--)
+				{
+                    // printf("scroll:scrollLeft; y: %d x: %d\n", y, x);
+					uint8_t *v = &(dev->frameBuffer[y*dev->cascade_size+x]);
+					uint8_t newCarry = *v & 0x80;
+					*v = (carry >> 7) | (*v << 1);
+					carry = newCarry;
+				}
+				if (wrap) setPixel(dev, 8*dev->cascade_size-1, y, carry);
+			}
+                // printf("scroll; : %0x %0x %0x %0x %0x %0x %0x %0x\n", dev->frameBuffer[7*dev->cascade_size], dev->frameBuffer[7*dev->cascade_size+1], dev->frameBuffer[7*dev->cascade_size+2], dev->frameBuffer[7*dev->cascade_size+3], dev->frameBuffer[7*dev->cascade_size+4], dev->frameBuffer[7*dev->cascade_size+5], dev->frameBuffer[7*dev->cascade_size+6], dev->frameBuffer[7*dev->cascade_size+7]);
+            _printBuffer(dev);
+			break;
+	}
+}
+
+void marquee(max7219_t *dev)
+{
+    
+    // if (dev->text == NULL) 
+    // {
+    //     return;
+    // }
+
+      // Get current time in microseconds and convert to milliseconds
+    uint64_t currentMillis = esp_timer_get_time() / 1000;
+
+    // Check if the current time has elapsed past the marqueeDelayTimestamp
+    if ((currentMillis < dev->mrqTmstmp) || (currentMillis - dev->mrqTmstmp < dev->scroll_delay)) {
+        return;
+    } 
+
+    // Update the timestamp for the next iteration
+    dev->mrqTmstmp = currentMillis + dev->scroll_delay;
+
+    // printf("marquee: frame0: 0x%x text: %u  ", dev->frameBuffer[0], dev->text_index);
+    // Shift everything left by one led column.
+//   printf("scroll -> writeCol -> nextCol; col: %d \n", dev->col_index);
+    scroll(dev, scrollLeft, true);
+
+    // Write the next column of leds to the right.
+//   printf("-> writeCol -> nextCol; col: %d \n", dev->col_index);
+    writeCol(dev);
+//   printf("<- writeCol <- nextCol; col: %d \n", dev->col_index);
+
+    // The driver is buffering so we need to write all changes.
+    display(dev);
+//   printf("display <- writeCol <- nextCol; col: %d \n", dev->col_index);
+}
+
+void write(max7219_t *dev, const char *text)
+{
+            _printBuffer(dev);
+
+    printf("-> write -> text: %s \n", text);
+    // dev->text = text;
+    // dev->text_index = 0;
+    // dev->col_index = 0;
+    // dev->scroll_whitespace = 0;
+    clear(dev);
+    // max7219_clear(dev);
+
+    copyText(dev, text);
 }

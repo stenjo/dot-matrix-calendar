@@ -5,6 +5,7 @@ add_library(usermod_max7219 INTERFACE)
 target_sources(usermod_max7219 INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}/mp_max7219.c
     ${CMAKE_CURRENT_LIST_DIR}/max7219.c
+    ${CMAKE_CURRENT_LIST_DIR}/matrix.c
 )
 
 

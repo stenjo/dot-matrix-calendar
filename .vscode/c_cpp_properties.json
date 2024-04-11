@@ -16,8 +16,16 @@
                 "~/esp/xtensa-lx106-elf/lib/gcc/xtensa-lx106-elf/8.4.0/include-fixed",
                 "~/esp/xtensa-lx106-elf/xtensa-lx106-elf/sys-include",
                 "~/esp/xtensa-lx106-elf/xtensa-lx106-elf/include",
-                "~/esp/xtensa-lx106-elf/include", // Additional necessary paths
-                "~/esp/xtensa-lx106-elf//xtensa-lx106-elf/include/machine"
+                "~/esp/xtensa-lx106-elf/include",
+                "~/esp/xtensa-lx106-elf//xtensa-lx106-elf/include/machine",
+                "~/esp/esp-idf/components/driver/spi/include",
+                "~/esp/esp-idf/components/esp_common/include",
+                "~/esp/esp-idf/components/hal/include",
+                "~/esp/esp-idf/components/soc/esp32/include",
+                "~/esp/esp-idf/components/esp_system/include",
+                "~/esp/esp-idf/components/esp_hw_support/include",
+                "~/esp/esp-idf/components/driver/gpio/include",
+                "~/esp/esp-idf/components/esp_rom/include"
             ],
             "defines": [
                 "MICROPY_ROM_TEXT_COMPRESSION=1",
@@ -63,6 +71,20 @@
                 "-fdata-sections",
                 "-ffunction-sections"
             ]
+        },
+        {
+            "name": "ESP32",
+            "includePath": [
+                "~/esp/esp-idf/components/**",
+                "${workspaceFolder}/**",
+                "~/.espressif/tools/xtensa-esp32-elf/esp-12.2.0_20230208/xtensa-esp32-elf/include"
+            ],
+            "defines": [],
+            "macFrameworkPath": [],
+            "compilerPath": "~/.espressif/tools/xtensa-esp32-elf/esp-12.2.0_20230208/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc",
+            "cStandard": "c99",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "gcc-x64"
         }
     ],
     "version": 4

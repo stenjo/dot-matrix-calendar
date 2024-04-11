@@ -1,8 +1,6 @@
-extern "C" {
-#include <cstdint>
-#include "py/runtime.h"
-#include <max7219.h>
-
+#include "max7219.h"
+#include "matrix.h"
+#include "string.h"
 /*
  *  A very efficient and versatile, no-whitespace marquee example written by James Gohl 20.03.2019.
  *    - Using hardware SPI driver by Bartosz Bielawski.
@@ -44,11 +42,11 @@ extern "C" {
  *    
  */
 // Set the Chip Select (CS) pin for the led matrix
-const uint8_t LEDMATRIX_CS_PIN = 9;
+// const uint8_t LEDMATRIX_CS_PIN = 9;
 // Set the number of modules you have daisy-chained together.
-const uint8_t LEDMATRIX_SEGMENTS = 8;
+// const uint8_t LEDMATRIX_SEGMENTS = 8;
 // Width of entire display, where 8 is the number of pixels on a single module.
-const uint16_t LEDMATRIX_WIDTH    = LEDMATRIX_SEGMENTS * 8;
+// const uint16_t LEDMATRIX_WIDTH    = LEDMATRIX_SEGMENTS * 8;
 
 /*
  *  Initialise LEDMatrixDriver
@@ -61,7 +59,7 @@ const uint16_t LEDMATRIX_WIDTH    = LEDMATRIX_SEGMENTS * 8;
  *        INVERT_Y
  *      
  */
-LEDMatrixDriver led(LEDMATRIX_SEGMENTS, LEDMATRIX_CS_PIN, LEDMatrixDriver::INVERT_SEGMENT_X | LEDMatrixDriver::INVERT_Y);
+// LEDMatrixDriver led(LEDMATRIX_SEGMENTS, LEDMATRIX_CS_PIN, LEDMatrixDriver::INVERT_SEGMENT_X | LEDMatrixDriver::INVERT_Y);
 
 /*
  *  Scroll Delay is performed using a tick count, 
@@ -70,9 +68,9 @@ LEDMatrixDriver led(LEDMATRIX_SEGMENTS, LEDMATRIX_CS_PIN, LEDMatrixDriver::INVER
  *    
  *  Set SCROLL_DELAY to 0 to see the efficiency of this example.
  */
-const uint16_t SCROLL_DELAY = 30;
+// const uint16_t SCROLL_DELAY = 30;
 // No need to alter this.
-uint64_t marqueeDelayTimestamp = 0;
+// uint64_t marqueeDelayTimestamp = 0;
 
 /*
  *  Font is derived from "5 by 7 Regular" by Peter Weigel with a few
@@ -101,7 +99,7 @@ uint64_t marqueeDelayTimestamp = 0;
  *    }
  *  
  */
-static const uint8_t font[515] PROGMEM = {
+static const uint8_t font[515] = {
   2,0b00000000,0b00000000,                                  /* 032 =   */
   2,0b01101111,0b01101111,                                  /* 033 = ! */
   3,0b00000011,0b00000000,0b00000011,                       /* 034 = " */
@@ -199,7 +197,7 @@ static const uint8_t font[515] PROGMEM = {
   5,0b00011000,0b00000100,0b00001000,0b00010000,0b00001100  /* 126 = ~ */
 };
 
-static const uint16_t font_index[95] PROGMEM = {
+static const uint16_t font_index[95] = {
   0,3,6,10,16,22,28,34,36,40,44,48,54,57,63,66,72,78,82,88,94,
   100,106,112,118,124,130,133,136,141,147,152,158,164,170,176,
   182,188,194,200,206,212,218,224,230,236,242,248,254,260,266,
@@ -215,10 +213,11 @@ static const uint16_t font_index[95] PROGMEM = {
  *    text scrolls away), then set textIndex and colIndex to 0.
  */
 char text[] = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_'abcdefghijklmnopqrstuvwxyz{|}~";
+// char text[] = "'   ";
 
 // Current text and column indices.
-uint16_t textIndex = 0;
-uint8_t colIndex = 0;
+// uint16_t textIndex = 0;
+// uint8_t colIndex = 0;
 
 /* 
  *  Used to set whitespace to the given number of columns,
@@ -226,86 +225,97 @@ uint8_t colIndex = 0;
  *    At the end of each character we set this in nextCol() for spacing.
  *    At the end of the text we set this to LEDMATRIX_WIDTH.
  */
-uint16_t scrollWhitespace = 0;
+// uint16_t scrollWhitespace = 0;
 
-void nextChar()
+void nextChar(max7219_t *dev)
 {
-  if (text[++textIndex] == '\0')
+  // printf("nextChar; text_index: %d, chr: '%c', whitespace: %x\n", dev->text_index, text[dev->text_index], dev->scroll_whitespace);
+  dev->text_index += 1;
+  if (dev->text != NULL) {
+    if (dev->text[dev->text_index] == '\0')
+    {
+      dev->text_index = 0;
+      // Set this to the number of pixels you want drawn between text loops.
+      dev->scroll_whitespace = dev->cascade_size * 8;
+    }
+    return;
+
+  }
+  if (text[dev->text_index] == '\0')
   {
-    textIndex = 0;
+    printf("nextChar; completed! text_index: %d\n", dev->text_index);
+    dev->text_index = 0;
     // Set this to the number of pixels you want drawn between text loops.
-    scrollWhitespace = LEDMATRIX_WIDTH;
+    dev->scroll_whitespace = dev->cascade_size * 8;
   }
 }
 
-void nextCol(uint8_t w)
+void nextCol(max7219_t *dev, uint8_t w)
 {
-  if (++colIndex == w)
+  // printf("nextCol ->; w: %u, col: %d \n", w, dev->col_index);
+  dev->col_index = dev->col_index + 1;
+  if (dev->col_index == w)
   {
     // Character spacing, consider increasing this when scrolling is faster.
-    scrollWhitespace = 2;
-    colIndex = 0;
-    nextChar();
+    dev->scroll_whitespace = 2;
+    dev->col_index = 0;
+    nextChar(dev);
   }  
+  // printf("nextCol <-; w: %u, col: %d \n", w, dev->col_index);
 }
 
-void writeCol()
+void writeCol(max7219_t *dev)
 {
-  if (scrollWhitespace > 0)
-  {
-    // Deal with whitespace - scroll but don't set LEDs.
-    scrollWhitespace--;
-    return;
-  }
-  
-  uint8_t asc = text[textIndex] - 32;
-  
-  // We need to use pgm_read_byte and pgm_read_word to read data we put into PROGMEM.
-  uint16_t idx = pgm_read_word(&(font_index[asc]));
-  uint8_t w = pgm_read_byte(&(font[idx]));
-  uint8_t col = pgm_read_byte(&(font[colIndex + idx + 1]));
-  
-  led.setColumn(LEDMATRIX_WIDTH - 1, col);
 
-  nextCol(w);
-}
-
-extern mp_obj_t mp_marquee()
-{
-  // millis() will reset back to zero eventually so we need to handle this.
-  if (millis() < 1)
-    marqueeDelayTimestamp = 0;
-  if (millis() < marqueeDelayTimestamp)
-    return;
+    if (dev->scroll_whitespace > 0)
+    {
+        printf("writeCol; whitespace: %d \n", dev->scroll_whitespace);
+        // Deal with whitespace - scroll but don't set LEDs.
+        dev->scroll_whitespace--;
+        return;
+    }
     
-  marqueeDelayTimestamp = millis() + SCROLL_DELAY;
+    uint8_t asc = (dev->text != NULL ? dev->text[dev->text_index] : text[dev->text_index]) - 32;
+    
+    // In ESP-IDF, we access the flash-stored data directly.
+    uint16_t idx = font_index[asc]; // Directly access flash-stored data
+    uint8_t w = font[idx];          // Directly access flash-stored data
+    uint8_t col = font[dev->col_index + idx + 1]; // Directly access flash-stored data
+    
+    // printf("writeCol; text_index: %d, chr: '%c', asc: %d, idx: %d , w: %d, col: %x\n", dev->text_index, text[dev->text_index], asc, idx, w, col);
 
-  // Shift everything left by one led column.
-  led.scroll(LEDMatrixDriver::scrollDirection::scrollLeft);
+    setColumn(dev, dev->cascade_size * 8 - 1, col);
 
-  // Write the next column of leds to the right.
-  writeCol();
-  
-  // The driver is buffering so we need write all changes.
-  led.display();
+  // printf("-> nextCol; w: %u, col: %d \n", w, dev->col_index);
+    nextCol(dev, w);
+  // printf("<- nextCol; w: %u, col: %d \n", w, dev->col_index);
 }
 
+void copyText(max7219_t * dev, const char * text) {
 
-void setup() {
+  printf("-> copyText -> length: %d \n", strlen(text));
+  int16_t x = 0;
+  for (int16_t i = 0; i < strlen(text); i++) 
+  {
+    printf("-> copyText -> text: %c \n", text[i]);
 
-  led.setEnabled(true);
+    if (text[i] ==  '\0')
+    {
+      display(dev);
+      return;
+    }
+    uint8_t asc = text[i] - 32;
+    
+    uint16_t idx = font_index[asc]; // Directly access flash-stored data
+    uint8_t w = font[idx];          // Directly access flash-stored data
+    
+    for (int16_t j = 0; j < w; j++) {
+      uint8_t col = font[j + idx + 1]; // Directly access flash-stored data
+      setColumn(dev, x++, col);
+    }
+    x++;
+  }
+      
+  display(dev);
 
-  // LED brightness (0 - 15).
-  led.setIntensity(0);
-}
-
-void loop()
-{
-  marquee();
-  
-  // Put additional functions in here. If they require a delay, don't use Delay().
-  // Instead, include the same delay mechanism but use a different delay timestamp
-  // variable, this prevents each function from blocking the next for smoother
-  // processing.
-}
 }

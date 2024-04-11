@@ -52,17 +52,36 @@
 extern "C" {
 #endif
 
-#define MAX7219_MAX_CLOCK_SPEED_HZ (10000000) // 10 MHz
+#define MAX7219_MAX_CLOCK_SPEED_HZ (1000000) // 1 MHz
 
 #define MAX7219_MAX_CASCADE_SIZE 8
 #define MAX7219_MAX_BRIGHTNESS   15
 
-#define DEFAULT_SCROLL_DELAY 50
+#define DEFAULT_SCROLL_DELAY 30
 #define DEFAULT_CASCADE_SIZE 8
 #define DEFAULT_PIN_NUM_MOSI 19
 #define DEFAULT_PIN_NUM_CLK 18
 #define DEFAULT_PIN_CS 5
 
+//commands as defined in the datasheet
+#define  ENABLE     0x0C00
+#define  TEST       0x0F00
+#define  INTENSITY  0x0A00
+#define  SCAN_LIMIT 0x0B00
+#define  DECODE     0x0900
+	
+	
+#define INVERT_SEGMENT_X    1
+#define INVERT_DISPLAY_X    2
+#define INVERT_Y    4
+
+typedef enum 
+{
+    scrollUp = 0,
+    scrollDown,
+    scrollLeft,
+    scrollRight
+} scrollDirection_t;
 
 /**
  * Display descriptor
@@ -73,11 +92,21 @@ typedef struct
     spi_device_handle_t spi_dev;
     uint8_t digits;              //!< Accessible digits in 7seg. Up to cascade_size * 8
     uint8_t cascade_size;        //!< Up to `MAX7219_MAX_CASCADE_SIZE` MAX721xx cascaded
-    uint8_t *frameBuffer;
+    uint8_t flags;
+    uint16_t scroll_delay;
     bool mirrored;               //!< true for horizontally mirrored displays
     bool bcd;
+    scrollDirection_t direction;
+    char * text;
+    uint16_t text_index;
+    uint16_t col_index;
+    uint8_t scroll_whitespace;
+    uint64_t mrqTmstmp;
+    uint8_t frameBuffer[MAX7219_MAX_CASCADE_SIZE*8];
+    uint8_t counter; // to be remo
 } max7219_t;
 
+// No need to alter this.
 /**
  * @brief Initialize device descriptor
  *
@@ -172,6 +201,21 @@ esp_err_t max7219_draw_text_7seg(max7219_t *dev, uint8_t pos, const char *s);
  * @return `ESP_OK` on success
  */
 esp_err_t max7219_draw_image_8x8(max7219_t *dev, uint8_t pos, const void *image);
+
+uint8_t * _getBufferPointer(max7219_t *dev, int16_t x, int16_t y);
+void setPixel(max7219_t *dev, int16_t x, int16_t y, bool enabled);
+bool getPixel(max7219_t *dev, int16_t x, int16_t y);
+void setColumn(max7219_t *dev, int16_t x, uint8_t value);
+void display(max7219_t *dev);
+void scroll(max7219_t *dev, scrollDirection_t direction, bool wrap);
+
+//flush a single row to the display
+void displayRow(max7219_t *dev, uint8_t row);
+//clear the framebuffer
+void clear(max7219_t *dev);
+
+void marquee(max7219_t *dev);
+void write(max7219_t *dev, const char *text);
 
 #ifdef __cplusplus
 }
