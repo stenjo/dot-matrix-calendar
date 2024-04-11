@@ -41,8 +41,6 @@ typedef struct _max7219_obj_t {
 STATIC mp_obj_t max7219_make_new(const mp_obj_type_t *type, size_t n_args, size_t n_kw, const mp_obj_t *args) {
     max7219_obj_t *self = mp_obj_malloc(max7219_obj_t, type);
 
-    // self->dev.frameBuffer = m_new(uint8_t, self->dev.cascade_size * 8);
-
    // Configure SPI bus
     spi_bus_config_t cfg = {
        .mosi_io_num = DEFAULT_PIN_NUM_MOSI,
@@ -58,11 +56,10 @@ STATIC mp_obj_t max7219_make_new(const mp_obj_type_t *type, size_t n_args, size_
     // Configure device
     self->dev.cascade_size = 4; //DEFAULT_CASCADE_SIZE;
     self->dev.scroll_delay = DEFAULT_SCROLL_DELAY;
-    self->dev.digits = 0;
+    self->dev.digits = 4*8;
     self->dev.mirrored = false;
     self->dev.text = NULL;
     self->dev.mrqTmstmp = 0;
-    self->dev.counter = 0;
 
     uint32_t clock_speed_hz = MAX7219_MAX_CLOCK_SPEED_HZ;
     if (n_args > 1) {
@@ -182,17 +179,27 @@ STATIC mp_obj_t mp_max7219_draw8x8(mp_obj_t self_in, mp_obj_t pos, mp_obj_t imag
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_3(max7219_draw8x8_obj, mp_max7219_draw8x8);
 
-STATIC mp_obj_t mp_max7219_marquee(mp_obj_t self_in) {
+STATIC mp_obj_t mp_max7219_marquee(mp_obj_t self_in, mp_obj_t text_obj) {
     max7219_obj_t *self = MP_OBJ_TO_PTR(self_in);
-    // max7219_t d=self->dev;
-    self->dev.counter = self->dev.counter + 1;
-    // size_t size = self->dev.cascade_size * 8;
-    // mp_printf(&mp_plat_print, "max7219 marquee count: %d,  cascade: %d, fBuf(bytes): %d, fBuf(elmts): %d, flags: %0b, \n", 
-    // self->dev.counter, self->dev.cascade_size, sizeof(self->dev.frameBuffer), size, self->dev.flags);
-    marquee(&(self->dev));
+    const char *text = mp_obj_str_get_str(text_obj);
+    marquee(&(self->dev), text);
     return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_1(max7219_marquee_obj, mp_max7219_marquee);
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(max7219_marquee_obj, mp_max7219_marquee);
+
+STATIC mp_obj_t mp_max7219_scroll(size_t n_args, const mp_obj_t *args) {
+    max7219_obj_t *self = MP_OBJ_TO_PTR(args[0]); // First argument is always self
+    bool wrap = false; // Default value
+    // Check if the wrap argument was provided
+    if (n_args > 1) {
+        wrap = mp_obj_is_true(args[1]);
+    }
+    bool done = scroll(&(self->dev), wrap);
+    return mp_obj_new_bool(done);
+}
+// Define a wrapper function for the variable argument version.
+STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(max7219_scroll_obj, 1, 2, mp_max7219_scroll);
+
 
 
 STATIC mp_obj_t mp_max7219_write(mp_obj_t self_in, mp_obj_t text_obj) {
@@ -200,21 +207,19 @@ STATIC mp_obj_t mp_max7219_write(mp_obj_t self_in, mp_obj_t text_obj) {
 
     // Convert the MicroPython string to a C string
     const char *text = mp_obj_str_get_str(text_obj);
-    write(&(self->dev), text);
-    mp_printf(&mp_plat_print, "max7219 write called: %s\n", text);
-    
-    // Call the write function - you pass a pointer to `dev`, not a copy of `dev`.
-
+    matrixWrite(&(self->dev), text);
+    mp_printf(&mp_plat_print, "max7219 matrixWrite called: %s\n", text);
     return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_2(max7219_write_obj, mp_max7219_write);
 
 STATIC const mp_rom_map_elem_t max7219_locals_dict_table[] = {
-    { MP_ROM_QSTR(MP_QSTR_write), MP_ROM_PTR(&max7219_write_obj) },
     { MP_ROM_QSTR(MP_QSTR_marquee), MP_ROM_PTR(&max7219_marquee_obj) },
+    { MP_ROM_QSTR(MP_QSTR_scroll), MP_ROM_PTR(&max7219_scroll_obj) },
     { MP_ROM_QSTR(MP_QSTR_test), MP_ROM_PTR(&max7219_test_obj) },
     { MP_ROM_QSTR(MP_QSTR_free), MP_ROM_PTR(&max7219_free_obj) },
     { MP_ROM_QSTR(MP_QSTR_clear), MP_ROM_PTR(&max7219_clear_obj) },
+    { MP_ROM_QSTR(MP_QSTR_write), MP_ROM_PTR(&max7219_write_obj) },
     { MP_ROM_QSTR(MP_QSTR_init), MP_ROM_PTR(&max7219_init_obj) },
     { MP_ROM_QSTR(MP_QSTR_decodeMode), MP_ROM_PTR(&max7219_decodeMode_obj) },
     { MP_ROM_QSTR(MP_QSTR_brightness), MP_ROM_PTR(&max7219_brightness_obj) },

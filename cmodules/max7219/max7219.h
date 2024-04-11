@@ -96,14 +96,14 @@ typedef struct
     uint16_t scroll_delay;
     bool mirrored;               //!< true for horizontally mirrored displays
     bool bcd;
+    bool wrap_text_scroll;
     scrollDirection_t direction;
-    char * text;
+    const char * text;
     uint16_t text_index;
     uint16_t col_index;
-    uint8_t scroll_whitespace;
+    int16_t scroll_whitespace;
     uint64_t mrqTmstmp;
     uint8_t frameBuffer[MAX7219_MAX_CASCADE_SIZE*8];
-    uint8_t counter; // to be remo
 } max7219_t;
 
 // No need to alter this.
@@ -207,15 +207,16 @@ void setPixel(max7219_t *dev, int16_t x, int16_t y, bool enabled);
 bool getPixel(max7219_t *dev, int16_t x, int16_t y);
 void setColumn(max7219_t *dev, int16_t x, uint8_t value);
 void display(max7219_t *dev);
-void scroll(max7219_t *dev, scrollDirection_t direction, bool wrap);
+void old_scroll(max7219_t *dev, scrollDirection_t direction, bool wrap);
+bool scroll(max7219_t *dev, bool wrap);
 
 //flush a single row to the display
 void displayRow(max7219_t *dev, uint8_t row);
 //clear the framebuffer
 void clear(max7219_t *dev);
 
-void marquee(max7219_t *dev);
-void write(max7219_t *dev, const char *text);
+void marquee(max7219_t *dev, const char *text);
+void matrixWrite(max7219_t *dev, const char *text);
 
 #ifdef __cplusplus
 }

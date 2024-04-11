@@ -385,7 +385,7 @@ void display(max7219_t *dev)
 	}
 }
 
-void scroll(max7219_t *dev, scrollDirection_t direction, bool wrap)
+void old_scroll(max7219_t *dev, scrollDirection_t direction, bool wrap)
 {
 
 	switch( direction )
@@ -457,51 +457,39 @@ void scroll(max7219_t *dev, scrollDirection_t direction, bool wrap)
 	}
 }
 
-void marquee(max7219_t *dev)
+bool scroll(max7219_t *dev, bool wrap)
 {
-    
-    // if (dev->text == NULL) 
-    // {
-    //     return;
-    // }
 
-      // Get current time in microseconds and convert to milliseconds
     uint64_t currentMillis = esp_timer_get_time() / 1000;
+    dev->wrap_text_scroll = wrap;
 
-    // Check if the current time has elapsed past the marqueeDelayTimestamp
     if ((currentMillis < dev->mrqTmstmp) || (currentMillis - dev->mrqTmstmp < dev->scroll_delay)) {
-        return;
+        return false;
     } 
-
-    // Update the timestamp for the next iteration
     dev->mrqTmstmp = currentMillis + dev->scroll_delay;
 
-    // printf("marquee: frame0: 0x%x text: %u  ", dev->frameBuffer[0], dev->text_index);
-    // Shift everything left by one led column.
-//   printf("scroll -> writeCol -> nextCol; col: %d \n", dev->col_index);
-    scroll(dev, scrollLeft, true);
+    bool done = scrollBuffer(dev);
+    printBuffer(dev);
 
-    // Write the next column of leds to the right.
-//   printf("-> writeCol -> nextCol; col: %d \n", dev->col_index);
-    writeCol(dev);
-//   printf("<- writeCol <- nextCol; col: %d \n", dev->col_index);
-
-    // The driver is buffering so we need to write all changes.
-    display(dev);
-//   printf("display <- writeCol <- nextCol; col: %d \n", dev->col_index);
+    return done;
 }
 
-void write(max7219_t *dev, const char *text)
+void marquee(max7219_t *dev, const char *text)
 {
-            _printBuffer(dev);
-
-    printf("-> write -> text: %s \n", text);
-    // dev->text = text;
-    // dev->text_index = 0;
-    // dev->col_index = 0;
-    // dev->scroll_whitespace = 0;
+    dev->text = text;
+    dev->text_index = 0;
+    dev->col_index = 0;
+    dev->scroll_whitespace = 0;
     clear(dev);
-    // max7219_clear(dev);
+    max7219_init(dev);
+    max7219_clear(dev);
+    // copyText(dev, text);
+}
+
+void matrixWrite(max7219_t *dev, const char *text)
+{
+    clear(dev);
+    max7219_clear(dev);
 
     copyText(dev, text);
 }

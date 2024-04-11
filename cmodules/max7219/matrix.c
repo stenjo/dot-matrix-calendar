@@ -206,6 +206,26 @@ static const uint16_t font_index[95] = {
   439,445,451,457,463,469,475,481,487,493,499,503,505,509
 };
 
+static const uint8_t specials[] = { // Escaped by char 195
+6, 0b00100000,0b01010100,  0b01010100,  0b01111100,  0b01010100,  0b01011000,   /* 184 = æ */
+5, 0b01011000,0b00100100,  0b01010100,  0b01001000,  0b00110100,                /* 166 = ø */
+5, 0b00100000,0b01010100,  0b01010101,  0b01010100,  0b01111000,                /* 165 = å */
+6, 0b01111110,0b00001001,  0b00001001,  0b01111111,  0b01001001,  0b01001001,   /* 134 = Æ */
+5, 0b01011110,0b00100001,  0b01011001,  0b01000110,  0b00111101,                /* 152 = Ø */
+5, 0b01111000,0b00010100,  0b00010101,  0b00010100,  0b01111000                 /* 133 = Å */
+};
+
+const uint8_t IMAGES[][8] = {
+{  0b00100000,  0b01010100,  0b01010100,  0b01111100,  0b01010100,  0b01011000,  0b00000000,  0b00000000},
+{  0b01011000,  0b00100100,  0b01010100,  0b01001000,  0b00110100,  0b00000000,  0b00000000,  0b00000000},
+{  0b00100000,  0b01010100,  0b01010101,  0b01010100,  0b01111000,  0b00000000,  0b00000000,  0b00000000},
+{  0b01111110,  0b00001001,  0b00001001,  0b01111111,  0b01001001,  0b01001001,  0b00000000,  0b00000000},
+{  0b01011110,  0b00100001,  0b01011001,  0b01000110,  0b00111101,  0b00000000,  0b00000000,  0b00000000},
+{  0b01111000,  0b00010100,  0b00010101,  0b00010100,  0b01111000,  0b00000000,  0b00000000,  0b00000000}
+};
+const int IMAGES_LEN = sizeof(IMAGES)/8;
+
+
 /*
  *  Text to scroll, this is hard-coded but if you want to have dynamic
  *    text from Serial input, you should Set scrollWhitespace =
@@ -291,31 +311,133 @@ void writeCol(max7219_t *dev)
   // printf("<- nextCol; w: %u, col: %d \n", w, dev->col_index);
 }
 
+void rotateImageCounterClockwise(const uint8_t* frameBuffer, uint8_t* rotatedBuffer) {
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            // If the bit at position j in the ith byte is set,
+            // set the corresponding bit in the new position
+            // in the rotated buffer.
+            if (frameBuffer[i] & (1 << j)) {
+                // Old position: (i, j), new position after rotation: (j, 7 - i)
+                rotatedBuffer[j] |= (1 << (7 - i));
+            }
+        }
+    }
+}
+
+void printImage(const uint8_t* frameBuffer, int size) {
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            printf("%c", (frameBuffer[i] & (1 << (7 - j))) ? '0' : '.');
+        }
+        printf("\n");
+    }
+        printf("\n");
+}
+
+uint8_t getSpecials(uint8_t chr, const uint8_t col) {
+  if (col > specials[0]) {
+    return 0;
+  }
+  return specials[col+1];
+}
+
 void copyText(max7219_t * dev, const char * text) {
+
+  // const char special[] = "øæåÆØÅ";
+  // for (int i = 0; i < strlen(special); ++i) {
+  //     printf("%c: %u\n", special[i],  special[i]);
+  // }
 
   printf("-> copyText -> length: %d \n", strlen(text));
   int16_t x = 0;
   for (int16_t i = 0; i < strlen(text); i++) 
   {
-    printf("-> copyText -> text: %c \n", text[i]);
+    // printf("-> copyText -> text: %c \n", text[i]);
 
-    if (text[i] ==  '\0')
-    {
-      display(dev);
-      return;
+    if (text[i] == 195) {
+      i++;
+      int j=0;
+      uint8_t col = 0;
+      do
+      {
+        col = getSpecials(text[i], j++);
+        if (col != 0) {
+          dev->frameBuffer[x] = col;
+        }
+      } while (col);
     }
-    uint8_t asc = text[i] - 32;
-    
-    uint16_t idx = font_index[asc]; // Directly access flash-stored data
-    uint8_t w = font[idx];          // Directly access flash-stored data
-    
-    for (int16_t j = 0; j < w; j++) {
-      uint8_t col = font[j + idx + 1]; // Directly access flash-stored data
-      setColumn(dev, x++, col);
+    else {
+      uint8_t asc = text[i] - 32;
+      uint16_t idx = font_index[asc]; // Directly access flash-stored data
+      uint8_t w = font[idx];          // Directly access flash-stored data
+      for (int16_t j = 0; j < w; j++) {
+        uint8_t col = font[j + idx + 1]; // Directly access flash-stored data
+        // setColumn(dev, x++, col);
+        dev->frameBuffer[x] = col;
+        x++;
+      }
     }
     x++;
   }
-      
-  display(dev);
 
+  printBuffer(dev);
+
+}
+
+bool scrollBuffer(max7219_t * dev)
+{
+  for (int16_t i = 1; i < dev->cascade_size*8; i++)
+  {
+    dev->frameBuffer[i-1] = dev->frameBuffer[i];
+  }
+
+  if (dev->text_index >= strlen(dev->text))
+  { 
+    // finished printing text - now whitespace
+    dev->frameBuffer[dev->cascade_size*8-1] = 0;
+    dev->scroll_whitespace--;
+    if (dev->scroll_whitespace <= 0 && dev->wrap_text_scroll)
+    {
+      dev->text_index = 0;
+      dev->col_index = 0;
+    }
+  }
+  else 
+  {
+    uint8_t asc = dev->text[dev->text_index] - 32;
+    uint16_t idx = font_index[asc];
+    uint8_t width = font[idx];
+    if (dev->col_index < width) 
+    {
+      uint8_t col = font[dev->col_index + idx + 1]; // Directly access flash-stored data
+      dev->frameBuffer[dev->cascade_size*8-1] = col;
+      dev->col_index ++;
+    }
+    else
+    {
+      dev->frameBuffer[dev->cascade_size*8-1] = 0;
+      dev->col_index = 0;
+      dev->text_index++;
+    }
+    // Reset whitespace counter
+    dev->scroll_whitespace = dev->cascade_size*8;
+  }
+  if (dev->scroll_whitespace <= 0)
+  {
+    return true;
+  }
+  return false;
+}
+
+void printBuffer(max7219_t * dev)
+{
+  size_t offs = 0;
+  uint8_t buffer[8];
+  for (int16_t d = 0; d < dev->cascade_size; d++)
+  {
+    memset(buffer, 0, 8);
+    rotateImageCounterClockwise((uint8_t *)(dev->frameBuffer + d * 8 + offs), (uint8_t *)buffer);
+    max7219_draw_image_8x8(dev, d*8, buffer);
+  }
 }

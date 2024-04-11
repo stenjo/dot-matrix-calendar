@@ -7,6 +7,7 @@ void nextChar(max7219_t *dev);
 void nextCol(max7219_t *dev, uint8_t w);
 void writeCol(max7219_t *dev);
 void copyText(max7219_t * dev, const char * text);
-
+bool scrollBuffer(max7219_t * dev);
+void printBuffer(max7219_t * dev);
 
 #endif // _MATRIX_H_

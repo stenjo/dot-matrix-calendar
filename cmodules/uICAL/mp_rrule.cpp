@@ -30,9 +30,16 @@ mp_obj_t cppfunc(mp_obj_t a_obj, mp_obj_t b_obj) {
 
 using rrule_t = uICAL::RRuleIter *;
 
+rrule_p RRule_new(const char * rrule, const char * dtstart) {
+    printf("RRule_new called with: %s, start: %s\n", rrule, dtstart);
+    return (rrule_p) 0x10000;
+}
+
 bool RRule_next(rrule_p p) {
-    auto rule = static_cast<uICAL::RRuleIter*>(p);
-    return rule->next();
+    // auto rule = static_cast<uICAL::RRuleIter*>(p);
+    // return rule->next();
+    printf("RRule_next called with: %p\n", p);
+    return true;
 }
 
 }

@@ -9,7 +9,7 @@ BOARD ?= ESP32_GENERIC
 # Location of MicroPython repository.
 MICROPY_TOP ?= $(abspath lib/micropython)
 
-# FROZEN_MANIFEST?=manifest.py
+FROZEN_MANIFEST?=$(abspath manifest.py)
 
 PROJECT_TOP?=$(abspath .)
 
@@ -41,7 +41,8 @@ firmware:
 		BOARD=$(BOARD) \
 		BOARD_DIR=$(BOARD_DIR) \
 		BUILD=$(BUILD) \
-		USER_C_MODULES=$(USER_C_MODULES)
+		USER_C_MODULES=$(USER_C_MODULES) \
+		MICROPY_FROZEN_MANIFEST=$(FROZEN_MANIFEST)
 
 deploy: $(FWBIN)
 	$(ECHO) "Writing $< to the board"

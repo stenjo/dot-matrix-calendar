@@ -7,11 +7,11 @@ extern "C" {
 
     typedef void* rrule_p;
 
-    rrule_p RRule_new(char * rrule, char * dtstart);
-    void RRule_del(rrule_p p);
+    rrule_p RRule_new(const char * rrule, const char * dtstart);
+    // void RRule_del(rrule_p p);
 
     bool RRule_next(rrule_p p);
-    void RRule_now(rrule_p p);
+    // void RRule_now(rrule_p p);
 
 #ifdef __cplusplus
 }
