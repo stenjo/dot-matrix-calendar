@@ -184,16 +184,6 @@ esp_err_t max7219_set_digit(max7219_t *dev, uint8_t digit, uint8_t val);
 esp_err_t max7219_clear(max7219_t *dev);
 
 /**
- * @brief Draw text on 7-segment display
- *
- * @param dev Display descriptor
- * @param pos Start digit
- * @param s Text
- * @return `ESP_OK` on success
- */
-esp_err_t max7219_draw_text_7seg(max7219_t *dev, uint8_t pos, const char *s);
-
-/**
  * @brief Draw 64-bit image on 8x8 matrix
  *
  * @param dev Display descriptor
@@ -203,20 +193,42 @@ esp_err_t max7219_draw_text_7seg(max7219_t *dev, uint8_t pos, const char *s);
  */
 esp_err_t max7219_draw_image_8x8(max7219_t *dev, uint8_t pos, const void *image);
 
-uint8_t * _getBufferPointer(max7219_t *dev, int16_t x, int16_t y);
-void setPixel(max7219_t *dev, int16_t x, int16_t y, bool enabled);
-bool getPixel(max7219_t *dev, int16_t x, int16_t y);
-void setColumn(max7219_t *dev, int16_t x, uint8_t value);
-void display(max7219_t *dev);
-void old_scroll(max7219_t *dev, scrollDirection_t direction, bool wrap);
-bool scroll(max7219_t *dev, bool wrap);
-
-//flush a single row to the display
-void displayRow(max7219_t *dev, uint8_t row);
-//clear the framebuffer
+/**
+ * @brief Clear the frame buffer
+ *
+ * @param dev Display descriptor
+ * @return void
+ */
 void clear(max7219_t *dev);
 
+/**
+ * @brief Scroll the text from marquee() left by one pixel and show. 
+ * Timer limited to set the scroll speed constant. Call as often as possible.
+ *
+ * @param dev Display descriptor
+ * @param wrap default False. Set to true to start scrolling text again when done.
+ * @return True if all text is scrolled left and empty display. False otherwise
+ */
+bool scroll(max7219_t *dev, bool wrap);
+
+
+/**
+ * @brief Write text to the display for scrolling. Scrolling is done 
+ * through the scroll() method
+ *
+ * @param dev Display descriptor
+ * @param text Null-terminated string to write
+ * @return void
+ */
 void marquee(max7219_t *dev, const char *text);
+
+/**
+ * @brief Write text to the display and show
+ *
+ * @param dev Display descriptor
+ * @param text Null-terminated string to write
+ * @return void
+ */
 void matrixWrite(max7219_t *dev, const char *text);
 
 #ifdef __cplusplus

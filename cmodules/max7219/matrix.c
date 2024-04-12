@@ -1,6 +1,7 @@
 #include "max7219.h"
 #include "matrix.h"
-#include "string.h"
+#include <string.h>
+#include <stdint.h>
 /*
  *  A very efficient and versatile, no-whitespace marquee example written by James Gohl 20.03.2019.
  *    - Using hardware SPI driver by Bartosz Bielawski.
@@ -206,6 +207,7 @@ static const uint16_t font_index[95] = {
   439,445,451,457,463,469,475,481,487,493,499,503,505,509
 };
 
+static const uint8_t ESCAPE_CHAR = 195;
 static const uint8_t specials[] = { // Escaped by char 195
 6, 0b00100000,0b01010100,0b01010100,0b01111100,0b01010100,0b01011000,   /* 184 = æ */
 5, 0b01011000,0b00100100,0b01010100,0b01001000,0b00110100,              /* 166 = ø */
@@ -219,77 +221,7 @@ static const uint16_t specials_map[] = {
   0,7,13,19,26,32
 };
 
-/*
- *  Text to scroll, this is hard-coded but if you want to have dynamic
- *    text from Serial input, you should Set scrollWhitespace =
- *    LEDMATRIX_WIDTH , wait for this to return to zero (so the previous 
- *    text scrolls away), then set textIndex and colIndex to 0.
- */
-char text[] = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_'abcdefghijklmnopqrstuvwxyz{|}~";
-// char text[] = "'   ";
 
-// Current text and column indices.
-// uint16_t textIndex = 0;
-// uint8_t colIndex = 0;
-
-/* 
- *  Used to set whitespace to the given number of columns,
- *    if > 0 in every loop this value will decrease by 1 and draw nothing while scrolling.
- *    At the end of each character we set this in nextCol() for spacing.
- *    At the end of the text we set this to LEDMATRIX_WIDTH.
- */
-// uint16_t scrollWhitespace = 0;
-
-void nextChar(max7219_t *dev)
-{
-  // printf("nextChar; text_index: %d, chr: '%c', whitespace: %x\n", dev->text_index, text[dev->text_index], dev->scroll_whitespace);
-  dev->text_index += 1;
-  if (dev->text != NULL) {
-    if (dev->text[dev->text_index] == '\0')
-    {
-      dev->text_index = 0;
-      // Set this to the number of pixels you want drawn between text loops.
-      dev->scroll_whitespace = dev->cascade_size * 8;
-    }
-    return;
-
-  }
-  if (text[dev->text_index] == '\0')
-  {
-    printf("nextChar; completed! text_index: %d\n", dev->text_index);
-    dev->text_index = 0;
-    // Set this to the number of pixels you want drawn between text loops.
-    dev->scroll_whitespace = dev->cascade_size * 8;
-  }
-}
-
-
-void writeCol(max7219_t *dev)
-{
-
-    if (dev->scroll_whitespace > 0)
-    {
-        printf("writeCol; whitespace: %d \n", dev->scroll_whitespace);
-        // Deal with whitespace - scroll but don't set LEDs.
-        dev->scroll_whitespace--;
-        return;
-    }
-    
-    uint8_t asc = (dev->text != NULL ? dev->text[dev->text_index] : text[dev->text_index]) - 32;
-    
-    // In ESP-IDF, we access the flash-stored data directly.
-    uint16_t idx = font_index[asc]; // Directly access flash-stored data
-    uint8_t w = font[idx];          // Directly access flash-stored data
-    uint8_t col = font[dev->col_index + idx + 1]; // Directly access flash-stored data
-    
-    // printf("writeCol; text_index: %d, chr: '%c', asc: %d, idx: %d , w: %d, col: %x\n", dev->text_index, text[dev->text_index], asc, idx, w, col);
-
-    setColumn(dev, dev->cascade_size * 8 - 1, col);
-
-  // printf("-> nextCol; w: %u, col: %d \n", w, dev->col_index);
-    nextCol(dev, w);
-  // printf("<- nextCol; w: %u, col: %d \n", w, dev->col_index);
-}
 
 void rotateImageCounterClockwise(const uint8_t* frameBuffer, uint8_t* rotatedBuffer) {
     for (int i = 0; i < 8; ++i) {
@@ -301,174 +233,138 @@ void rotateImageCounterClockwise(const uint8_t* frameBuffer, uint8_t* rotatedBuf
     }
 }
 
-void printImage(const uint8_t* frameBuffer, int size) {
-    for (int i = 0; i < size; ++i) {
-        for (int j = 0; j < 8; ++j) {
-            printf("%c", (frameBuffer[i] & (1 << (7 - j))) ? '0' : '.');
-        }
-        printf("\n");
+typedef struct {
+    uint16_t offset;
+    uint8_t width;
+} SpecialCharInfo;
+
+SpecialCharInfo getSpecialCharInfo(uint8_t chr) {
+    SpecialCharInfo info = {0, 0}; // Initialize to zero, indicating an invalid character (by default)
+    switch (chr) {
+        case 166: info.offset = specials_map[0]; break;
+        case 184: info.offset = specials_map[1]; break;
+        case 165: info.offset = specials_map[2]; break;
+        case 134: info.offset = specials_map[3]; break;
+        case 152: info.offset = specials_map[4]; break;
+        case 133: info.offset = specials_map[5]; break;
+        default: return info; // If the character is not special, we return zeros
     }
-        printf("\n");
+    info.width = specials[info.offset]; // Determine width using offset
+    return info;
 }
 
 uint8_t getSpecials(uint8_t chr, const uint8_t col) {
-  uint16_t offset = 0;
-  uint16_t width = 0;
-  switch(chr) {
-    case 166:
-      offset =  specials_map[0];
-      break;
-    case 184:
-      offset = specials_map[1];
-      break;
-    case 165:
-      offset =  specials_map[2];
-      break;
-    case 134:
-      offset =  specials_map[3];
-      break;
-    case 152:
-      offset =  specials_map[4];
-      break;
-    case 133:
-      offset =  specials_map[5];
-      break;
-    default:
-      // printf("get special: chr: %d, col: %d, offset: %d\n", chr, col, offset);
-      return 0;
-  }
+    SpecialCharInfo info = getSpecialCharInfo(chr);
   
-  width = specials[offset];
-  // printf("get special: chr: %d, col: %d, offset: %d, width: %d\n", chr, col, offset, width);
-
-
-  if (col >= width) {
-    return 0;
-  }
-  return specials[col+1+offset];
+    if (col >= info.width) {
+        return 0;
+    }
+    return specials[col + 1 + info.offset];
 }
 
-void nextCol(max7219_t *dev, uint8_t w)
-{
-  dev->col_index = dev->col_index + 1;
-  if (dev->col_index == w)
-  {
-    // Character spacing, consider increasing this when scrolling is faster.
-    dev->scroll_whitespace = 2;
-    dev->col_index = 0;
-    nextChar(dev);
-  }  
+uint8_t getCharColumn(uint8_t chr, uint8_t pos) {
+  uint8_t asc = chr - 32;
+  uint16_t idx = font_index[asc];
+  uint8_t w = font[idx];
+  if (pos >= w) return 0;
+  return font[pos + idx + 1];
 }
 
 void copyText(max7219_t * dev, const char * text) {
+  size_t textLength = strlen(text); // Calculate the length of the text once
+  int16_t bufferIndex = 0;
 
-  printf("-> copyText -> length: %d \n", strlen(text));
-  int16_t x = 0;
-  for (int16_t i = 0; i < strlen(text); i++) 
-  {
-    printf("-> copyText -> text: %c \n", text[i]);
-
-    if (text[i] == 195) {
-      i++;
-      int j=0;
-      uint8_t col = 0;
-      do
-      {
-        col = getSpecials(text[i], j++);
-        if (col != 0) {
-          dev->frameBuffer[x] = col;
-          x++;
-        }
-      } while (col > 0);
+  for (size_t strIdx = 0; strIdx < textLength; strIdx++) {
+    uint8_t chr = text[strIdx];
+    
+    if (chr == ' ') {
+      // If the character is a space, skip 2 columns
+      bufferIndex += 3;
+      continue;
     }
-    else {
-      uint8_t asc = text[i] - 32;
-      uint16_t idx = font_index[asc];
-      uint8_t w = font[idx];
-      for (int16_t j = 0; j < w; j++) {
-        uint8_t col = font[j + idx + 1];
-        dev->frameBuffer[x] = col;
-        x++;
+    
+    if (chr == ESCAPE_CHAR) {
+      // If the character is an escape character, handle it specially
+      strIdx++; // Move to the escaped char
+      if (strIdx < textLength) {
+        chr = text[strIdx];
+      } else {
+        // Error handling if ESCAPE_CHAR is the last character in the text
+        break;
       }
     }
-    x++;
+    
+    // Process each column of the character
+    for (int16_t charColumn = 0; ; charColumn++) {
+      uint8_t col = (chr == ESCAPE_CHAR) 
+                    ? getSpecials(text[strIdx], charColumn) 
+                    : getCharColumn(chr, charColumn);
+
+      // Exit the loop if the column data is zero (i.e., column processing is complete)
+      if (col == 0) break;
+
+      // Write to the buffer and increment the buffer index
+      dev->frameBuffer[bufferIndex++] = col;
+    }
   }
 
+  // After filling the buffer, print it
   printBuffer(dev);
-
 }
 
-bool scrollBuffer(max7219_t * dev)
-{
-  size_t bufferSize = dev->cascade_size * 8;
-  size_t textLength = strlen(dev->text);
+bool scrollBuffer(max7219_t *dev) {
+    size_t bufferSize = dev->cascade_size * 8;
+    size_t textLength = strlen(dev->text);
 
-  memmove(dev->frameBuffer, dev->frameBuffer + 1, bufferSize - 1);
-     
-  if (dev->text_index >= textLength) 
-  { 
-    // finished printing text - now whitespace
-    dev->frameBuffer[bufferSize - 1] = 0;
-    dev->scroll_whitespace--;
-    if (--dev->scroll_whitespace == 0 && dev->wrap_text_scroll) {
-        dev->text_index = 0;
-        dev->col_index = 0;
+    memmove(dev->frameBuffer, dev->frameBuffer + 1, bufferSize - 1);
+
+    if (dev->text_index >= textLength) {
+        // Finished processing text, add whitespace
+        dev->frameBuffer[bufferSize - 1] = 0;
+        if (--dev->scroll_whitespace <= 0) {  // Decrement and check whitespace count
+            if (dev->wrap_text_scroll) {
+                dev->text_index = 0;  // Reset text index
+                dev->col_index = 0;   // Reset column index
+                dev->scroll_whitespace = bufferSize;  // Reset whitespace count
+            }
+            return true;  // End of scrolling
+        }
+    } else {
+        uint8_t chr = dev->text[dev->text_index];
+        uint8_t col = 0;
+
+        if (dev->char_escaped) {
+            // Fetch the column for the special character
+            col = getSpecials(chr, dev->col_index);
+        } else if (chr == ' ' && dev->col_index < 1) {
+            dev->col_index++;
+            return false; 
+        } else {
+            // Fetch the column for the normal character
+            col = getCharColumn(chr, dev->col_index);
+            // Check if the character is an escape character
+            if (chr == ESCAPE_CHAR) {
+                dev->char_escaped = true;
+                chr = dev->text[++dev->text_index];  // Move to the next character and use as special character
+                col = getSpecials(chr, dev->col_index);
+            }
+        }
+
+        if (col != 0) {
+            // If there is column data, add it to buffer and increment column index
+            dev->frameBuffer[bufferSize - 1] = col;
+            dev->col_index++;
+        } else {
+            // No more columns for the character, reset column index, move to next character
+            dev->frameBuffer[bufferSize - 1] = 0;
+            dev->col_index = 0;
+            dev->text_index++;  // Increment text index to move to next character
+            dev->char_escaped = false;  // Reset escape flag after processing a special character
+        }
+        // Reset whitespace count as long as we're displaying text
         dev->scroll_whitespace = bufferSize;
     }
-
-  }
-  else 
-  {
-
-    uint8_t chr = dev->text[dev->text_index];
-
-    if (chr == 195 || dev->char_escaped) {
-      dev->char_escaped = true;
-      chr = dev->text[dev->text_index+1];
-      uint8_t col = getSpecials(chr, dev->col_index);
-      // printf("get special: chr: %d, col: %d, col_index: %d, text_index: %d\n", chr, col, dev->col_index, dev->text_index);
-
-      if (col != 0) {
-        dev->frameBuffer[dev->cascade_size*8-1] = col;
-        dev->col_index++;
-      }
-      else
-      {
-        dev->frameBuffer[dev->cascade_size*8-1] = 0;
-        dev->col_index = 0;
-        dev->text_index+=2;
-        dev->char_escaped = false;
-      }
-    }
-    else 
-    {
-
-      uint8_t asc = dev->text[dev->text_index] - 32;
-      uint16_t idx = font_index[asc];
-      uint8_t width = font[idx];
-      // printf("normal char: chr: %c, col: %d, col_index: %d, text_index: %d\n", 
-      // dev->text[dev->text_index], font[dev->col_index + idx + 1]+32, dev->col_index, dev->text_index);
-      if (dev->col_index < width) 
-      {
-        uint8_t col = font[dev->col_index + idx + 1];
-        dev->frameBuffer[dev->cascade_size*8-1] = col;
-        dev->col_index ++;
-      }
-      else
-      {
-        dev->frameBuffer[dev->cascade_size*8-1] = 0;
-        dev->col_index = 0;
-        dev->text_index++;
-      }
-    }
-    // Reset whitespace counter
-    dev->scroll_whitespace = dev->cascade_size*8;
-  }
-  if (dev->scroll_whitespace <= 0)
-  {
-    return true;
-  }
-  return false;
+    return false;  // Continue scrolling
 }
 
 void printBuffer(max7219_t * dev)
@@ -481,4 +377,20 @@ void printBuffer(max7219_t * dev)
     rotateImageCounterClockwise((uint8_t *)(dev->frameBuffer + d * 8 + offs), (uint8_t *)buffer);
     max7219_draw_image_8x8(dev, d*8, buffer);
   }
+}
+
+int textLength(max7219_t * dev, const char * text)
+{
+  int len = 0;
+  for (uint16_t i = 0; i < strlen(text); i++) {
+ 
+    if (text[i] == ESCAPE_CHAR) {
+      SpecialCharInfo info = getSpecialCharInfo(text[i]);
+      len += info.width + 1;
+    }
+    else {
+      len += font[font_index[text[i]-32]]+1;
+    }
+  }
+  return len-1;
 }

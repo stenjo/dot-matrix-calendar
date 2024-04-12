@@ -61,10 +61,6 @@ STATIC mp_obj_t max7219_make_new(const mp_obj_type_t *type, size_t n_args, size_
 STATIC mp_obj_t mp_max7219_test(mp_obj_t self_in) {
     max7219_obj_t *self = MP_OBJ_TO_PTR(self_in);
     marquee(&(self->dev), "I Åsane har vi både færøymål, låglønnsnæring og skjærgårdsøl!");
-    // bool done = false;
-    // while (!done) {
-    //     done = scroll(&(self->dev), false);
-    // }
     return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(max7219_test_obj, mp_max7219_test);
