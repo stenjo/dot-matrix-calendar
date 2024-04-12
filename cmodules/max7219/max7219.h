@@ -97,6 +97,7 @@ typedef struct
     bool mirrored;               //!< true for horizontally mirrored displays
     bool bcd;
     bool wrap_text_scroll;
+    bool char_escaped;
     scrollDirection_t direction;
     const char * text;
     uint16_t text_index;

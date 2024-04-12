@@ -480,6 +480,7 @@ void marquee(max7219_t *dev, const char *text)
     dev->text_index = 0;
     dev->col_index = 0;
     dev->scroll_whitespace = 0;
+    dev->char_escaped = false;
     clear(dev);
     max7219_init(dev);
     max7219_clear(dev);

@@ -6,26 +6,6 @@
 #include "max7219.h"
 #include "matrix.h"
 
-static const uint64_t symbols[] = {
-    0x383838fe7c381000, // arrows
-    0x10387cfe38383800,
-    0x10307efe7e301000,
-    0x1018fcfefc181000,
-    0x10387cfefeee4400, // heart
-    0x105438ee38541000, // sun
-
-    0x7e1818181c181800, // digits
-    0x7e060c3060663c00,
-    0x3c66603860663c00,
-    0x30307e3234383000,
-    0x3c6660603e067e00,
-    0x3c66663e06663c00,
-    0x1818183030667e00,
-    0x3c66663c66663c00,
-    0x3c66607c66663c00,
-    0x3c66666e76663c00
-};
-
 typedef struct _max7219_obj_t {
     mp_obj_base_t base;
     max7219_t dev;
@@ -72,8 +52,6 @@ STATIC mp_obj_t max7219_make_new(const mp_obj_type_t *type, size_t n_args, size_
     }
 
     max7219_init_desc(&(self->dev), SPI2_HOST, clock_speed_hz, cs_pin);
-    mp_printf(&mp_plat_print, "max7219 init cascade: %d, clock: %d, CS: %d, \n", self->dev.cascade_size, clock_speed_hz, cs_pin);
-
     max7219_init(&(self->dev));
 
     // The make_new function always returns self.
@@ -81,27 +59,12 @@ STATIC mp_obj_t max7219_make_new(const mp_obj_type_t *type, size_t n_args, size_
 }
 
 STATIC mp_obj_t mp_max7219_test(mp_obj_t self_in) {
-    static const size_t symbols_size = sizeof(symbols) - sizeof(uint64_t) * DEFAULT_CASCADE_SIZE;
     max7219_obj_t *self = MP_OBJ_TO_PTR(self_in);
-    max7219_t d=self->dev;
-    size_t size = sizeof(d.frameBuffer);
-    mp_printf(&mp_plat_print, "max7219 test digits: %d,  cascade: %d, fBuf(bytes): %d, fBuf(elmts): %d, flags: %x, \n", 
-    self->dev.digits, self->dev.cascade_size, sizeof(d.frameBuffer), size, d.flags);
-    size_t offs = 0;
-    uint repeats = 9;
-    while (repeats)
-    {
-        mp_printf(&mp_plat_print, "%d ---------- draw\n", self->dev.scroll_delay);
-
-        for (uint8_t c = 0; c < self->dev.cascade_size; c ++)
-            max7219_draw_image_8x8(&d, c * 8, (uint8_t *)symbols + c * 8 + offs + 32);
-        vTaskDelay(pdMS_TO_TICKS(self->dev.scroll_delay*4));
-
-        if (++offs == symbols_size)
-            offs = 0;
-
-        repeats--;
-    }
+    marquee(&(self->dev), "I Åsane har vi både færøymål, låglønnsnæring og skjærgårdsøl!");
+    // bool done = false;
+    // while (!done) {
+    //     done = scroll(&(self->dev), false);
+    // }
     return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(max7219_test_obj, mp_max7219_test);

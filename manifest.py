@@ -1,11 +1,11 @@
 # base modules
 include("$(PORT_DIR)/boards/manifest.py")
-freeze("./modules", "dateHandling.py")
-freeze("./modules", "datetime.py")
-freeze("./modules", "time.py")
-freeze("./modules", "mpy_env.py")
-freeze("./modules", "msgpack.py")
-freeze("./modules", "uuid.py")
+freeze("$(PROJECT_TOP)/modules", "dateHandling.py")
+freeze("$(PROJECT_TOP)/modules", "datetime.py")
+freeze("$(PROJECT_TOP)/modules", "time.py")
+freeze("$(PROJECT_TOP)/modules", "mpy_env.py")
+freeze("$(PROJECT_TOP)/modules", "msgpack.py")
+freeze("$(PROJECT_TOP)/modules", "uuid.py")
 
 require("contextlib")
 require("warnings")

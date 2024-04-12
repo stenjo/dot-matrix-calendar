@@ -207,24 +207,17 @@ static const uint16_t font_index[95] = {
 };
 
 static const uint8_t specials[] = { // Escaped by char 195
-6, 0b00100000,0b01010100,  0b01010100,  0b01111100,  0b01010100,  0b01011000,   /* 184 = æ */
-5, 0b01011000,0b00100100,  0b01010100,  0b01001000,  0b00110100,                /* 166 = ø */
-5, 0b00100000,0b01010100,  0b01010101,  0b01010100,  0b01111000,                /* 165 = å */
-6, 0b01111110,0b00001001,  0b00001001,  0b01111111,  0b01001001,  0b01001001,   /* 134 = Æ */
-5, 0b01011110,0b00100001,  0b01011001,  0b01000110,  0b00111101,                /* 152 = Ø */
-5, 0b01111000,0b00010100,  0b00010101,  0b00010100,  0b01111000                 /* 133 = Å */
+6, 0b00100000,0b01010100,0b01010100,0b01111100,0b01010100,0b01011000,   /* 184 = æ */
+5, 0b01011000,0b00100100,0b01010100,0b01001000,0b00110100,              /* 166 = ø */
+5, 0b00100000,0b01010100,0b01010101,0b01010100,0b01111000,              /* 165 = å */
+6, 0b01111110,0b00001001,0b00001001,0b01111111,0b01001001,0b01001001,   /* 134 = Æ */
+5, 0b01011110,0b00100001,0b01011001,0b01000110,0b00111101,              /* 152 = Ø */
+5, 0b01111000,0b00010100,0b00010101,0b00010100,0b01111000,0b00000000    /* 133 = Å */
 };
 
-const uint8_t IMAGES[][8] = {
-{  0b00100000,  0b01010100,  0b01010100,  0b01111100,  0b01010100,  0b01011000,  0b00000000,  0b00000000},
-{  0b01011000,  0b00100100,  0b01010100,  0b01001000,  0b00110100,  0b00000000,  0b00000000,  0b00000000},
-{  0b00100000,  0b01010100,  0b01010101,  0b01010100,  0b01111000,  0b00000000,  0b00000000,  0b00000000},
-{  0b01111110,  0b00001001,  0b00001001,  0b01111111,  0b01001001,  0b01001001,  0b00000000,  0b00000000},
-{  0b01011110,  0b00100001,  0b01011001,  0b01000110,  0b00111101,  0b00000000,  0b00000000,  0b00000000},
-{  0b01111000,  0b00010100,  0b00010101,  0b00010100,  0b01111000,  0b00000000,  0b00000000,  0b00000000}
+static const uint16_t specials_map[] = {
+  0,7,13,19,26,32
 };
-const int IMAGES_LEN = sizeof(IMAGES)/8;
-
 
 /*
  *  Text to scroll, this is hard-coded but if you want to have dynamic
@@ -270,19 +263,6 @@ void nextChar(max7219_t *dev)
   }
 }
 
-void nextCol(max7219_t *dev, uint8_t w)
-{
-  // printf("nextCol ->; w: %u, col: %d \n", w, dev->col_index);
-  dev->col_index = dev->col_index + 1;
-  if (dev->col_index == w)
-  {
-    // Character spacing, consider increasing this when scrolling is faster.
-    dev->scroll_whitespace = 2;
-    dev->col_index = 0;
-    nextChar(dev);
-  }  
-  // printf("nextCol <-; w: %u, col: %d \n", w, dev->col_index);
-}
 
 void writeCol(max7219_t *dev)
 {
@@ -314,11 +294,7 @@ void writeCol(max7219_t *dev)
 void rotateImageCounterClockwise(const uint8_t* frameBuffer, uint8_t* rotatedBuffer) {
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
-            // If the bit at position j in the ith byte is set,
-            // set the corresponding bit in the new position
-            // in the rotated buffer.
             if (frameBuffer[i] & (1 << j)) {
-                // Old position: (i, j), new position after rotation: (j, 7 - i)
                 rotatedBuffer[j] |= (1 << (7 - i));
             }
         }
@@ -336,24 +312,61 @@ void printImage(const uint8_t* frameBuffer, int size) {
 }
 
 uint8_t getSpecials(uint8_t chr, const uint8_t col) {
-  if (col > specials[0]) {
+  uint16_t offset = 0;
+  uint16_t width = 0;
+  switch(chr) {
+    case 166:
+      offset =  specials_map[0];
+      break;
+    case 184:
+      offset = specials_map[1];
+      break;
+    case 165:
+      offset =  specials_map[2];
+      break;
+    case 134:
+      offset =  specials_map[3];
+      break;
+    case 152:
+      offset =  specials_map[4];
+      break;
+    case 133:
+      offset =  specials_map[5];
+      break;
+    default:
+      // printf("get special: chr: %d, col: %d, offset: %d\n", chr, col, offset);
+      return 0;
+  }
+  
+  width = specials[offset];
+  // printf("get special: chr: %d, col: %d, offset: %d, width: %d\n", chr, col, offset, width);
+
+
+  if (col >= width) {
     return 0;
   }
-  return specials[col+1];
+  return specials[col+1+offset];
+}
+
+void nextCol(max7219_t *dev, uint8_t w)
+{
+  dev->col_index = dev->col_index + 1;
+  if (dev->col_index == w)
+  {
+    // Character spacing, consider increasing this when scrolling is faster.
+    dev->scroll_whitespace = 2;
+    dev->col_index = 0;
+    nextChar(dev);
+  }  
 }
 
 void copyText(max7219_t * dev, const char * text) {
-
-  // const char special[] = "øæåÆØÅ";
-  // for (int i = 0; i < strlen(special); ++i) {
-  //     printf("%c: %u\n", special[i],  special[i]);
-  // }
 
   printf("-> copyText -> length: %d \n", strlen(text));
   int16_t x = 0;
   for (int16_t i = 0; i < strlen(text); i++) 
   {
-    // printf("-> copyText -> text: %c \n", text[i]);
+    printf("-> copyText -> text: %c \n", text[i]);
 
     if (text[i] == 195) {
       i++;
@@ -364,16 +377,16 @@ void copyText(max7219_t * dev, const char * text) {
         col = getSpecials(text[i], j++);
         if (col != 0) {
           dev->frameBuffer[x] = col;
+          x++;
         }
-      } while (col);
+      } while (col > 0);
     }
     else {
       uint8_t asc = text[i] - 32;
-      uint16_t idx = font_index[asc]; // Directly access flash-stored data
-      uint8_t w = font[idx];          // Directly access flash-stored data
+      uint16_t idx = font_index[asc];
+      uint8_t w = font[idx];
       for (int16_t j = 0; j < w; j++) {
-        uint8_t col = font[j + idx + 1]; // Directly access flash-stored data
-        // setColumn(dev, x++, col);
+        uint8_t col = font[j + idx + 1];
         dev->frameBuffer[x] = col;
         x++;
       }
@@ -387,38 +400,66 @@ void copyText(max7219_t * dev, const char * text) {
 
 bool scrollBuffer(max7219_t * dev)
 {
-  for (int16_t i = 1; i < dev->cascade_size*8; i++)
-  {
-    dev->frameBuffer[i-1] = dev->frameBuffer[i];
-  }
+  size_t bufferSize = dev->cascade_size * 8;
+  size_t textLength = strlen(dev->text);
 
-  if (dev->text_index >= strlen(dev->text))
+  memmove(dev->frameBuffer, dev->frameBuffer + 1, bufferSize - 1);
+     
+  if (dev->text_index >= textLength) 
   { 
     // finished printing text - now whitespace
-    dev->frameBuffer[dev->cascade_size*8-1] = 0;
+    dev->frameBuffer[bufferSize - 1] = 0;
     dev->scroll_whitespace--;
-    if (dev->scroll_whitespace <= 0 && dev->wrap_text_scroll)
-    {
-      dev->text_index = 0;
-      dev->col_index = 0;
+    if (--dev->scroll_whitespace == 0 && dev->wrap_text_scroll) {
+        dev->text_index = 0;
+        dev->col_index = 0;
+        dev->scroll_whitespace = bufferSize;
     }
+
   }
   else 
   {
-    uint8_t asc = dev->text[dev->text_index] - 32;
-    uint16_t idx = font_index[asc];
-    uint8_t width = font[idx];
-    if (dev->col_index < width) 
-    {
-      uint8_t col = font[dev->col_index + idx + 1]; // Directly access flash-stored data
-      dev->frameBuffer[dev->cascade_size*8-1] = col;
-      dev->col_index ++;
+
+    uint8_t chr = dev->text[dev->text_index];
+
+    if (chr == 195 || dev->char_escaped) {
+      dev->char_escaped = true;
+      chr = dev->text[dev->text_index+1];
+      uint8_t col = getSpecials(chr, dev->col_index);
+      // printf("get special: chr: %d, col: %d, col_index: %d, text_index: %d\n", chr, col, dev->col_index, dev->text_index);
+
+      if (col != 0) {
+        dev->frameBuffer[dev->cascade_size*8-1] = col;
+        dev->col_index++;
+      }
+      else
+      {
+        dev->frameBuffer[dev->cascade_size*8-1] = 0;
+        dev->col_index = 0;
+        dev->text_index+=2;
+        dev->char_escaped = false;
+      }
     }
-    else
+    else 
     {
-      dev->frameBuffer[dev->cascade_size*8-1] = 0;
-      dev->col_index = 0;
-      dev->text_index++;
+
+      uint8_t asc = dev->text[dev->text_index] - 32;
+      uint16_t idx = font_index[asc];
+      uint8_t width = font[idx];
+      // printf("normal char: chr: %c, col: %d, col_index: %d, text_index: %d\n", 
+      // dev->text[dev->text_index], font[dev->col_index + idx + 1]+32, dev->col_index, dev->text_index);
+      if (dev->col_index < width) 
+      {
+        uint8_t col = font[dev->col_index + idx + 1];
+        dev->frameBuffer[dev->cascade_size*8-1] = col;
+        dev->col_index ++;
+      }
+      else
+      {
+        dev->frameBuffer[dev->cascade_size*8-1] = 0;
+        dev->col_index = 0;
+        dev->text_index++;
+      }
     }
     // Reset whitespace counter
     dev->scroll_whitespace = dev->cascade_size*8;
