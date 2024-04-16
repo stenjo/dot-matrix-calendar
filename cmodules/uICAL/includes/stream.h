@@ -4,14 +4,8 @@
 #ifndef uical_stream_h
 #define uical_stream_h
 
-#ifdef ARDUINO
-    //#include <Arduino.h>
-    #include <WString.h>
-    #include <Stream.h>
-#else
-    #include <istream>
-#endif
-
+#include <istream>
+#include <vector>
 namespace uICAL {
     class string;
 
@@ -46,50 +40,19 @@ namespace uICAL {
         protected:
     };
 
-    #ifdef ARDUINO
 
-        class istream_Stream : public istream {
-            public:
-                istream_Stream(Stream& istm);
+    class istream_stl : public istream {
+        public:
+            istream_stl(std::istream& istm);
 
-                char peek() const;
-                char get();
+            char peek() const;
+            char get();
 
-                bool readuntil(string& st, char delim);
+            bool readuntil(string& st, char delim);
 
-            protected:
-                Stream& stm;
-        };
+        protected:
+            std::istream& istm;
+    };
 
-        class istream_String : public istream {
-            public:
-                istream_String(const String& st);
-
-                char peek() const;
-                char get();
-
-                bool readuntil(string& st, char delim);
-
-            protected:
-                const String& st;
-                size_t pos;
-        };
-
-    #else
-
-        class istream_stl : public istream {
-            public:
-                istream_stl(std::istream& istm);
-
-                char peek() const;
-                char get();
-
-                bool readuntil(string& st, char delim);
-
-            protected:
-                std::istream& istm;
-        };
-
-    #endif
 }
 #endif

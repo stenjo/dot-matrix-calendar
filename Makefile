@@ -54,3 +54,6 @@ erase:
 
 reset:
 	echo -e "\r\nimport machine; machine.reset()\r\n" >$(PORT)
+
+prompt:
+	screen $(PORT)

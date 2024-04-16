@@ -5,7 +5,7 @@
 #define uical_tz_h
 
 #include "includes/base.h"
-
+#include "includes/datetime.h"
 namespace uICAL {
     class DateStamp;
     class TZMap;

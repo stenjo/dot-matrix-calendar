@@ -1,9 +1,19 @@
 from max7219 import Matrix8x8
-from uICAL import RRule
+import ics_parser
 
+ics_data = """BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+SUMMARY:Meeting with John
+DTSTART:20230412T160000Z
+END:VEVENT
+END:VCALENDAR"""
+
+event = ics_parser.parse(ics_data)
+
+print(event)  # Should print a tuple like ("Meeting with John", "20230412T160000Z")
 m = Matrix8x8()
 
-r=RRule("Rule text", "2024-04-10:12:57:34")
 m.clear()
 m.init()
 m.test()

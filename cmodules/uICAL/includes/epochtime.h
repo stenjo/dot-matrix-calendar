@@ -5,7 +5,7 @@
 #define uical_epochtime_h
 
 #include "includes/base.h"
-
+#include "includes/tz.h"
 namespace uICAL {
     class TZ;
 

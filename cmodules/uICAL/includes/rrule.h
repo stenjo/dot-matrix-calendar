@@ -12,6 +12,7 @@ namespace uICAL {
 
     class RRule : public Base {
         public:
+            // RRule(const string& rrule);
             RRule(const string& rrule, const DateTime& dtstart);
 
             void exclude(const DateTime& exclude);

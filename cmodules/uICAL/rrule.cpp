@@ -9,6 +9,8 @@
 #include "includes/rrule.h"
 
 namespace uICAL {
+
+    // RRule::RRule(const string& rrule)//, const DateTime& dtstart)
     RRule::RRule(const string& rrule, const DateTime& dtstart)
     : dtstart(dtstart)
     {

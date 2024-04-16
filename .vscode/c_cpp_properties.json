@@ -75,16 +75,34 @@
         {
             "name": "ESP32",
             "includePath": [
-                "~/esp/esp-idf/components/**",
-                "${workspaceFolder}/**",
-                "~/.espressif/tools/xtensa-esp32-elf/esp-12.2.0_20230208/xtensa-esp32-elf/include"
+                "/Users/sten.johnsen/esp/esp-idf/components/**",
+                "/Users/sten.johnsen/git/dot-matrix-calendar/**",
+                "/Users/sten.johnsen/git/dot-matrix-calendar/cmodules/uICAL",
+                "/Users/sten.johnsen/git/dot-matrix-calendar/cmodules/uICAL/includes",
+                "/Users/sten.johnsen/.espressif/tools/xtensa-esp32-elf/esp-2022r1-11.2.0/xtensa-esp32-elf/include"
             ],
             "defines": [],
             "macFrameworkPath": [],
-            "compilerPath": "~/.espressif/tools/xtensa-esp32-elf/esp-12.2.0_20230208/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc",
+            "compilerPath": "/Users/sten.johnsen/.espressif/tools/xtensa-esp32-elf/esp-2022r1-11.2.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-g++",
             "cStandard": "c99",
             "cppStandard": "c++11",
-            "intelliSenseMode": "gcc-x64"
+            "intelliSenseMode": "gcc-x64",
+            "compilerPathInCppPropertiesJson": "~/.espressif/tools/xtensa-esp32-elf/esp-12.2.0_20230208/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc",
+            "compilerArgs": [
+                "-I lib/micropython"
+            ],
+            "mergeConfigurations": false,
+            "browse": {
+                "path": [
+                    "/Users/sten.johnsen/esp/esp-idf/components/**",
+                    "/Users/sten.johnsen/git/dot-matrix-calendar/**",
+                    "/Users/sten.johnsen/git/dot-matrix-calendar/cmodules/uICAL",
+                    "/Users/sten.johnsen/git/dot-matrix-calendar/cmodules/uICAL/includes",
+                    "/Users/sten.johnsen/.espressif/tools/xtensa-esp32-elf/esp-12.2.0_20230208/xtensa-esp32-elf/include",
+                    "${workspaceFolder}"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            }
         }
     ],
     "version": 4

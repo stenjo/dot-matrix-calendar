@@ -43,7 +43,10 @@
         "pystack.h": "c",
         "regex": "c",
         "modmachine.h": "c",
-        "max7219.h": "c"
+        "max7219.h": "c",
+        "misc.h": "c",
+        "mp_rrule.h": "c",
+        "vector": "cpp"
     },
     "cmake.configureOnOpen": false,
     "idf.port": "/dev/cu.usbserial-0001"
