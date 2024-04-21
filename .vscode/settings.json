@@ -46,8 +46,14 @@
         "max7219.h": "c",
         "misc.h": "c",
         "mp_rrule.h": "c",
-        "vector": "cpp"
+        "vector": "cpp",
+        "stdlib.h": "c",
+        "setjmp.h": "c",
+        "ics_parser.h": "c"
     },
     "cmake.configureOnOpen": false,
-    "idf.port": "/dev/cu.usbserial-0001"
+    "idf.port": "/dev/cu.usbserial-0001",
+    "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild",
+    "C_Cpp.default.compileCommands": "/Users/sten.johnsen/git/dot-matrix-calendar/cmodules/ics/builddir/compile_commands.json",
+    "unityExplorer.unitUnderTestFolder": "./test"
 }

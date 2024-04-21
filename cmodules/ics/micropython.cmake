@@ -3,7 +3,9 @@ add_library(usermod_ics INTERFACE)
 
 # Add our source files to the lib
 target_sources(usermod_ics INTERFACE
-    ${CMAKE_CURRENT_LIST_DIR}/ics_parser.c
+    ${CMAKE_CURRENT_LIST_DIR}/src/ics_parser.c
+    ${CMAKE_CURRENT_LIST_DIR}/src/ics_file.c
+    ${CMAKE_CURRENT_LIST_DIR}/mp_ics.c
 )
 
 # Add the current directory as an include directory.

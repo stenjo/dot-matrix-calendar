@@ -12,6 +12,7 @@ END:VCALENDAR"""
 event = ics_parser.parse(ics_data)
 
 print(event)  # Should print a tuple like ("Meeting with John", "20230412T160000Z")
+
 m = Matrix8x8()
 
 m.clear()

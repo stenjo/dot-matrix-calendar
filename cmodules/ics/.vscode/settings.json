@@ -1,0 +1,11 @@
+{
+    "C_Cpp.default.compileCommands": "/Users/sten.johnsen/git/dot-matrix-calendar/cmodules/ics/builddir/compile_commands.json",
+    "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild",
+    "files.associations": {
+        "ics_parser.h": "c",
+        "ics_file.h": "c"
+    },
+    "mesonbuild.formatting.enabled": true,
+    "mesonbuild.linter.muon.enabled": true,
+    "mesonbuild.mesonlsp.others.muonPath": "/opt/homebrew/bin/muon"
+}
