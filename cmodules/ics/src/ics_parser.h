@@ -1,6 +1,8 @@
 #ifndef ICS_PARSE_H
 #define ICS_PARSE_H
 
+#include <stdbool.h>
+
 // Define the structure to hold parsed event information
 typedef struct {
     char *summary;
@@ -16,10 +18,11 @@ typedef struct {
 } ics_t;
 
 event_t getEvent(const char *ics_data, const char ** next);
-ics_t parse(const char *ics_data);
+ics_t parse(ics_t * ics, const char *ics_data);
 event_t getFirstEvent(ics_t *ics);
 event_t getNextEvent(ics_t *ics);
 event_t getLastEvent(ics_t *ics);
 void initIcs(ics_t *ics);
+bool atEnd(ics_t *ics);
 
 #endif // ICS_PARSE_H

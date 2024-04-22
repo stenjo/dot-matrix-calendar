@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include "ics_parser.h"
 
 // Helper function to find the end of the line ('\r\n')
@@ -79,21 +80,20 @@ event_t getEvent(const char *ics_data, const char **next) {
     return event;
 }
 
-ics_t parse(const char * ics_data) 
+ics_t parse(ics_t *ics, const char * ics_data) 
 {
-    ics_t ics;
-    initIcs(&ics);
+    initIcs(ics);
 
-    event_t event = getEvent(ics_data, &ics.next);
+    event_t event = getEvent(ics_data, &ics->next);
 
-    while (ics.next != NULL && ics.count < MAX_EVENT_COUNT)
+    while (ics->next != NULL && ics->count < MAX_EVENT_COUNT)
     {
-        ics.events[ics.count] = event;
-        ics.count += 1;
-        event = getEvent(ics.next, &ics.next);
+        ics->events[ics->count] = event;
+        ics->count += 1;
+        event = getEvent(ics->next, &ics->next);
     }
 
-    return ics;
+    return *ics;
 }
 
 event_t getFirstEvent(ics_t *ics)
@@ -110,14 +110,13 @@ event_t getFirstEvent(ics_t *ics)
 
 event_t getNextEvent(ics_t *ics)
 {
-    if (ics->current < MAX_EVENT_COUNT - 1 && ics->current < ics->count -1)
+    if (atEnd(ics))
     {
-        ics->current++;
-        return ics->events[ics->current];
+        return (event_t){NULL, NULL}; 
     }
 
-    return (event_t){NULL, NULL}; 
-
+    ics->current++;
+    return ics->events[ics->current];
 }
 
 event_t getLastEvent(ics_t *ics)
@@ -135,4 +134,11 @@ void initIcs(ics_t *ics)
     ics->count = 0;
     ics->next = NULL;
     memset(ics->events, 0, sizeof(ics->events));
+}
+
+bool atEnd(ics_t *ics)
+{
+    if (ics == NULL || ics->count == 0)
+    { return false; }
+    return ics->current >= (MAX_EVENT_COUNT - 1) || ics->current >= (ics->count - 1);
 }

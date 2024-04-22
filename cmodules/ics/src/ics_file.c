@@ -1,15 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include "ics_file.h"
 #include "ics_parser.h"
 
-ics_t parseFile(const char *file_path) {
+ics_t parseFile(ics_t * ics, const char *file_path) {
     // Allocate a buffer for the file's contents
     char *buffer = NULL;
-    ics_t ics;
-    initIcs(&ics);
+    initIcs(ics);
     long length;
-    FILE *f = fopen(file_path, "r");  // Open file for reading
+    FILE *f = fopen(file_path, "rb");  // Open file for reading
 
     if (f) {
         fseek(f, 0, SEEK_END);
@@ -25,10 +25,13 @@ ics_t parseFile(const char *file_path) {
 
         if (buffer) {
             // Parse the ICS data from the buffer
-            ics = parse(buffer);
+            parse(ics, buffer);
             free(buffer);  // Don't forget to free the allocated buffer
         }
+     } else {
+        // Print an error message if the file could not be opened
+        printf("Error opening file '%s': %d\n", file_path, errno);
     }
 
-    return ics;
+    return *ics;
 }

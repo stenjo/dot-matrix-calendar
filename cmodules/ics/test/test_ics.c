@@ -66,7 +66,10 @@ void test_ics_parse_ShouldReturnEventSummaryAndStart(void)
 }
 
 void test_parse_ShouldReturnEventList(void) {
-    ics_t ics = parse(ics_data);
+
+    ics_t ics;
+    initIcs(&ics);
+    parse(&ics, ics_data);
     TEST_ASSERT_EQUAL_STRING("Meeting with John",ics.events[0].summary);
     TEST_ASSERT_EQUAL_STRING("20230412T160000Z", ics.events[0].dtstart);
     TEST_ASSERT_EQUAL(1,ics.count);
@@ -74,7 +77,9 @@ void test_parse_ShouldReturnEventList(void) {
 }
 
 void test_parse_ShouldReturnEventListIterationOneEvent(void) {
-    ics_t ics = parse(ics_data);
+    ics_t ics;
+    initIcs(&ics);
+    parse(&ics, ics_data);
     event_t event = getFirstEvent(&ics);
 
     TEST_ASSERT_EQUAL_STRING("Meeting with John",event.summary);
@@ -82,7 +87,9 @@ void test_parse_ShouldReturnEventListIterationOneEvent(void) {
         
 }
 void test_parse_ShouldReturnEventListIterationThreeEvents(void) {
-    ics_t ics = parse(ics_data3);
+    ics_t ics;
+    initIcs(&ics);
+    parse(&ics, ics_data3);
     event_t event = getFirstEvent(&ics);
 
     TEST_ASSERT_EQUAL(3,ics.count);
@@ -101,7 +108,9 @@ void test_parse_ShouldReturnEventListIterationThreeEvents(void) {
 
 void test_parse_ics_from_file(void)
 {
-    ics_t ics =  parseFile("../test/test_event.ics");
+    ics_t ics;
+    initIcs(&ics);
+    parseFile(&ics, "../test/test_event.ics");
 
     TEST_ASSERT_NOT_NULL(ics.events[0].summary);
     TEST_ASSERT_NOT_NULL(ics.events[0].dtstart);
@@ -116,7 +125,9 @@ void test_parse_ics_from_file(void)
 
 void test_parse_ics_from_f2_file(void)
 {
-    ics_t ics = parseFile("../test/f2-calendar_p_q_sprint_feature.ics");
+    ics_t ics;
+    initIcs(&ics);
+    parseFile(&ics, "../test/f2-calendar_p_q_sprint_feature.ics");
 
     TEST_ASSERT_NOT_NULL(ics.events[0].summary);
     TEST_ASSERT_NOT_NULL(ics.events[0].dtstart);
@@ -129,3 +140,4 @@ void test_parse_ics_from_f2_file(void)
     if (ics.events[0].summary) free(ics.events[0].summary);
     if (ics.events[0].dtstart) free(ics.events[0].dtstart);
 }
+

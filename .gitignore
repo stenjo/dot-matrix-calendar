@@ -164,3 +164,5 @@ env.json
 .creds.json
 .DS_Store
 log
+**/build/**
+**/managed_components/**
