@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <time.h>
+
 #include "ics_parser.h"
 
 // Helper function to find the end of the line ('\r\n')
@@ -15,6 +17,13 @@ static char *find_eol(char *s) {
     } else {
         return s;
     }
+}
+
+time_t parse_date_string(const char *date_str) {
+    struct tm tm;
+    strptime(date_str, "%Y%m%dT%H%M%SZ", &tm);
+    time_t t = mktime(&tm);
+    return t;
 }
 
 event_t getEvent(const char *ics_data, const char **next) {
@@ -80,7 +89,7 @@ event_t getEvent(const char *ics_data, const char **next) {
     return event;
 }
 
-ics_t parse(ics_t *ics, const char * ics_data) 
+size_t parse(ics_t *ics, const char * ics_data) 
 {
     initIcs(ics);
 
@@ -93,7 +102,7 @@ ics_t parse(ics_t *ics, const char * ics_data)
         event = getEvent(ics->next, &ics->next);
     }
 
-    return *ics;
+    return ics->count;
 }
 
 event_t getFirstEvent(ics_t *ics)
@@ -104,7 +113,7 @@ event_t getFirstEvent(ics_t *ics)
 
     ics->current = 0;
 
-    return ics->events[0];
+    return getCurrentEvent(ics);
 
 }
 
@@ -116,7 +125,7 @@ event_t getNextEvent(ics_t *ics)
     }
 
     ics->current++;
-    return ics->events[ics->current];
+    return getCurrentEvent(ics);
 }
 
 event_t getLastEvent(ics_t *ics)
@@ -125,7 +134,87 @@ event_t getLastEvent(ics_t *ics)
         return (event_t){NULL, NULL}; 
     }
     ics->current = ics->count - 1;
+    return getCurrentEvent(ics);
+}
+
+event_t getCurrentEvent(ics_t *ics)
+{
+    if (ics == NULL || ics->count == 0) {
+        return (event_t){NULL, NULL}; 
+    }
     return ics->events[ics->current];
+}
+
+size_t setCurrentEvent(ics_t *ics, size_t index)
+{
+    if (ics == NULL || ics->count == 0 || index >= MAX_EVENT_COUNT || index >= ics->count || index < 0) {
+        printf("Error index outside boundaries: index: %zu, max: %d\n", index, MAX_EVENT_COUNT);
+        return -1; 
+    }
+    ics->current = index;
+    return ics->current;
+}
+
+event_t getEventAt(ics_t *ics, size_t index) 
+{
+    if (ics == NULL || ics->count == 0) {
+        return (event_t){NULL, NULL}; 
+    }
+    size_t saved_index = ics->current;
+
+    size_t current = setCurrentEvent(ics, index);
+    if (current == -1) {
+        return (event_t){NULL, NULL};
+    }
+
+    event_t event = getCurrentEvent(ics);
+    ics->current = saved_index;
+
+    return event;
+
+}
+
+event_t getNextEventInRange(ics_t *ics, const char *start_date_str, const char *end_date_str) {
+    // Check if the start date string is supplied
+    if (start_date_str == NULL) {
+        // Handle error or return an empty event.
+        return (event_t){NULL, NULL};
+    }
+
+    // Convert date strings to time_t for comparison.
+    time_t start = parse_date_string(start_date_str);
+    time_t end;
+    // If the end date string is not supplied or is empty, set it to the maximum time_t value.
+    if (end_date_str == NULL || strlen(end_date_str) == 0) {
+        end = 0;
+    } else {
+        end = parse_date_string(end_date_str);
+    }
+
+    while (!atEnd(ics)) {
+        ics->current++;
+        event_t event = getCurrentEvent(ics);
+        
+        // Parse the event's start date.
+        time_t event_start = parse_date_string(event.dtstart);
+        
+        // Check if the event's start date is within the range.
+        if (difftime(event_start, start) >= 0 && ( end == 0 || difftime(event_start, end) <= 0)) {
+            return event; // Event is within the range.
+        }
+    }
+
+    // Return an empty event if no more events are within the range.
+    return (event_t){NULL, NULL};
+}
+
+
+time_t setStartDate(ics_t *ics, const char *start)
+{
+    time_t event_start = parse_date_string(start);
+    ics->startTime = event_start;
+  
+    return event_start;
 }
 
 void initIcs(ics_t *ics)
@@ -133,12 +222,14 @@ void initIcs(ics_t *ics)
     ics->current = 0;
     ics->count = 0;
     ics->next = NULL;
+    ics->startTime = 0;
+    ics->endTime = 0;
     memset(ics->events, 0, sizeof(ics->events));
 }
 
 bool atEnd(ics_t *ics)
 {
     if (ics == NULL || ics->count == 0)
-    { return false; }
+    { return true; }
     return ics->current >= (MAX_EVENT_COUNT - 1) || ics->current >= (ics->count - 1);
 }

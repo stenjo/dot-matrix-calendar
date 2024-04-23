@@ -7,5 +7,6 @@
     },
     "mesonbuild.formatting.enabled": true,
     "mesonbuild.linter.muon.enabled": true,
-    "mesonbuild.mesonlsp.others.muonPath": "/opt/homebrew/bin/muon"
+    "mesonbuild.mesonlsp.others.muonPath": "/opt/homebrew/bin/muon",
+    "mesonbuild.mesonlsp.others.defaultFormattingConfig": null
 }

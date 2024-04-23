@@ -77,8 +77,6 @@
             "includePath": [
                 "/Users/sten.johnsen/esp/esp-idf/components/**",
                 "/Users/sten.johnsen/git/dot-matrix-calendar/**",
-                "/Users/sten.johnsen/git/dot-matrix-calendar/cmodules/ics",
-                "/Users/sten.johnsen/git/dot-matrix-calendar/lib/micropython",
                 "/Users/sten.johnsen/.espressif/tools/xtensa-esp32-elf/esp-2022r1-11.2.0/xtensa-esp32-elf/include"
             ],
             "defines": [],

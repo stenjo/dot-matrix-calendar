@@ -4,7 +4,7 @@
 #include "ics_file.h"
 #include "ics_parser.h"
 
-ics_t parseFile(ics_t * ics, const char *file_path) {
+size_t parseFile(ics_t * ics, const char *file_path) {
     // Allocate a buffer for the file's contents
     char *buffer = NULL;
     initIcs(ics);
@@ -33,5 +33,5 @@ ics_t parseFile(ics_t * ics, const char *file_path) {
         printf("Error opening file '%s': %d\n", file_path, errno);
     }
 
-    return *ics;
+    return ics->count;
 }
