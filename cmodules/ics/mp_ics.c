@@ -35,6 +35,9 @@ STATIC mp_obj_t ics_make_new(const mp_obj_type_t *type, size_t n_args, size_t n_
 {
     ics_obj_t * self = mp_obj_malloc(ics_obj_t, type);
     initIcs(&(self->ics));
+    self->ics.startTime = 0;
+    self->ics.endTime = 0;
+
     return MP_OBJ_FROM_PTR(self);
 }
 
@@ -123,33 +126,44 @@ STATIC mp_obj_t mp_setCurrentEvent(mp_obj_t self_in, mp_obj_t mp_index_obj) {
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_2(setCurrentEvent_obj, mp_setCurrentEvent);
 
-STATIC mp_obj_t mp_getNextEventInRange(size_t n_args, const mp_obj_t *args) {
-    // args[0] is self, args[1] is start date, and args[2] (optional) is the end date.
-    mp_check_self(mp_obj_is_type(args[0], &ics_parser_type_ICS));
-
-    ics_obj_t *self = MP_OBJ_TO_PTR(args[0]);
-    const char *start_date_str = mp_obj_str_get_str(args[1]);
-    const char *end_date_str = (n_args > 2) ? mp_obj_str_get_str(args[2]) : NULL;
-
-    // Call the C function that filters the events.
-    event_t event = getNextEventInRange(&(self->ics), start_date_str, end_date_str);
-
-    // Return the event as a MicroPython object.
-    return getEventObj(event);
-}
-STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(mp_getNextEventInRange_obj, 2, 3, mp_getNextEventInRange);
-
 STATIC mp_obj_t mp_setStartDate(mp_obj_t self_in, mp_obj_t start_date_obj) {
     mp_check_self(mp_obj_is_type(self_in, &ics_parser_type_ICS)); // Modify the type check accordingly
-    mp_check_self(mp_obj_is_str_or_bytes(start_date_obj));
     ics_obj_t *self = MP_OBJ_TO_PTR(self_in);
+
+    mp_check_self(mp_obj_is_str_or_bytes(start_date_obj));
+
     const char* startDate = mp_obj_str_get_str(start_date_obj);
+    mp_printf(&mp_plat_print, "mp_setStartDate called: %s\n", startDate);
 
     size_t result = setStartDate(&(self->ics), startDate);
 
     return mp_obj_new_int(result);
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_2(setStartDate_obj, mp_setStartDate);
+
+
+STATIC mp_obj_t mp_setEndDate(mp_obj_t self_in, mp_obj_t end_date_obj) {
+    mp_check_self(mp_obj_is_type(self_in, &ics_parser_type_ICS)); // Modify the type check accordingly
+    ics_obj_t *self = MP_OBJ_TO_PTR(self_in);
+
+    mp_check_self(mp_obj_is_str_or_bytes(end_date_obj));
+    GET_STR_DATA_LEN(end_date_obj, end_date, end_date_len);
+    const char* endDate = mp_obj_str_get_str(end_date_obj);
+
+    size_t result = setEndDate(&(self->ics), endDate);
+
+    return mp_obj_new_int(result);
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(setEndDate_obj, mp_setEndDate);
+
+STATIC mp_obj_t mp_reset(mp_obj_t self_in) {
+    mp_check_self(mp_obj_is_type(self_in, &ics_parser_type_ICS)); // Modify the type check accordingly
+    ics_obj_t *self = MP_OBJ_TO_PTR(self_in);
+    initIcs(&(self->ics));
+    initIcsDates(&(self->ics));
+    return mp_const_none;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_1(reset_obj, mp_reset);
 
 
 STATIC const mp_rom_map_elem_t ics_parser_locals_dict_table[] = {
@@ -162,8 +176,9 @@ STATIC const mp_rom_map_elem_t ics_parser_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR_getCurrent), MP_ROM_PTR(&getCurrent_obj) },
     { MP_ROM_QSTR(MP_QSTR_getEventAt), MP_ROM_PTR(&getEventAt_obj) },
     { MP_ROM_QSTR(MP_QSTR_setCurrentEvent), MP_ROM_PTR(&setCurrentEvent_obj) },
-    { MP_ROM_QSTR(MP_QSTR_getNextEventInRange), MP_ROM_PTR(&mp_getNextEventInRange_obj) },
     { MP_ROM_QSTR(MP_QSTR_setStartDate), MP_ROM_PTR(&setStartDate_obj) },
+    { MP_ROM_QSTR(MP_QSTR_setEndDate), MP_ROM_PTR(&setEndDate_obj) },
+    { MP_ROM_QSTR(MP_QSTR_reset), MP_ROM_PTR(&reset_obj) },
 };
 
 STATIC MP_DEFINE_CONST_DICT(ics_parser_locals_dict, ics_parser_locals_dict_table);

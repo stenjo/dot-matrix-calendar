@@ -4,7 +4,7 @@ from datetime import datetime
 import ujson
 from Calendar import Calendar
 
-c=Calendar('f2-calendar_p_q_sprint_feature.ics')
+c=Calendar('f2-calendar_p_q_sprint_feature.ics', start='20240501T000000Z')
 event = c.first()
 
 print(event)  # Should print a tuple like ("Test Event", "20230412T160000Z")

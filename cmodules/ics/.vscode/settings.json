@@ -3,7 +3,9 @@
     "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild",
     "files.associations": {
         "ics_parser.h": "c",
-        "ics_file.h": "c"
+        "ics_file.h": "c",
+        "__bit_reference": "c",
+        "bitset": "c"
     },
     "mesonbuild.formatting.enabled": true,
     "mesonbuild.linter.muon.enabled": true,

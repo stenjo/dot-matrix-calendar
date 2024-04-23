@@ -8,6 +8,7 @@
 typedef struct {
     char *summary;
     char *dtstart;
+    time_t tstart;
 } event_t;
 
 #define MAX_EVENT_COUNT 100
@@ -30,8 +31,10 @@ size_t setCurrentEvent(ics_t *ics, size_t index);
 event_t getEventAt(ics_t *ics, size_t index); 
 event_t getNextEventInRange(ics_t *ics, const char *start_date_str, const char *end_date_str);
 time_t setStartDate(ics_t *ics, const char *start);
+time_t setEndDate(ics_t *ics, const char *end);
 
 void initIcs(ics_t *ics);
+void initIcsDates(ics_t *ics);
 bool atEnd(ics_t *ics);
 
 #endif // ICS_PARSE_H

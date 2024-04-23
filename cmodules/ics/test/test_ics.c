@@ -69,6 +69,7 @@ void test_parse_ShouldReturnEventList(void) {
 
     ics_t ics;
     initIcs(&ics);
+    initIcsDates(&ics);
     parse(&ics, ics_data);
     TEST_ASSERT_EQUAL_STRING("Meeting with John",ics.events[0].summary);
     TEST_ASSERT_EQUAL_STRING("20230412T160000Z", ics.events[0].dtstart);
@@ -79,6 +80,7 @@ void test_parse_ShouldReturnEventList(void) {
 void test_parse_ShouldReturnEventListIterationOneEvent(void) {
     ics_t ics;
     initIcs(&ics);
+    initIcsDates(&ics);
     size_t count = parse(&ics, ics_data);
     event_t event = getFirstEvent(&ics);
     TEST_ASSERT_EQUAL(1,count);
@@ -90,6 +92,7 @@ void test_parse_ShouldReturnEventListIterationOneEvent(void) {
 void test_parse_ShouldReturnEventListIterationThreeEvents(void) {
     ics_t ics;
     initIcs(&ics);
+    initIcsDates(&ics);
     size_t count = parse(&ics, ics_data3);
     event_t event = getFirstEvent(&ics);
 
@@ -111,6 +114,7 @@ void test_setCurrentEvent_verifyIndexWithinBounds(void) {
     
     ics_t ics;
     initIcs(&ics);
+    initIcsDates(&ics);
     size_t count = parse(&ics, ics_data3);
 
     TEST_ASSERT_EQUAL(3,count);
@@ -134,6 +138,7 @@ void test_getEventAt_verifyGettingEventAtGivenIndex(void) {
     
     ics_t ics;
     initIcs(&ics);
+    initIcsDates(&ics);
     size_t count = parse(&ics, ics_data3);
 
     TEST_ASSERT_EQUAL(3,count);
@@ -148,6 +153,7 @@ void test_parse_ics_from_file(void)
 {
     ics_t ics;
     initIcs(&ics);
+    initIcsDates(&ics);
     size_t count = parseFile(&ics, "../test/test_event.ics");
     TEST_ASSERT_EQUAL(1,count);
 
@@ -166,6 +172,7 @@ void test_parse_ics_from_f2_file(void)
 {
     ics_t ics;
     initIcs(&ics);
+    initIcsDates(&ics);
     size_t count = parseFile(&ics, "../test/f2-calendar_p_q_sprint_feature.ics");
     TEST_ASSERT_EQUAL(56,count);
 
@@ -184,25 +191,40 @@ void test_getNExtEventInRange(void)
 {
     ics_t ics;
     initIcs(&ics);
-    size_t count = parseFile(&ics, "../test/f2-calendar_p_q_sprint_feature.ics");
-    TEST_ASSERT_EQUAL(56,count);
-
-    event_t event = getFirstEvent(&ics);
-
-    TEST_ASSERT_EQUAL_STRING("F2: Practice (Bahrain)", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20240229T090500Z", event.dtstart);
-    TEST_ASSERT_EQUAL(56,ics.count);
-
+    initIcsDates(&ics);
 
     const char startDate[] = "20240501T000000Z";
     const char endDate[] =  "20240701T000000Z";
 
-    event = getNextEventInRange(&ics, startDate, endDate);
+    time_t start = setStartDate(&ics, startDate);
+    TEST_ASSERT_EQUAL(1714514400,start);
+
+
+    size_t count = parseFile(&ics, "../test/f2-calendar_p_q_sprint_feature.ics");
+    TEST_ASSERT_EQUAL(44,count);
+
+    event_t event = getFirstEvent(&ics);
+
+    TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event.summary);
+    TEST_ASSERT_EQUAL_STRING("20240517T090500Z", event.dtstart);
+    TEST_ASSERT_EQUAL(44,ics.count);
+
+    initIcs(&ics);
+    time_t end = setEndDate(&ics, endDate);
+    TEST_ASSERT_EQUAL(1719784800,end);
+
+    count = parseFile(&ics, "../test/f2-calendar_p_q_sprint_feature.ics");
+    TEST_ASSERT_EQUAL(16,ics.count);
+
+    event = getFirstEvent(&ics);
+
     TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event.summary);
     TEST_ASSERT_EQUAL_STRING("20240517T090500Z", event.dtstart);
 
-//     event = getNextEventInRange(&ics, startDate, NULL);
-//     TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event.summary);
-//     TEST_ASSERT_EQUAL_STRING("20240517T090500Z", event.dtstart);
+    event = getLastEvent(&ics);
+    
 
-// }
+    TEST_ASSERT_EQUAL_STRING("F2: Feature (Austrian)", event.summary);
+    TEST_ASSERT_EQUAL_STRING("20240630T094000Z", event.dtstart);
+
+}

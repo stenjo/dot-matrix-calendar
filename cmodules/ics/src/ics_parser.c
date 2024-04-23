@@ -19,11 +19,20 @@ static char *find_eol(char *s) {
     }
 }
 
-time_t parse_date_string(const char *date_str) {
-    struct tm tm;
-    strptime(date_str, "%Y%m%dT%H%M%SZ", &tm);
-    time_t t = mktime(&tm);
-    return t;
+int parse_date_string(const char *date_str, struct tm *tm) {
+    if (sscanf(date_str, "%4d%2d%2dT%2d%2d%2dZ",
+               &tm->tm_year,
+               &tm->tm_mon,
+               &tm->tm_mday,
+               &tm->tm_hour,
+               &tm->tm_min,
+               &tm->tm_sec) == 6) {
+        tm->tm_year -= 1900; // tm_year is years since 1900
+        tm->tm_mon -= 1;    // tm_mon is 0-based
+        return 1; // Successfully parsed
+    } else {
+        return 0; // Failed to parse
+    }
 }
 
 event_t getEvent(const char *ics_data, const char **next) {
@@ -95,10 +104,26 @@ size_t parse(ics_t *ics, const char * ics_data)
 
     event_t event = getEvent(ics_data, &ics->next);
 
-    while (ics->next != NULL && ics->count < MAX_EVENT_COUNT)
+    while (ics->next != NULL && ics->count < MAX_EVENT_COUNT && event.dtstart != NULL)
     {
-        ics->events[ics->count] = event;
-        ics->count += 1;
+        struct tm tm_event_start;
+        if (parse_date_string(event.dtstart, &tm_event_start)) {
+        time_t event_time = mktime(&tm_event_start);
+
+            if (
+                (ics->startTime == 0 || difftime(event_time, ics->startTime) >= 0) &&
+                (ics->endTime == 0 || difftime(ics->endTime, event_time) >= 0)
+            )
+            {
+                event.tstart = event_time;
+                ics->events[ics->count] = event;
+                ics->count += 1;
+            }
+            else {
+                free(event.summary);
+                free(event.dtstart);
+            }
+        }
         event = getEvent(ics->next, &ics->next);
     }
 
@@ -108,6 +133,7 @@ size_t parse(ics_t *ics, const char * ics_data)
 event_t getFirstEvent(ics_t *ics)
 {
     if (ics == NULL || ics->count == 0) {
+
         return (event_t){NULL, NULL}; 
     }
 
@@ -174,47 +200,31 @@ event_t getEventAt(ics_t *ics, size_t index)
 
 }
 
-event_t getNextEventInRange(ics_t *ics, const char *start_date_str, const char *end_date_str) {
-    // Check if the start date string is supplied
-    if (start_date_str == NULL) {
-        // Handle error or return an empty event.
-        return (event_t){NULL, NULL};
-    }
-
-    // Convert date strings to time_t for comparison.
-    time_t start = parse_date_string(start_date_str);
-    time_t end;
-    // If the end date string is not supplied or is empty, set it to the maximum time_t value.
-    if (end_date_str == NULL || strlen(end_date_str) == 0) {
-        end = 0;
-    } else {
-        end = parse_date_string(end_date_str);
-    }
-
-    while (!atEnd(ics)) {
-        ics->current++;
-        event_t event = getCurrentEvent(ics);
-        
-        // Parse the event's start date.
-        time_t event_start = parse_date_string(event.dtstart);
-        
-        // Check if the event's start date is within the range.
-        if (difftime(event_start, start) >= 0 && ( end == 0 || difftime(event_start, end) <= 0)) {
-            return event; // Event is within the range.
-        }
-    }
-
-    // Return an empty event if no more events are within the range.
-    return (event_t){NULL, NULL};
-}
-
-
 time_t setStartDate(ics_t *ics, const char *start)
 {
-    time_t event_start = parse_date_string(start);
-    ics->startTime = event_start;
+    struct tm tm_event_start;
+    if (parse_date_string(start, &tm_event_start)) {
+        time_t event_time = mktime(&tm_event_start);
+
+        ics->startTime = event_time;
   
-    return event_start;
+        return event_time;
+    }
+    printf("setTimeFailed with %s", start);
+    return 0;
+}
+
+time_t setEndDate(ics_t *ics, const char *end)
+{
+    struct tm tm_event_start;
+    if (parse_date_string(end, &tm_event_start)) {
+        time_t event_time = mktime(&tm_event_start);
+
+        ics->endTime = event_time;
+    
+        return event_time;
+    }
+    return 0;
 }
 
 void initIcs(ics_t *ics)
@@ -222,9 +232,13 @@ void initIcs(ics_t *ics)
     ics->current = 0;
     ics->count = 0;
     ics->next = NULL;
+    memset(ics->events, 0, sizeof(ics->events));
+}
+
+void initIcsDates(ics_t *ics)
+{
     ics->startTime = 0;
     ics->endTime = 0;
-    memset(ics->events, 0, sizeof(ics->events));
 }
 
 bool atEnd(ics_t *ics)

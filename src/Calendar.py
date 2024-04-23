@@ -25,8 +25,15 @@ def toDict(event_tuple):
 
 class Calendar(ICS):
     
-    def __init__(self, filename=None):
+    def __init__(self, filename=None, start=None, end=None):
         super().__init__()
+        self.reset()
+        if start is not None:
+            self.setStartDate(start)
+            
+        if end is not None:
+            self.setEndDate(end)
+            
         if filename is not None:
             self.parseFile(filename)
     
@@ -41,4 +48,11 @@ class Calendar(ICS):
         
     def next(self):
         return toDict(self.getNext())
+    
+    def start(self, startDate):
+        self.setStartDate(startDate)
         
+    def end(self, endDate):
+        self.setEndDate(endDate)
+        
+# c.setStartDate('20240501T000000Z')
