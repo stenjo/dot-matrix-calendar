@@ -8,6 +8,7 @@
 
 // Helper function to find the end of the line ('\r\n')
 static char *find_eol(char *s) {
+    if (s == NULL) return NULL;
     while (*s != '\0' && !(s[0] == '\r' || s[0] == '\n')) {
         s++;
     }
@@ -20,6 +21,10 @@ static char *find_eol(char *s) {
 }
 
 int parse_date_string(const char *date_str, struct tm *tm) {
+    if (date_str == NULL) {
+        return 0;
+    }
+    
     if (sscanf(date_str, "%4d%2d%2dT%2d%2d%2dZ",
                &tm->tm_year,
                &tm->tm_mon,
@@ -35,6 +40,29 @@ int parse_date_string(const char *date_str, struct tm *tm) {
     }
 }
 
+// Comparison function for qsort
+int compare_events(const void *a, const void *b)
+{
+    const event_t *event_a = (const event_t *)a;
+    const event_t *event_b = (const event_t *)b;
+
+    // Use difftime to get a difference in seconds (double)
+    double diff = difftime(event_a->tstart, event_b->tstart);
+    if (diff < 0.0) {
+        return -1; // a goes before b
+    } else if (diff > 0.0) {
+        return 1; // b goes before a
+    } else {
+        return 0; // a and b are equal
+    }
+}
+
+// Function to sort the events in ics->events by their tstart field.
+void sortEventsByStart(ics_t *ics)
+{
+    qsort(ics->events, ics->count, sizeof(event_t), compare_events);
+}
+
 event_t getEvent(const char *ics_data, const char **next) {
     event_t event = {NULL, NULL};
 
@@ -43,6 +71,7 @@ event_t getEvent(const char *ics_data, const char **next) {
     const char *key_vevent_end = "END:VEVENT";
     const char *key_summary = "SUMMARY:";
     const char *key_dtstart = "DTSTART:";
+    const char *key_dtend = "DTEND:";
     
      // We will only parse the first VEVENT found
     char *vevent_start = strstr(ics_data, key_vevent_start);
@@ -64,8 +93,14 @@ event_t getEvent(const char *ics_data, const char **next) {
     }
     dtstart_start += strlen(key_dtstart);
    
+    char *dtend_start = strstr(vevent_start, key_dtend);
+     if (dtend_start) {
+        dtend_start += strlen(key_dtend);
+    }
+   
     char *summary_end = find_eol(summary_start);
     char *dtstart_end = find_eol(dtstart_start);
+    char *dtend_end = find_eol(dtend_start);
     if (!summary_end || !dtstart_end) {
         return event;
     }
@@ -78,19 +113,33 @@ event_t getEvent(const char *ics_data, const char **next) {
         event.summary[summary_len] = '\0';
     }
     
-   size_t dtstart_len = dtstart_end - dtstart_start;
+    size_t dtstart_len = dtstart_end - dtstart_start;
     event.dtstart = (char *)malloc(dtstart_len + 1);
     if (event.dtstart) {
         memcpy(event.dtstart, dtstart_start, dtstart_len);
         event.dtstart[dtstart_len] = '\0';
     }
 
+    if (dtend_start && dtend_end)
+    {
+        size_t dtend_len = dtend_end - dtend_start;
+        event.dtend = (char *)malloc(dtend_len + 1);
+        if (event.dtend) {
+            memcpy(event.dtend, dtend_start, dtend_len);
+            event.dtstart[dtend_len] = '\0';
+        }
+    }
+
     // Check if either allocation failed
-    if (event.summary == NULL || event.dtstart == NULL) {
+    if (event.summary == NULL || event.dtstart == NULL ) {
         free(event.summary); // If one of the allocations failed, free the other one
         free(event.dtstart);
+        if (event.dtend != NULL) {
+            free(event.dtend);
+        }
         event.summary = NULL;
         event.dtstart = NULL;
+        event.dtend = NULL;
     }
     
     *next = vevent_end;
@@ -108,14 +157,20 @@ size_t parse(ics_t *ics, const char * ics_data)
     {
         struct tm tm_event_start;
         if (parse_date_string(event.dtstart, &tm_event_start)) {
-        time_t event_time = mktime(&tm_event_start);
+            time_t event_time = mktime(&tm_event_start);
 
             if (
                 (ics->startTime == 0 || difftime(event_time, ics->startTime) >= 0) &&
                 (ics->endTime == 0 || difftime(ics->endTime, event_time) >= 0)
             )
             {
+                struct tm tm_event_end;
                 event.tstart = event_time;
+                if (parse_date_string(event.dtend, &tm_event_end)) 
+                {
+                    time_t event_end_time = mktime(&tm_event_end);
+                    event.tend = event_end_time;
+                }
                 ics->events[ics->count] = event;
                 ics->count += 1;
             }
@@ -227,12 +282,29 @@ time_t setEndDate(ics_t *ics, const char *end)
     return 0;
 }
 
+void freeIcs(ics_t *ics)
+{
+    for (int i = 0; i < ics->count; i++) 
+    {
+        // Free dynamically allocated memory inside the event, if any.
+        if (ics->events[i].summary != NULL) {
+            free(ics->events[i].summary);
+            ics->events[i].summary = NULL; // Avoid dangling pointers
+        }
+        if (ics->events[i].dtstart != NULL) {
+            free(ics->events[i].dtstart);
+            ics->events[i].dtstart = NULL; // Avoid dangling pointers
+        }
+        // If there are other dynamically allocated fields, also free them here.
+    }
+    initIcs(ics);
+}
+
 void initIcs(ics_t *ics)
 {
     ics->current = 0;
     ics->count = 0;
     ics->next = NULL;
-    memset(ics->events, 0, sizeof(ics->events));
 }
 
 void initIcsDates(ics_t *ics)

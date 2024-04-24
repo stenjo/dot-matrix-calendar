@@ -3,8 +3,11 @@ from dateHandling import dayText
 from datetime import datetime
 import ujson
 from Calendar import Calendar
+import time
 
-c=Calendar('f2-calendar_p_q_sprint_feature.ics', start='20240501T000000Z')
+c=Calendar('f2-calendar_p_q_sprint_feature.ics', 
+           start=time.localtime(), 
+           end=datetime(2024, 8, 1, 0,0,0).timetuple())
 event = c.first()
 
 print(event)  # Should print a tuple like ("Test Event", "20230412T160000Z")

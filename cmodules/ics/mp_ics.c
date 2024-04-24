@@ -159,7 +159,7 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_2(setEndDate_obj, mp_setEndDate);
 STATIC mp_obj_t mp_reset(mp_obj_t self_in) {
     mp_check_self(mp_obj_is_type(self_in, &ics_parser_type_ICS)); // Modify the type check accordingly
     ics_obj_t *self = MP_OBJ_TO_PTR(self_in);
-    initIcs(&(self->ics));
+    freeIcs(&(self->ics));
     initIcsDates(&(self->ics));
     return mp_const_none;
 }

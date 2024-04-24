@@ -74,6 +74,7 @@ void test_parse_ShouldReturnEventList(void) {
     TEST_ASSERT_EQUAL_STRING("Meeting with John",ics.events[0].summary);
     TEST_ASSERT_EQUAL_STRING("20230412T160000Z", ics.events[0].dtstart);
     TEST_ASSERT_EQUAL(1,ics.count);
+    freeIcs(&ics);
         
 }
 
@@ -88,6 +89,7 @@ void test_parse_ShouldReturnEventListIterationOneEvent(void) {
     TEST_ASSERT_EQUAL_STRING("Meeting with John",event.summary);
     TEST_ASSERT_EQUAL_STRING("20230412T160000Z", event.dtstart);
         
+    freeIcs(&ics);
 }
 void test_parse_ShouldReturnEventListIterationThreeEvents(void) {
     ics_t ics;
@@ -109,6 +111,12 @@ void test_parse_ShouldReturnEventListIterationThreeEvents(void) {
     event = getNextEvent(&ics);
     TEST_ASSERT_EQUAL_STRING("F2: Feature (Monaco)", event.summary);
     TEST_ASSERT_EQUAL_STRING("20240526T084000Z", event.dtstart);
+
+    event = getFirstEvent(&ics);
+    TEST_ASSERT_EQUAL_STRING("Meeting with John",event.summary);
+    TEST_ASSERT_EQUAL_STRING("20230412T160000Z", event.dtstart);
+
+    freeIcs(&ics);
 }
 void test_setCurrentEvent_verifyIndexWithinBounds(void) {
     
@@ -131,6 +139,8 @@ void test_setCurrentEvent_verifyIndexWithinBounds(void) {
     
     index = setCurrentEvent(&ics, -1);
     TEST_ASSERT_EQUAL(-1,index);
+
+    freeIcs(&ics);
     
 }
 
@@ -163,9 +173,7 @@ void test_parse_ics_from_file(void)
     if (ics.events[0].summary) TEST_ASSERT_EQUAL_STRING("Test Event", ics.events[0].summary);
     if (ics.events[0].dtstart) TEST_ASSERT_EQUAL_STRING("20230412T160000Z", ics.events[0].dtstart);
 
-    // Free any allocated resources by the parse function
-    if (ics.events[0].summary) free(ics.events[0].summary);
-    if (ics.events[0].dtstart) free(ics.events[0].dtstart);
+    freeIcs(&ics);
 }
 
 void test_parse_ics_from_f2_file(void)
@@ -183,9 +191,7 @@ void test_parse_ics_from_f2_file(void)
     TEST_ASSERT_EQUAL_STRING("20240229T090500Z", ics.events[0].dtstart);
     TEST_ASSERT_EQUAL(56,ics.count);
 
-    // Free any allocated resources by the parse function
-    if (ics.events[0].summary) free(ics.events[0].summary);
-    if (ics.events[0].dtstart) free(ics.events[0].dtstart);
+    freeIcs(&ics);
 }
 void test_getNExtEventInRange(void)
 {
@@ -227,4 +233,58 @@ void test_getNExtEventInRange(void)
     TEST_ASSERT_EQUAL_STRING("F2: Feature (Austrian)", event.summary);
     TEST_ASSERT_EQUAL_STRING("20240630T094000Z", event.dtstart);
 
+}
+
+void test_sortEvents_sortAllFilteredEventsByStartTime(void)
+{
+    ics_t ics;
+    initIcs(&ics);
+    initIcsDates(&ics);
+
+    const char startDate[] = "20240501T000000Z";
+    const char endDate[] =  "20240701T000000Z";
+
+    time_t start = setStartDate(&ics, startDate);
+    TEST_ASSERT_EQUAL(1714514400,start);
+    time_t end = setEndDate(&ics, endDate);
+    TEST_ASSERT_EQUAL(1719784800,end);
+
+    int count = parseFile(&ics, "../test/f2-calendar_p_q_sprint_feature.ics");
+    event_t event = getFirstEvent(&ics);
+    TEST_ASSERT_EQUAL(16,count);
+
+    TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event.summary);
+    TEST_ASSERT_EQUAL_STRING("20240517T090500Z", event.dtstart);
+    TEST_ASSERT_EQUAL(16,ics.count);
+
+    sortEventsByStart(&ics);
+
+    event = getFirstEvent(&ics);
+    TEST_ASSERT_EQUAL(16,ics.count);
+
+    TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event.summary);
+    TEST_ASSERT_EQUAL_STRING("20240517T090500Z", event.dtstart);
+    TEST_ASSERT_EQUAL(16,ics.count);
+}
+
+void test_endDate_verifyEndDateAvailableOnEvents(void)
+{
+    ics_t ics;
+    initIcs(&ics);
+    initIcsDates(&ics);
+
+    const char startDate[] = "20240501T000000Z";
+    const char endDate[] =  "20240701T000000Z";
+
+    time_t start = setStartDate(&ics, startDate);
+    TEST_ASSERT_EQUAL(1714514400,start);
+    time_t end = setEndDate(&ics, endDate);
+    TEST_ASSERT_EQUAL(1719784800,end);
+
+    int count = parseFile(&ics, "../test/f2-calendar_p_q_sprint_feature.ics");
+    event_t event = getFirstEvent(&ics);
+    TEST_ASSERT_EQUAL(16,count);
+
+    TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event.summary);
+    TEST_ASSERT_EQUAL_STRING("20240517T095000Z", event.dtend);
 }
