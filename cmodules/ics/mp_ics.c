@@ -18,12 +18,12 @@ mp_obj_t getEventObj(event_t event) {
         // mp_printf(&mp_plat_print, "summary and start not null\n");
         mp_obj_t summary_obj = mp_obj_new_str(event.summary, strlen(event.summary));
         mp_obj_t dtstart_obj = mp_obj_new_str(event.dtstart, strlen(event.dtstart));
-        mp_obj_t tuple[2] = {summary_obj, dtstart_obj};
-        result = mp_obj_new_tuple(2, tuple);
-
-        // Memory allocated in ics_parse should be freed after creating MicroPython objects
-        free(event.summary);
-        free(event.dtstart);
+        mp_obj_t dtend_obj = mp_const_none;
+        if (event.dtend != NULL) {
+            mp_obj_t dtend_obj = mp_obj_new_str(event.dtend, strlen(event.dtend));
+        }
+        mp_obj_t tuple[3] = {summary_obj, dtstart_obj, dtend_obj};
+        result = mp_obj_new_tuple(3, tuple);
     } else {
         result = mp_const_none;
     }
@@ -49,6 +49,7 @@ STATIC mp_obj_t parse_ics(mp_obj_t self_in, mp_obj_t ics_str_obj) {
     GET_STR_DATA_LEN(ics_str_obj, ics_str, ics_str_len);
     
     size_t count = parse(&self->ics, (const char *)ics_str);
+    sortEventsByStart(&(self->ics));
     mp_obj_t result = mp_obj_new_int(count);
     
     return result;
@@ -72,7 +73,8 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_2(parse_ics_file_obj, mp_parse_ics_file);
 STATIC mp_obj_t mp_getFirst(mp_obj_t self_in) {
     mp_check_self(mp_obj_is_type(self_in, &ics_parser_type_ICS)); // Modify the type check accordingly
     ics_obj_t *self = MP_OBJ_TO_PTR(self_in);
-    event_t event = getFirstEvent(&self->ics);
+    event_t event = getFirstEvent(&(self->ics));
+    // mp_printf(&mp_plat_print, "mp_getFirst called: %s\n", event.summary);
     return getEventObj(event);
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(getFirst_obj, mp_getFirst);
@@ -126,6 +128,13 @@ STATIC mp_obj_t mp_setCurrentEvent(mp_obj_t self_in, mp_obj_t mp_index_obj) {
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_2(setCurrentEvent_obj, mp_setCurrentEvent);
 
+/**
+ * @brief Set start date of earliest possible event start to parse
+ * @param self_in Pointer to Self
+ * @param start_date_obj datetime in the format 'yyyymmddThhmmssZ'
+ * 
+ * @return timestamp from converted date
+*/
 STATIC mp_obj_t mp_setStartDate(mp_obj_t self_in, mp_obj_t start_date_obj) {
     mp_check_self(mp_obj_is_type(self_in, &ics_parser_type_ICS)); // Modify the type check accordingly
     ics_obj_t *self = MP_OBJ_TO_PTR(self_in);
@@ -133,7 +142,7 @@ STATIC mp_obj_t mp_setStartDate(mp_obj_t self_in, mp_obj_t start_date_obj) {
     mp_check_self(mp_obj_is_str_or_bytes(start_date_obj));
 
     const char* startDate = mp_obj_str_get_str(start_date_obj);
-    mp_printf(&mp_plat_print, "mp_setStartDate called: %s\n", startDate);
+    // mp_printf(&mp_plat_print, "mp_setStartDate called: %s\n", startDate);
 
     size_t result = setStartDate(&(self->ics), startDate);
 

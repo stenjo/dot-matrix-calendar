@@ -4,7 +4,7 @@
 #include "py/objstr.h"
 #include "py/obj.h"
 #include "max7219.h"
-#include "matrix.h"
+#include "src/matrix.h"
 
 typedef struct _max7219_obj_t {
     mp_obj_base_t base;

@@ -59,6 +59,7 @@ class Calendar(ICS):
         return count
 
     def parseURL(self, url):
+        url = url.replace('webcal://', 'http://')
         response = urequests.get(url)
         if response.status_code == 200:
             # Successfully fetched the calendar data, now parse it.

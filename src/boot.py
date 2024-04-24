@@ -5,8 +5,8 @@ from time import sleep
 import os, machine
 #os.dupterm(None, 1) # disable REPL on UART(0)
 import gc
-import webrepl
-webrepl.start()
+# import webrepl
+# webrepl.start()
 gc.collect()
 
 # boot.py -- run on boot-up

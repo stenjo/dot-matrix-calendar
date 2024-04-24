@@ -41,7 +41,7 @@
 #include <string.h>
 #include <esp_log.h>
 #include <esp_timer.h> // Include the header for ESP timer functions
-#include "matrix.h"
+#include "src/matrix.h"
 #include "max7219_priv.h"
 
 static const char *TAG = "max7219";

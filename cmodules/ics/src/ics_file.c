@@ -7,7 +7,7 @@
 size_t parseFile(ics_t * ics, const char *file_path) {
     // Allocate a buffer for the file's contents
     char *buffer = NULL;
-    initIcs(ics);
+    // initIcs(ics);
     long length;
     FILE *f = fopen(file_path, "rb");  // Open file for reading
 

@@ -288,3 +288,69 @@ void test_endDate_verifyEndDateAvailableOnEvents(void)
     TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event.summary);
     TEST_ASSERT_EQUAL_STRING("20240517T095000Z", event.dtend);
 }
+
+void test_withLargeCalendar(void)
+{
+        ics_t ics;
+    initIcs(&ics);
+    initIcsDates(&ics);
+
+    const char startDate[] = "20240401T000000Z";
+    const char endDate[] =  "20240701T000000Z";
+
+    time_t start = setStartDate(&ics, startDate);
+    TEST_ASSERT_EQUAL(1711922400,start);
+    time_t end = setEndDate(&ics, endDate);
+    TEST_ASSERT_EQUAL(1719784800,end);
+
+    int count = parseFile(&ics, "../test/basic.ics");
+    event_t event = getFirstEvent(&ics);
+    TEST_ASSERT_EQUAL(24,count);
+
+    TEST_ASSERT_EQUAL_STRING("Pokebowl", event.summary);
+    TEST_ASSERT_EQUAL_STRING("20240418T053000Z", event.dtstart);
+
+}
+
+void test_withMultipleCalendars(void)
+{
+    ics_t ics;
+    initIcs(&ics);
+    initIcsDates(&ics);
+
+    const char startDate[] = "20240401T000000Z";
+    const char endDate[] =  "20241201T000000Z";
+
+    time_t start = setStartDate(&ics, startDate);
+    TEST_ASSERT_EQUAL(1711926000,start);
+    time_t end = setEndDate(&ics, endDate);
+    TEST_ASSERT_EQUAL(1733004000,end);
+
+    int count = parseFile(&ics, "../test/f2-calendar_p_q_sprint_feature.ics");
+    TEST_ASSERT_EQUAL(39,count);
+
+    event_t event = getFirstEvent(&ics);
+    TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event.summary);
+    TEST_ASSERT_EQUAL_STRING("20240517T090500Z", event.dtstart);
+
+    count = parseFile(&ics, "../test/f3-calendar_p_q_sprint_feature.ics");
+    TEST_ASSERT_EQUAL(70,count);
+
+    sortEventsByStart(&ics);
+
+    event = getFirstEvent(&ics);
+    TEST_ASSERT_EQUAL_STRING("F3: Practice (Emilia Romagna)", event.summary);
+    TEST_ASSERT_EQUAL_STRING("20240517T075500Z", event.dtstart);
+
+    event = getNextEvent(&ics);
+    TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event.summary);
+    TEST_ASSERT_EQUAL_STRING("20240517T090500Z", event.dtstart);
+
+    count = parseFile(&ics, "../test/basic.ics");
+    sortEventsByStart(&ics);
+
+    event = getFirstEvent(&ics);
+    TEST_ASSERT_EQUAL_STRING("Vegetar taco", event.summary);
+    TEST_ASSERT_EQUAL_STRING("20240418T053000Z", event.dtstart);
+
+}

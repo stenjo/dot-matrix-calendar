@@ -94,8 +94,11 @@ event_t getEvent(const char *ics_data, const char **next) {
     dtstart_start += strlen(key_dtstart);
    
     char *dtend_start = strstr(vevent_start, key_dtend);
-     if (dtend_start) {
+     if (dtend_start && dtend_start < vevent_end) {
         dtend_start += strlen(key_dtend);
+    }
+    else {
+        dtend_start = NULL;
     }
    
     char *summary_end = find_eol(summary_start);
@@ -149,7 +152,7 @@ event_t getEvent(const char *ics_data, const char **next) {
 
 size_t parse(ics_t *ics, const char * ics_data) 
 {
-    initIcs(ics);
+    // initIcs(ics);
 
     event_t event = getEvent(ics_data, &ics->next);
 

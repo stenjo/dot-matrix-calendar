@@ -5,9 +5,13 @@ import ujson
 from Calendar import Calendar
 import time
 
-c=Calendar('f2-calendar_p_q_sprint_feature.ics', 
-           start=time.localtime(), 
-           end=datetime(2024, 8, 1, 0,0,0).timetuple())
+c=Calendar()
+c.start(time.localtime())
+c.end(datetime(2024, 6, 1, 0,0,0).timetuple())
+
+c.parseURL('webcal://files-f3.motorsportcalendars.com/no/f3-calendar_p_q_sprint_feature.ics')
+c.parseURL('webcal://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics')
+# c.parseURL('https://calendar.google.com/calendar/ical/parterapeutene.no_e1or90m2lp6p523ma7u15v2pc0%40group.calendar.google.com/private-95204a6ebd527a9ba3d5004beeb57b74/basic.ics')
 event = c.first()
 
 print(event)  # Should print a tuple like ("Test Event", "20230412T160000Z")
