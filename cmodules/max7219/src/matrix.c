@@ -306,6 +306,7 @@ void copyText(max7219_t * dev, const char * text) {
       // Write to the buffer and increment the buffer index
       dev->frameBuffer[bufferIndex++] = col;
     }
+    dev->frameBuffer[bufferIndex++] = 0;
   }
 
   // After filling the buffer, print it

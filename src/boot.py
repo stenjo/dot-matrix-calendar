@@ -40,9 +40,9 @@ do_connect()
 ntptime.host = "1.europe.pool.ntp.org"
 
 try:
-    print("Local time before synchronization：%s" %str(time.localtime()))
+    print("Local time before synchronization: %s" %str(time.localtime()))
     #make sure to have internet connection
     ntptime.settime()
-    print("Local time after synchronization：%s" %str(time.localtime()))
+    print("Local time after synchronization: %s" %str(time.localtime()))
 except:
     print("Error syncing time")
