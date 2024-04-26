@@ -19,10 +19,17 @@ print(event)  # Should print a tuple like ("Test Event", "20230412T160000Z")
 print(dayText(event))
 
 # (8x8 blocks, spi host, clock speed, CS pin)
-m = Matrix8x8(8)
+m = Matrix8x8(16)
 
 m.clear()
 m.init()
+seconds = 60
+while seconds > 0:
+    tm = time.localtime()
+    m.write("   {} : {:02} : {:02}".format(tm[3], tm[4], tm[5]))
+    time.sleep(1)
+    seconds -= 1
+
 m.marquee(dayText(event))
 while event:
     done = False
