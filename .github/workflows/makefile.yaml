@@ -78,7 +78,8 @@ jobs:
     - name: Compile firmware
       working-directory: boards/CUSTOM_ESP32
       run: |
-       idf.py build
+        source ../../esp-idf/export.sh
+        idf.py build
       
     - name: Check output
       working-directory: boards/CUSTOM_ESP32
