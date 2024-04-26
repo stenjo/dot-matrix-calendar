@@ -40,7 +40,7 @@ while event:
         seconds = 60
         while seconds > 0:
             tm = time.localtime()
-            m.write("   {} : {:02} : {:02}".format(tm[3], tm[4], tm[5]))
+            m.write("     {}:{:02}:{:02}".format(tm[3], tm[4], tm[5]))
             time.sleep(0.5)
             seconds -= 1
         event = c.first()

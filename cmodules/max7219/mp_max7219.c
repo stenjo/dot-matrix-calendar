@@ -15,6 +15,7 @@ typedef struct _max7219_obj_t {
  * @brief Initialize device
  *
  * @param blocks Number of 8x8 blocks cascaded
+ * @param scroll Scrolling delay
  * @param host SPI host
  * @param clock_speed_hz SPI clock speed, Hz
  * @param cs_pin CS GPIO number

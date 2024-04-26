@@ -250,8 +250,8 @@ void marquee(max7219_t *dev, const char *text)
 
 void matrixWrite(max7219_t *dev, const char *text)
 {
-    clear(dev);
-    max7219_clear(dev);
+    // clear(dev);
+    // max7219_clear(dev);
 
     copyText(dev, text);
 }

@@ -301,15 +301,22 @@ void copyText(max7219_t * dev, const char * text) {
                     : getCharColumn(chr, charColumn);
 
       // Exit the loop if the column data is zero (i.e., column processing is complete)
-      if (col == 0) break;
+      if (col == 0 || bufferIndex >= MAX7219_MAX_CASCADE_SIZE*8) break;
 
       // Write to the buffer and increment the buffer index
       dev->frameBuffer[bufferIndex++] = col;
     }
-    dev->frameBuffer[bufferIndex++] = 0;
+    if (bufferIndex < MAX7219_MAX_CASCADE_SIZE*8) {
+      dev->frameBuffer[bufferIndex++] = 0;
+    }
   }
 
-  // After filling the buffer, print it
+  // clear remaining buffer
+  while (bufferIndex < MAX7219_MAX_CASCADE_SIZE*8)
+  {
+    dev->frameBuffer[bufferIndex++] = 0;
+  }
+ // After filling the buffer, print it
   printBuffer(dev);
 }
 
