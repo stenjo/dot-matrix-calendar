@@ -34,5 +34,6 @@ Add a env.json in the format:
 
 ## Credits
 
-[MicroPython Max7219 8x8 LED Matrix](https://pypi.org/project/micropython-max7219/): Leo Spratt ([enchant97](https://pypi.org/user/enchant97/))
+[MicroPython Max7219 8x8 LED Matrix]()
 [micropython-env](https://github.com/ShenTengTu/micropython-env/tree/master): Shen-Teng Tu ([ShengTengtu](https://github.com/ShenTengTu))
+[MicroPython WiFi setup](https://github.com/george-hawkins/micropython-wifi-setup)

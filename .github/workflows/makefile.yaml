@@ -74,6 +74,7 @@ jobs:
     - name: Make submodules    
       working-directory: lib/micropython/ports/esp32
       run: |
+        source ../../../../esp-idf/export.sh
         make submodules
         make
       
