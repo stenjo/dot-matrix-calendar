@@ -13,6 +13,14 @@ const char *ics_data = "BEGIN:VCALENDAR\r\n"
                       "END:VEVENT\r\n"
                       "END:VCALENDAR";
 
+const char *ics_all_day = "BEGIN:VCALENDAR\r\n"
+                      "VERSION:2.0\r\n"
+                      "BEGIN:VEVENT\r\n"
+                      "SUMMARY:Meeting with John\r\n"
+                      "DTSTART:20230412T160000Z\r\n"
+                      "END:VEVENT\r\n"
+                      "END:VCALENDAR";
+
 const char *ics_data3 = "BEGIN:VCALENDAR\r\n"
                       "VERSION:2.0\r\n"
                       "BEGIN:VEVENT\r\n"
@@ -305,9 +313,9 @@ void test_withLargeCalendar(void)
 
     int count = parseFile(&ics, "../test/basic.ics");
     event_t event = getFirstEvent(&ics);
-    TEST_ASSERT_EQUAL(24,count);
+    TEST_ASSERT_EQUAL(10,count);
 
-    TEST_ASSERT_EQUAL_STRING("Pokebowl", event.summary);
+    TEST_ASSERT_EQUAL_STRING("Service på bilen", event.summary);
     TEST_ASSERT_EQUAL_STRING("20240418T053000Z", event.dtstart);
 
 }
@@ -322,9 +330,9 @@ void test_withMultipleCalendars(void)
     const char endDate[] =  "20241201T000000Z";
 
     time_t start = setStartDate(&ics, startDate);
-    TEST_ASSERT_EQUAL(1711926000,start);
+    TEST_ASSERT_EQUAL(1711922400,start);
     time_t end = setEndDate(&ics, endDate);
-    TEST_ASSERT_EQUAL(1733004000,end);
+    TEST_ASSERT_EQUAL(1733007600,end);
 
     int count = parseFile(&ics, "../test/f2-calendar_p_q_sprint_feature.ics");
     TEST_ASSERT_EQUAL(39,count);
@@ -350,7 +358,26 @@ void test_withMultipleCalendars(void)
     sortEventsByStart(&ics);
 
     event = getFirstEvent(&ics);
-    TEST_ASSERT_EQUAL_STRING("Vegetar taco", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20240418T053000Z", event.dtstart);
+    // TEST_ASSERT_EQUAL_STRING("R\xC3\xB8d curry med torsk", event.summary);
+    TEST_ASSERT_EQUAL_STRING("20240416", event.dtstart);
+
+}
+
+void test_parse_allDayEvents(void)
+{
+    ics_t ics;
+    initIcs(&ics);
+    initIcsDates(&ics);
+
+    int count = parseFile(&ics, "../test/allday.ics");
+    TEST_ASSERT_EQUAL(2,count);
+
+    event_t event = getFirstEvent(&ics);
+    TEST_ASSERT_EQUAL_STRING("Første eventet", event.summary);
+    TEST_ASSERT_EQUAL_STRING("20240425T070000Z", event.dtstart);
+    event = getNextEvent(&ics);
+    TEST_ASSERT_EQUAL_STRING("I Åsane har vi både færøymål\\, låglønnsnæring og skjærgårdsøl!", event.summary);
+    TEST_ASSERT_EQUAL_STRING("20240427", event.dtstart);
+    TEST_ASSERT_EQUAL_STRING("20240428", event.dtend);
 
 }

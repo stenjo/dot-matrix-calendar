@@ -16,11 +16,12 @@ mp_obj_t getEventObj(event_t event) {
 
     if (event.summary != NULL && event.dtstart != NULL) {
         // mp_printf(&mp_plat_print, "summary and start not null\n");
+        // mp_printf(&mp_plat_print, "dtend: %s\n", event.dtend);
         mp_obj_t summary_obj = mp_obj_new_str(event.summary, strlen(event.summary));
         mp_obj_t dtstart_obj = mp_obj_new_str(event.dtstart, strlen(event.dtstart));
         mp_obj_t dtend_obj = mp_const_none;
         if (event.dtend != NULL) {
-            mp_obj_t dtend_obj = mp_obj_new_str(event.dtend, strlen(event.dtend));
+            dtend_obj = mp_obj_new_str(event.dtend, strlen(event.dtend));
         }
         mp_obj_t tuple[3] = {summary_obj, dtstart_obj, dtend_obj};
         result = mp_obj_new_tuple(3, tuple);
@@ -156,7 +157,7 @@ STATIC mp_obj_t mp_setEndDate(mp_obj_t self_in, mp_obj_t end_date_obj) {
     ics_obj_t *self = MP_OBJ_TO_PTR(self_in);
 
     mp_check_self(mp_obj_is_str_or_bytes(end_date_obj));
-    GET_STR_DATA_LEN(end_date_obj, end_date, end_date_len);
+    // GET_STR_DATA_LEN(end_date_obj, end_date, end_date_len);
     const char* endDate = mp_obj_str_get_str(end_date_obj);
 
     size_t result = setEndDate(&(self->ics), endDate);

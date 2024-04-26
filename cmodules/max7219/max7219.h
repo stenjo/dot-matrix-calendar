@@ -44,9 +44,13 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#ifndef UNITY_FRAMEWORK_H
 #include <driver/spi_master.h>
 #include <driver/gpio.h> // add by nopnop2002
 #include <esp_err.h>
+#elif
+typedef int esp_err_t;
+#endif
 
 #ifdef __cplusplus
 extern "C" {

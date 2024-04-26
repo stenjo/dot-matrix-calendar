@@ -5,17 +5,23 @@ def dtStrToIso(dtstart):
     # Assuming the format of dtstart is '20230412T165722Z'
     # We remove the 'Z' as it indicates UTC and 'fromisoformat' does not support 'Z'
     dtstart = dtstart.rstrip('Z')
+    time_iso = None
     date_part = dtstart[:8]
-    time_part = dtstart[9:]
-    
     # Insert hyphens and colons to match ISO 8601 format
     date_iso = "{}-{}-{}".format(date_part[:4], date_part[4:6], date_part[6:])
-    time_iso = "{}:{}:{}".format(time_part[:2], time_part[2:4], time_part[4:])
+    if len(dtstart) > 10:
+        time_part = dtstart[9:]
+        time_iso = "{}:{}:{}".format(time_part[:2], time_part[2:4], time_part[4:])
+        return "{}T{}".format(date_iso, time_iso)
+    else:
+        return date_iso
 
-    return "{}T{}".format(date_iso, time_iso)
 
 
 def toDtStr(date_input):
+    if date_input is None:
+        return None
+    
     if isinstance(date_input, str):
         # Assume the string is already in the correct format.
         return date_input
@@ -33,10 +39,17 @@ def toDict(event_tuple):
     if not event_tuple:
         return None
     
-    return {
-        "start": {"date": dtStrToIso(event_tuple[1])},
-        "summary": event_tuple[0]
-    }
+    dt = dtStrToIso(event_tuple[1])
+    if len(dt) > 8:
+        return {
+            "start": {"dateTime": dt},
+            "summary": event_tuple[0]
+        }
+    else:
+        return {
+            "start": {"date": dt},
+            "summary": event_tuple[0]
+        }
 
 class Calendar(ICS):
     
@@ -83,4 +96,3 @@ class Calendar(ICS):
     def end(self, endDate):
         self.setEndDate(toDtStr(endDate))
         
-# c.setStartDate('20240501T000000Z')

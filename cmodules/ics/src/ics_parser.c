@@ -20,11 +20,28 @@ static char *find_eol(char *s) {
     }
 }
 
+// Helper function to check if a key exists within a line
+int key_exists_within_line(char *line_start, char *line_end, const char *key)
+{
+    size_t key_length = strlen(key);
+    // Ensure the key doesn't overrun the line boundaries
+    if (line_start + key_length >= line_end) return 0;
+    return strncmp(line_start, key, key_length) == 0;
+}
+
+bool startsWith(const char *pre, const char *str)
+{
+    size_t lenpre = strlen(pre),
+           lenstr = strlen(str);
+    return lenstr < lenpre ? false : memcmp(pre, str, lenpre) == 0;
+}
+
 int parse_date_string(const char *date_str, struct tm *tm) {
     if (date_str == NULL) {
         return 0;
     }
-    
+
+    // Parse the date string.
     if (sscanf(date_str, "%4d%2d%2dT%2d%2d%2dZ",
                &tm->tm_year,
                &tm->tm_mon,
@@ -33,9 +50,21 @@ int parse_date_string(const char *date_str, struct tm *tm) {
                &tm->tm_min,
                &tm->tm_sec) == 6) {
         tm->tm_year -= 1900; // tm_year is years since 1900
-        tm->tm_mon -= 1;    // tm_mon is 0-based
+        tm->tm_mon -= 1;     // tm_mon is 0-based
+        tm->tm_isdst = -1;   // Daylight saving information is unknown
         return 1; // Successfully parsed
-    } else {
+    } else if (sscanf(date_str, "%4d%2d%2d",
+               &tm->tm_year,
+               &tm->tm_mon,
+               &tm->tm_mday) == 3){
+
+        tm->tm_year -= 1900; // tm_year is years since 1900
+        tm->tm_mon -= 1;     // tm_mon is 0-based
+        tm->tm_isdst = -1;   // Daylight saving information is unknown
+        return 1; // Successfully parsed
+    }
+    else
+    {
         return 0; // Failed to parse
     }
 }
@@ -64,14 +93,16 @@ void sortEventsByStart(ics_t *ics)
 }
 
 event_t getEvent(const char *ics_data, const char **next) {
-    event_t event = {NULL, NULL};
+    event_t event = {NULL, NULL, NULL};
 
     *next = NULL;
     const char *key_vevent_start = "BEGIN:VEVENT";
     const char *key_vevent_end = "END:VEVENT";
     const char *key_summary = "SUMMARY:";
     const char *key_dtstart = "DTSTART:";
+    const char *key_dtstart_date = "DTSTART;VALUE=DATE:";
     const char *key_dtend = "DTEND:";
+    const char *key_dtend_date = "DTEND;VALUE=DATE:";
     
      // We will only parse the first VEVENT found
     char *vevent_start = strstr(ics_data, key_vevent_start);
@@ -82,55 +113,57 @@ event_t getEvent(const char *ics_data, const char **next) {
     
     char *vevent_end = strstr(vevent_start, key_vevent_end);
     char *summary_start = strstr(vevent_start, key_summary);
-    if (!summary_start) {
+    if (!summary_start|| summary_start > vevent_end) {
         return event;
     }
     summary_start += strlen(key_summary);
     
     char *dtstart_start = strstr(vevent_start, key_dtstart);
-     if (!dtstart_start) {
-        return event;
+    if (!dtstart_start || dtstart_start > vevent_end) {
+        dtstart_start = strstr(vevent_start, key_dtstart_date);
+        dtstart_start += strlen(key_dtstart_date);
+        if (!dtstart_start || dtstart_start > vevent_end) {
+            return event;
+        }
     }
-    dtstart_start += strlen(key_dtstart);
+    else {
+        dtstart_start += strlen(key_dtstart);
+    }
    
     char *dtend_start = strstr(vevent_start, key_dtend);
      if (dtend_start && dtend_start < vevent_end) {
         dtend_start += strlen(key_dtend);
     }
     else {
+        dtend_start = strstr(vevent_start, key_dtend_date);
+        if (dtend_start && dtend_start < vevent_end) {
+            dtend_start += strlen(key_dtend_date);
+        }
+        else {
+
         dtend_start = NULL;
+        }
     }
    
     char *summary_end = find_eol(summary_start);
     char *dtstart_end = find_eol(dtstart_start);
     char *dtend_end = find_eol(dtend_start);
-    if (!summary_end || !dtstart_end) {
+    if (!summary_end || summary_end > vevent_end || !dtstart_end || dtstart_end > vevent_end) {
         return event;
     }
     
-    // Copy the strings to newly allocated memory
     size_t summary_len = summary_end - summary_start;
-    event.summary = (char *)malloc(summary_len + 1);
-    if (event.summary) {
-        memcpy(event.summary, summary_start, summary_len);
-        event.summary[summary_len] = '\0';
-    }
+    event.summary = strndup(summary_start, summary_len);
     
     size_t dtstart_len = dtstart_end - dtstart_start;
-    event.dtstart = (char *)malloc(dtstart_len + 1);
-    if (event.dtstart) {
-        memcpy(event.dtstart, dtstart_start, dtstart_len);
-        event.dtstart[dtstart_len] = '\0';
-    }
+    char *temp_dtstart = strndup(dtstart_start, dtstart_len);
+
+    event.dtstart = strndup(dtstart_start, dtstart_len);
 
     if (dtend_start && dtend_end)
     {
         size_t dtend_len = dtend_end - dtend_start;
-        event.dtend = (char *)malloc(dtend_len + 1);
-        if (event.dtend) {
-            memcpy(event.dtend, dtend_start, dtend_len);
-            event.dtstart[dtend_len] = '\0';
-        }
+        event.dtend = strndup(dtend_start, dtend_len);
     }
 
     // Check if either allocation failed
@@ -145,7 +178,7 @@ event_t getEvent(const char *ics_data, const char **next) {
         event.dtend = NULL;
     }
     
-    *next = vevent_end;
+    *next = vevent_end + strlen(key_vevent_end);
 
     return event;
 }
