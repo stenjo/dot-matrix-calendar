@@ -19,32 +19,34 @@ print(event)  # Should print a tuple like ("Test Event", "20230412T160000Z")
 print(dayText(event))
 
 # (8x8 blocks, spi host, clock speed, CS pin)
-m = Matrix8x8(16)
+m = Matrix8x8(8)
 
 m.clear()
 m.init()
-seconds = 60
-while seconds > 0:
-    tm = time.localtime()
-    m.write("     {}:{:02}:{:02}".format(tm[3], tm[4], tm[5]))
-    time.sleep(1)
-    seconds -= 1
-
+# seconds = 60
+# while seconds > 0:
+#     tm = time.localtime()
+#     m.write("     {}:{:02}:{:02}".format(tm[3], tm[4], tm[5]))
+#     time.sleep(1)
+#     seconds -= 1
+(year, month, day, hour, min, sec, _, _) = time.localtime()
+print("     {}:{:02}:{:02}".format(hour, min, sec))
+m.write("     {}:{:02}:{:02}".format(hour, min, sec))
+time.sleep(1)  # import time(1)
+event = c.first()
 m.marquee(dayText(event))
-while event:
-    done = False
-    while done == False:
-        done = m.scroll(False)
-    event = c.next()
-    if not event:
-        seconds = 60
-        while seconds > 0:
-            tm = time.localtime()
-            m.write("     {}:{:02}:{:02}".format(tm[3], tm[4], tm[5]))
-            time.sleep(0.5)
-            seconds -= 1
-        event = c.first()
-    m.marquee(dayText(event))
+done = False
+while True:
+    done = m.scroll(False)
+    if done:
+        (year, month, day, hour, min, sec, _, _) = time.localtime()
+        while sec != 0:
+            m.write("     {}:{:02}:{:02}".format(hour, min, sec))
+            (year, month, day, hour, min, sec, _, _) = time.localtime()
+        event = c.next()
+        if not event:
+            event = c.first()
+        m.marquee(dayText(event))
 
 m.test()
 done = False
