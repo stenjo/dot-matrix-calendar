@@ -23,6 +23,34 @@ typedef struct _max7219_obj_t {
 STATIC mp_obj_t max7219_make_new(const mp_obj_type_t *type, size_t n_args, size_t n_kw, const mp_obj_t *args) {
     max7219_obj_t *self = mp_obj_malloc(max7219_obj_t, type);
 
+
+    uint32_t cascade_size = DEFAULT_CASCADE_SIZE;
+    uint16_t scroll_delay = DEFAULT_SCROLL_DELAY;
+    uint32_t host_device = SPI2_HOST;
+
+    if (n_args > 0) {
+        cascade_size = mp_obj_get_int(args[0]);
+        mp_printf(&mp_plat_print, "Display blocks: %d\n", cascade_size);
+    }
+
+    if (n_args > 1) {
+        scroll_delay = mp_obj_get_int(args[1]);
+        mp_printf(&mp_plat_print, "Scroll delay: %dms\n", scroll_delay);
+    }
+
+    if (n_args > 2) {
+        host_device = mp_obj_get_int(args[2]);
+        mp_printf(&mp_plat_print, "SPI host: %d\n", host_device);
+    }
+
+    // Configure device
+    self->dev.cascade_size = cascade_size;
+    self->dev.scroll_delay = scroll_delay;
+    self->dev.digits = cascade_size*8;
+    self->dev.mirrored = false;
+    self->dev.text = NULL;
+    self->dev.mrqTmstmp = 0;
+
    // Configure SPI bus
     spi_bus_config_t cfg = {
        .mosi_io_num = DEFAULT_PIN_NUM_MOSI,
@@ -35,40 +63,19 @@ STATIC mp_obj_t max7219_make_new(const mp_obj_type_t *type, size_t n_args, size_
     };
     ESP_ERROR_CHECK(spi_bus_initialize(SPI2_HOST, &cfg, 1));
 
-    uint32_t cascade_size = DEFAULT_CASCADE_SIZE;
-    if (n_args > 0) {
-        cascade_size = mp_obj_get_int(args[0]);
-        mp_printf(&mp_plat_print, "Display blocks: %d\n", cascade_size);
-    }
-
-    // Configure device
-    self->dev.cascade_size = cascade_size;
-    self->dev.scroll_delay = DEFAULT_SCROLL_DELAY;
-    self->dev.digits = cascade_size*8;
-    self->dev.mirrored = false;
-    self->dev.text = NULL;
-    self->dev.mrqTmstmp = 0;
-
-
-    uint32_t host_device = SPI2_HOST;
-    if (n_args > 1) {
-        host_device = mp_obj_get_int(args[1]);
-        mp_printf(&mp_plat_print, "SPI host: %d\n", host_device);
-    }
-
     uint32_t clock_speed_hz = MAX7219_MAX_CLOCK_SPEED_HZ;
-    if (n_args > 2) {
-        clock_speed_hz = mp_obj_get_int(args[2]);
+    if (n_args > 3) {
+        clock_speed_hz = mp_obj_get_int(args[3]);
         mp_printf(&mp_plat_print, "Clock speed: %d\n", clock_speed_hz);
     }
 
     mp_uint_t cs_pin = DEFAULT_PIN_CS;
-    if (n_args > 3) {
-        cs_pin = mp_obj_get_int(args[3]);
+    if (n_args > 4) {
+        cs_pin = mp_obj_get_int(args[4]);
         mp_printf(&mp_plat_print, "Chip select: %d\n", cs_pin);
     }
 
-    max7219_init_desc(&(self->dev), SPI2_HOST, clock_speed_hz, cs_pin);
+    max7219_init_desc(&(self->dev), host_device, clock_speed_hz, cs_pin);
     max7219_init(&(self->dev));
 
     // The make_new function always returns self.

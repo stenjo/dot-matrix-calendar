@@ -36,6 +36,12 @@ def do_connect():
 
 do_connect()
 
+from wifi_setup.wifi_setup import WiFiSetup
+
+ws = WiFiSetup("dot-matrix-calendar")
+sta = ws.connect_or_setup()
+
+
 #if needed, overwrite default time server
 ntptime.host = "1.europe.pool.ntp.org"
 
