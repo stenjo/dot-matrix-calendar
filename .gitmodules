@@ -2,3 +2,9 @@
 	path = lib/micropython
 	url = https://github.com/micropython/micropython.git
 	branch = v1.19
+[submodule "cmodules/micropython-wifi-setup"]
+	path = cmodules/micropython-wifi-setup
+	url = https://github.com/george-hawkins/micropython-wifi-setup
+[submodule "modules/micropython-wifi-setup"]
+	path = modules/micropython-wifi-setup
+	url = https://github.com/george-hawkins/micropython-wifi-setup
