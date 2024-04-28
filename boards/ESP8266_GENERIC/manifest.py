@@ -27,5 +27,3 @@ require("umqtt.robust")
 
 require("urequests")
 require("ssl")
-
-package("ics", base_path="../../modules")

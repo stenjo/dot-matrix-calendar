@@ -9,6 +9,9 @@ MICROPY_VFS_LFS2 ?= 1
 # Add asyncio and extra micropython-lib packages (in addition to the port manifest).
 FROZEN_MANIFEST ?= $(BOARD_DIR)/manifest.py
 
+# Custom C modules
+USER_C_MODULES = $(PROJECT_TOP)/cmodules
+
 # Configure mpconfigboard.h.
 CFLAGS += -DMICROPY_ESP8266_2M
 endif

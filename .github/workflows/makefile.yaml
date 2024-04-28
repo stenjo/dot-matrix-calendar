@@ -45,13 +45,14 @@ jobs:
         make CROSS_COMPILE=/usr/lib/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-
 
     - name: Check output
+      working-directory: boards/ESP8266_GENERIC
       run: ls -al build/firmware.bin
 
     - name: Save binary
       uses: actions/upload-artifact@v4
       with:
         name: esp8266-binary
-        path: build/firmware.bin
+        path: boards/ESP8266_GENERIC/build/firmware.bin
 
   esp32:
 
@@ -73,6 +74,7 @@ jobs:
     - name: Update repos
       run: |
         git submodule update --init lib/micropython
+        git submodule update --init modules/micropython-wifi-setup
         make -C lib/micropython/mpy-cross
         
     - name: Make submodules    
