@@ -33,9 +33,12 @@ jobs:
         
     - name: Make submodules    
       working-directory: lib/micropython
-      run: make -C ports/esp8266 submodules
+      run: |
+        git submodule update --init lib/stm32lib lib/berkeley-db-1.xx
+        make -C ports/esp8266 submodules
         
     - name: Compile firmware
+      working-directory: boards/ESP8266_GENERIC
       run: |
         echo "${{ env.ESP_ESPRESSIF_ROOT}}/xtensa-lx106-elf/bin" >> $GITHUB_PATH
         /usr/lib/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc -v
@@ -94,37 +97,8 @@ jobs:
       with:
         name: esp32-binary
         path: boards/CUSTOM_ESP32/build/micropython.bin
-
-  esp32-S2:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Exporting xtensa gcc path
-      run: echo "ESP_ESPRESSIF_ROOT=/usr/lib/espressif" >> $GITHUB_ENV
-
-    - name: Install tools
-      run: |
-        git clone -b v5.0.4 --recursive https://github.com/espressif/esp-idf.git
-        cd esp-idf
-        ./install.sh
-        source export.sh
-        
-    - name: Update repos
-      run: |
-        git submodule update --init lib/micropython
-        make -C lib/micropython/mpy-cross
-        
-    - name: Make submodules    
-      working-directory: lib/micropython/ports/esp32
-      run: |
-        source ../../../../esp-idf/export.sh
-        make submodules
-        make
-      
-    - name: Compile firmware
+     
+    - name: Compile firmware LOLIN_S2_MINI
       working-directory: boards/LOLIN_S2_MINI
       run: |
         source ../../esp-idf/export.sh
