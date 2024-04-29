@@ -270,11 +270,21 @@ uint8_t getCharColumn(uint8_t chr, uint8_t pos) {
   return font[pos + idx + 1];
 }
 
-void copyText(max7219_t * dev, const char * text) {
+void copyText(max7219_t * dev, const char * text, bool center) {
   size_t textLength = strlen(text); // Calculate the length of the text once
   int16_t bufferIndex = 0;
+  int16_t padding = 0;
 
-  for (size_t strIdx = 0; strIdx < textLength; strIdx++) {
+  // printf("textLength: %d, ", textLength);
+  if (textLength < dev->cascade_size*8 && center) {
+    padding = (dev->cascade_size*8 - textLength)/2;
+    // printf("padding: %d\n", padding);
+    for (int16_t i = 0; i < padding; i++) {
+      dev->frameBuffer[bufferIndex++] = 0;
+    }
+  }
+
+  for (size_t strIdx = 0; strIdx < textLength && bufferIndex < MAX7219_MAX_CASCADE_SIZE*8; strIdx++) {
     uint8_t chr = text[strIdx];
     
     if (chr == ' ') {
@@ -286,7 +296,7 @@ void copyText(max7219_t * dev, const char * text) {
     if (chr == ESCAPE_CHAR) {
       // If the character is an escape character, handle it specially
       strIdx++; // Move to the escaped char
-      if (strIdx < textLength) {
+      if (strIdx < textLength ) {
         chr = text[strIdx];
       } else {
         // Error handling if ESCAPE_CHAR is the last character in the text

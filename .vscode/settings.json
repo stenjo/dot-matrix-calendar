@@ -50,7 +50,8 @@
         "stdlib.h": "c",
         "setjmp.h": "c",
         "ics_parser.h": "c",
-        "__locale": "c"
+        "__locale": "c",
+        "max7219_priv.h": "c"
     },
     "cmake.configureOnOpen": false,
     "idf.port": "/dev/cu.usbserial-0001",

@@ -25,6 +25,7 @@ PORT ?= /dev/tty.usbserial-1430
 BAUD ?= 115200
 FLASH_MODE ?= qio
 FLASH_SIZE ?= detect
+CFLAGS += -DESP8266
 
 include $(MICROPY_TOP)/py/mkenv.mk
 include $(MICROPY_TOP)/py/mkrules.mk

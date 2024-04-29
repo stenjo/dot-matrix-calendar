@@ -6,6 +6,12 @@
 #include "max7219.h"
 #include "src/matrix.h"
 
+#if defined(ESP32)
+#include <driver/spi_master.h>
+#elif defined(ESP8266)
+#include <esp8266/spi.h>
+#endif
+
 typedef struct _max7219_obj_t {
     mp_obj_base_t base;
     max7219_t dev;

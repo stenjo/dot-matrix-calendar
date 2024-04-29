@@ -45,7 +45,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 #ifndef UNITY_FRAMEWORK_H
+#if defined(ESP32)
 #include <driver/spi_master.h>
+#elif defined(ESP8266)
+#include <esp8266/spi.h>
+#endif
 #include <driver/gpio.h> // add by nopnop2002
 #include <esp_err.h>
 #elif
@@ -63,8 +67,8 @@ extern "C" {
 
 #define DEFAULT_SCROLL_DELAY 30
 #define DEFAULT_CASCADE_SIZE 8
-#define DEFAULT_PIN_NUM_MOSI 19
-#define DEFAULT_PIN_NUM_CLK 18
+#define DEFAULT_PIN_NUM_MOSI    MICROPY_HW_SPI1_MOSI //19
+#define DEFAULT_PIN_NUM_CLK     MICROPY_HW_SPI1_SCK //18
 #define DEFAULT_PIN_CS 5
 
 //commands as defined in the datasheet

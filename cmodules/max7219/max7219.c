@@ -43,6 +43,11 @@
 #include <esp_timer.h> // Include the header for ESP timer functions
 #include "src/matrix.h"
 #include "max7219_priv.h"
+#if defined(ESP32)
+#include <driver/spi_master.h>
+#elif defined(ESP8266)
+#include <esp8266/spi.h>
+#endif
 
 static const char *TAG = "max7219";
 
@@ -245,7 +250,6 @@ void marquee(max7219_t *dev, const char *text)
     clear(dev);
     max7219_init(dev);
     max7219_clear(dev);
-    // copyText(dev, text);
 }
 
 void matrixWrite(max7219_t *dev, const char *text)
@@ -253,5 +257,5 @@ void matrixWrite(max7219_t *dev, const char *text)
     // clear(dev);
     // max7219_clear(dev);
 
-    copyText(dev, text);
+    copyText(dev, text, false);
 }

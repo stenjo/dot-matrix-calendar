@@ -2,6 +2,7 @@
 # Nothing in here needs to be customised, it will work for any board.
 
 cmake_minimum_required(VERSION 3.12)
+add_definitions(-DESP32)
 
 # Set the location of MicroPython, the esp32 port, and the board directory.
 get_filename_component(PROJECT_DIR "../.." ABSOLUTE)

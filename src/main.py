@@ -23,15 +23,9 @@ m = Matrix8x8(8,20)
 
 m.clear()
 m.init()
-# seconds = 60
-# while seconds > 0:
-#     tm = time.localtime()
-#     m.write("     {}:{:02}:{:02}".format(tm[3], tm[4], tm[5]))
-#     time.sleep(1)
-#     seconds -= 1
 (year, month, day, hour, min, sec, _, _) = time.localtime()
-print("     {}:{:02}:{:02}".format(hour, min, sec))
-m.write("     {}:{:02}:{:02}".format(hour, min, sec))
+print("{}:{:02}:{:02}".format(hour, min, sec))
+m.write("{}:{:02}:{:02}".format(hour, min, sec))
 time.sleep(1)  # import time(1)
 event = c.first()
 m.marquee(dayText(event))
@@ -41,7 +35,7 @@ while True:
     if done:
         (year, month, day, hour, min, sec, _, _) = time.localtime()
         while sec != 0:
-            m.write("     {}:{:02}:{:02}".format(hour, min, sec))
+            m.write("{}:{:02}:{:02}".format(hour, min, sec))
             (year, month, day, hour, min, sec, _, _) = time.localtime()
         event = c.next()
         if not event:

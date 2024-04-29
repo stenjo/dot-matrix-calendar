@@ -9,7 +9,7 @@
  * @param dev Display descriptor
  * @return void
  */
-void copyText(max7219_t * dev, const char * text);
+void copyText(max7219_t * dev, const char * text, bool center);
 
 /**
  * @brief Shift buffer one pixel left, filling in from text string in descriptor
