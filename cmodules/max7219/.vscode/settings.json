@@ -1,0 +1,10 @@
+{
+    "C_Cpp.default.compileCommands": "/Users/sten.johnsen/git/dot-matrix-calendar/cmodules/max7219/builddir/compile_commands.json",
+    "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild",
+    "C_Cpp.default.compilerArgs": [
+        "-Wgnu-binary-literal"
+    ],
+    "files.associations": {
+        "max7219.h": "c"
+    }
+}

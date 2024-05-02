@@ -3,7 +3,7 @@
 #include "py/binary.h"
 #include "py/objstr.h"
 #include "py/obj.h"
-#include "max7219.h"
+#include "src/max7219.h"
 #include "src/matrix.h"
 
 #if defined(ESP32)

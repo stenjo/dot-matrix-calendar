@@ -1,0 +1,14 @@
+:cmock:
+  :plugins:
+    - :ignore
+    - :callback
+    - :ignore_arg
+    - :array
+    - :return_thru_ptr
+
+  :treat_as:
+    uint8:    HEX8
+    uint16:   HEX16
+    uint32:   UINT32
+    int8:     INT8
+    bool:     UINT8

@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "~/esp/esp-idf/components/**/include",
+                "~/esp/esp-idf/tools/**/include",
+                "~/git/esp32/build/config",
+                "${workspaceFolder}/subprojects/unity/src"
+            ],
+            "defines": [],
+            "macFrameworkPath": [
+                "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "macos-clang-arm64",
+            "configurationProvider": "mesonbuild.mesonbuild"
+        }
+    ],
+    "version": 4
+}

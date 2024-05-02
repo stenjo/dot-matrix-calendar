@@ -39,11 +39,11 @@
  */
 #include "max7219.h"
 #include <string.h>
-#include <esp_log.h>
-#include <esp_timer.h> // Include the header for ESP timer functions
-#include "src/matrix.h"
+#include "matrix.h"
 #include "max7219_priv.h"
 #if defined(ESP32)
+#include <esp_log.h>
+#include <esp_timer.h> // Include the header for ESP timer functions
 #include <driver/spi_master.h>
 #elif defined(ESP8266)
 #include <esp8266/spi.h>
@@ -211,51 +211,216 @@ esp_err_t max7219_clear(max7219_t *dev)
     return ESP_OK;
 }
 
-esp_err_t max7219_draw_image_8x8(max7219_t *dev, uint8_t pos, const void *image)
+#include <string.h>
+#include <stdlib.h>
+#include <setjmp.h>
+#include "cmock.h"
+#include "max7219.h"
+
+
+esp_err_t max7219_init_desc(max7219_t* dev, spi_host_device_t host, uint32_t clock_speed_hz, gpio_num_t cs_pin)
 {
-    CHECK_ARG(dev && image);
-
-    for (uint8_t i = pos, offs = 0; i < dev->cascade_size*8 && offs < 8; i++, offs++)
-        max7219_set_digit(dev, i, *((uint8_t *)image + offs));
-
-    return ESP_OK;
+  /*TODO: Implement Me!*/
+  (void)dev;
+  (void)host;
+  (void)clock_speed_hz;
+  (void)cs_pin;
+  return (esp_err_t)0;
 }
 
-void clear(max7219_t *dev) {memset(dev->frameBuffer, 0, 8*dev->cascade_size);}
-
-bool scroll(max7219_t *dev, bool wrap)
+esp_err_t max7219_free_desc(max7219_t* dev)
 {
-
-    uint64_t currentMillis = esp_timer_get_time() / 1000;
-    dev->wrap_text_scroll = wrap;
-
-    if ((currentMillis < dev->mrqTmstmp) || (currentMillis - dev->mrqTmstmp < dev->scroll_delay)) {
-        return false;
-    } 
-    dev->mrqTmstmp = currentMillis + dev->scroll_delay;
-
-    bool done = scrollBuffer(dev);
-    printBuffer(dev);
-
-    return done;
+  /*TODO: Implement Me!*/
+  (void)dev;
+  return (esp_err_t)0;
 }
 
-void marquee(max7219_t *dev, const char *text)
+esp_err_t max7219_init(max7219_t* dev)
 {
-    dev->text = text;
-    dev->text_index = 0;
-    dev->col_index = 0;
-    dev->scroll_whitespace = 0;
-    dev->char_escaped = false;
-    clear(dev);
-    max7219_init(dev);
-    max7219_clear(dev);
+  /*TODO: Implement Me!*/
+  (void)dev;
+  return (esp_err_t)0;
 }
 
-void matrixWrite(max7219_t *dev, const char *text)
+esp_err_t max7219_set_decode_mode(max7219_t* dev, bool bcd)
 {
-    // clear(dev);
-    // max7219_clear(dev);
-
-    copyText(dev, text, false);
+  /*TODO: Implement Me!*/
+  (void)dev;
+  (void)bcd;
+  return (esp_err_t)0;
 }
+
+esp_err_t max7219_set_brightness(max7219_t* dev, uint8_t value)
+{
+  /*TODO: Implement Me!*/
+  (void)dev;
+  (void)value;
+  return (esp_err_t)0;
+}
+
+esp_err_t max7219_set_shutdown_mode(max7219_t* dev, bool shutdown)
+{
+  /*TODO: Implement Me!*/
+  (void)dev;
+  (void)shutdown;
+  return (esp_err_t)0;
+}
+
+esp_err_t max7219_set_digit(max7219_t* dev, uint8_t digit, uint8_t val)
+{
+  /*TODO: Implement Me!*/
+  (void)dev;
+  (void)digit;
+  (void)val;
+  return (esp_err_t)0;
+}
+
+esp_err_t max7219_clear(max7219_t* dev)
+{
+  /*TODO: Implement Me!*/
+  (void)dev;
+  return (esp_err_t)0;
+}
+
+#include <string.h>
+#include <stdlib.h>
+#include <setjmp.h>
+#include "cmock.h"
+#include "max7219.h"
+
+
+esp_err_t max7219_init_desc(max7219_t* dev, spi_host_device_t host, uint32_t clock_speed_hz, gpio_num_t cs_pin)
+{
+  /*TODO: Implement Me!*/
+  (void)dev;
+  (void)host;
+  (void)clock_speed_hz;
+  (void)cs_pin;
+  return (esp_err_t)0;
+}
+
+esp_err_t max7219_free_desc(max7219_t* dev)
+{
+  /*TODO: Implement Me!*/
+  (void)dev;
+  return (esp_err_t)0;
+}
+
+esp_err_t max7219_init(max7219_t* dev)
+{
+  /*TODO: Implement Me!*/
+  (void)dev;
+  return (esp_err_t)0;
+}
+
+esp_err_t max7219_set_decode_mode(max7219_t* dev, bool bcd)
+{
+  /*TODO: Implement Me!*/
+  (void)dev;
+  (void)bcd;
+  return (esp_err_t)0;
+}
+
+esp_err_t max7219_set_brightness(max7219_t* dev, uint8_t value)
+{
+  /*TODO: Implement Me!*/
+  (void)dev;
+  (void)value;
+  return (esp_err_t)0;
+}
+
+esp_err_t max7219_set_shutdown_mode(max7219_t* dev, bool shutdown)
+{
+  /*TODO: Implement Me!*/
+  (void)dev;
+  (void)shutdown;
+  return (esp_err_t)0;
+}
+
+esp_err_t max7219_set_digit(max7219_t* dev, uint8_t digit, uint8_t val)
+{
+  /*TODO: Implement Me!*/
+  (void)dev;
+  (void)digit;
+  (void)val;
+  return (esp_err_t)0;
+}
+
+esp_err_t max7219_clear(max7219_t* dev)
+{
+  /*TODO: Implement Me!*/
+  (void)dev;
+  return (esp_err_t)0;
+}
+
+#include <string.h>
+#include <stdlib.h>
+#include <setjmp.h>
+#include "cmock.h"
+#include "max7219.h"
+
+
+esp_err_t max7219_init_desc(max7219_t* dev, spi_host_device_t host, uint32_t clock_speed_hz, gpio_num_t cs_pin)
+{
+  /*TODO: Implement Me!*/
+  (void)dev;
+  (void)host;
+  (void)clock_speed_hz;
+  (void)cs_pin;
+  return (esp_err_t)0;
+}
+
+esp_err_t max7219_free_desc(max7219_t* dev)
+{
+  /*TODO: Implement Me!*/
+  (void)dev;
+  return (esp_err_t)0;
+}
+
+esp_err_t max7219_init(max7219_t* dev)
+{
+  /*TODO: Implement Me!*/
+  (void)dev;
+  return (esp_err_t)0;
+}
+
+esp_err_t max7219_set_decode_mode(max7219_t* dev, bool bcd)
+{
+  /*TODO: Implement Me!*/
+  (void)dev;
+  (void)bcd;
+  return (esp_err_t)0;
+}
+
+esp_err_t max7219_set_brightness(max7219_t* dev, uint8_t value)
+{
+  /*TODO: Implement Me!*/
+  (void)dev;
+  (void)value;
+  return (esp_err_t)0;
+}
+
+esp_err_t max7219_set_shutdown_mode(max7219_t* dev, bool shutdown)
+{
+  /*TODO: Implement Me!*/
+  (void)dev;
+  (void)shutdown;
+  return (esp_err_t)0;
+}
+
+esp_err_t max7219_set_digit(max7219_t* dev, uint8_t digit, uint8_t val)
+{
+  /*TODO: Implement Me!*/
+  (void)dev;
+  (void)digit;
+  (void)val;
+  return (esp_err_t)0;
+}
+
+esp_err_t max7219_clear(max7219_t* dev)
+{
+  /*TODO: Implement Me!*/
+  (void)dev;
+  return (esp_err_t)0;
+}
+

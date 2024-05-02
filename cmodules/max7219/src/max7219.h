@@ -44,16 +44,19 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#ifndef UNITY_FRAMEWORK_H
 #if defined(ESP32)
+#include <esp_err.h>
 #include <driver/spi_master.h>
+#include <driver/gpio.h> // add by nopnop2002
 #elif defined(ESP8266)
 #include <esp8266/spi.h>
-#endif
-#include <driver/gpio.h> // add by nopnop2002
+#else
 #include <esp_err.h>
-#elif
-typedef int esp_err_t;
+#pragma GCC diagnostic ignored "-Wgnu-binary-literal"
+typedef int spi_device_handle_t;
+typedef int spi_device_interface_config_t;
+typedef int spi_host_device_t;
+typedef int gpio_num_t;
 #endif
 
 #ifdef __cplusplus
@@ -191,53 +194,6 @@ esp_err_t max7219_set_digit(max7219_t *dev, uint8_t digit, uint8_t val);
  */
 esp_err_t max7219_clear(max7219_t *dev);
 
-/**
- * @brief Draw 64-bit image on 8x8 matrix
- *
- * @param dev Display descriptor
- * @param pos Start digit
- * @param image 64-bit buffer with image data
- * @return `ESP_OK` on success
- */
-esp_err_t max7219_draw_image_8x8(max7219_t *dev, uint8_t pos, const void *image);
-
-/**
- * @brief Clear the frame buffer
- *
- * @param dev Display descriptor
- * @return void
- */
-void clear(max7219_t *dev);
-
-/**
- * @brief Scroll the text from marquee() left by one pixel and show. 
- * Timer limited to set the scroll speed constant. Call as often as possible.
- *
- * @param dev Display descriptor
- * @param wrap default False. Set to true to start scrolling text again when done.
- * @return True if all text is scrolled left and empty display. False otherwise
- */
-bool scroll(max7219_t *dev, bool wrap);
-
-
-/**
- * @brief Write text to the display for scrolling. Scrolling is done 
- * through the scroll() method
- *
- * @param dev Display descriptor
- * @param text Null-terminated string to write
- * @return void
- */
-void marquee(max7219_t *dev, const char *text);
-
-/**
- * @brief Write text to the display and show
- *
- * @param dev Display descriptor
- * @param text Null-terminated string to write
- * @return void
- */
-void matrixWrite(max7219_t *dev, const char *text);
 
 #ifdef __cplusplus
 }
