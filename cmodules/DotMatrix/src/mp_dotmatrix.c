@@ -17,6 +17,17 @@ typedef struct _max7219_obj_t {
 } max7219_obj_t;
 
 
+/**
+ * @brief Initialize Matrix8x8 object
+ * 
+ * @param blocks: number of 8x8 dot matrix modules cascaded. Default: 8
+ * @param scroll_delay: Delay in milliseconds between shifting pixels left. Default is 30
+ * @param spi_device: 0 or 1. SPI device to use. Default: SPI2_HOST (=1)
+ * @param clock_speed: SPI clocking speed in Hz. Default 1000000 (1 MHz)
+ * @param chip_select_pin: CS pin number. Default 5
+ * 
+ * @returns Matrix8x8 Object initialized
+*/
 STATIC mp_obj_t dotmatrix_make_new(const mp_obj_type_t *type, size_t n_args, size_t n_kw, const mp_obj_t *args) {
     max7219_obj_t *self = mp_obj_malloc(max7219_obj_t, type);
 
@@ -57,7 +68,7 @@ STATIC mp_obj_t dotmatrix_make_new(const mp_obj_type_t *type, size_t n_args, siz
        .max_transfer_sz = 0,
        .flags = 0
     };
-    spi_bus_initialize(SPI2_HOST, &cfg, 1);
+    spi_bus_initialize(host_device, &cfg, 1);
 
     uint32_t clock_speed_hz = MAX7219_MAX_CLOCK_SPEED_HZ;
     if (n_args > 3) {
@@ -83,17 +94,27 @@ STATIC mp_obj_t dotmatrix_make_new(const mp_obj_type_t *type, size_t n_args, siz
  * @param self: instance
  * @param text: Text to write to the display
  * @param centered: Center text if true
- * 
+ *
+ * @returns None 
 */
-STATIC mp_obj_t mp_dotmatrix_write(mp_obj_t self_in, mp_obj_t text_obj) {
-    max7219_obj_t *self = MP_OBJ_TO_PTR(self_in);
+STATIC mp_obj_t mp_dotmatrix_write(size_t n_args, const mp_obj_t *args) {
+    max7219_obj_t *self = MP_OBJ_TO_PTR(args[0]); 
+    const char *text = NULL;
+    bool centered = false;
 
-    // Convert the MicroPython string to a C string
-    const char *text = mp_obj_str_get_str(text_obj);
-    matrixWrite(&(self->dev), text, true);
+    if (n_args > 1) {
+        // Convert the MicroPython string to a C string
+        text = mp_obj_str_get_str(args[1]);
+    }
+    // Check if the centered argument was provided
+    if (n_args > 2) {
+        centered = mp_obj_is_true(args[1]);
+    }
+
+    matrixWrite(&(self->dev), text, centered);
     return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_2(dotmatrix_write_obj, mp_dotmatrix_write);
+STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(dotmatrix_write_obj, 2, 3, mp_dotmatrix_write);
 
 /**
  * @brief   Write a scrolling text to the display. Needs scroll() 
@@ -113,8 +134,9 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_2(dotmatrix_marquee_obj, mp_dotmatrix_marquee);
  * @brief Shift the text defined through marquee() to the left one pixel position. 
  * 
  * @param self: The instance
- * @param loop: Will start scrolling from the right if set True, Default: False
- * @param scroll_delay: Delay in milliseconds between shifting pixels left. Default is 30
+ * @param loop: Boolean. Will start scrolling from the right if set True, Default: False
+ * @param scroll_delay: Int: Delay in milliseconds between shifting pixels left. Default 
+ *                      is unchanged or 30
  * 
  * @returns True if all text was scrolled through, False otherwise
  * 
@@ -122,14 +144,17 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_2(dotmatrix_marquee_obj, mp_dotmatrix_marquee);
 STATIC mp_obj_t mp_dotmatrix_scroll(size_t n_args, const mp_obj_t *args) {
     max7219_obj_t *self = MP_OBJ_TO_PTR(args[0]); // First argument is always self
     bool wrap = false; // Default value
-    // Check if the wrap argument was provided
+
     if (n_args > 1) {
         wrap = mp_obj_is_true(args[1]);
+    }
+    if (n_args > 2) {
+        self->dev.scroll_delay = mp_obj_get_int(args[2]);
     }
     bool done = scroll(&(self->dev), wrap);
     return mp_obj_new_bool(done);
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(dotmatrix_scroll_obj, 1, 2, mp_dotmatrix_scroll);
+STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(dotmatrix_scroll_obj, 1, 3, mp_dotmatrix_scroll);
 
 /**
  * @brief Clears the display

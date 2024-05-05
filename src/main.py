@@ -5,6 +5,7 @@ import ujson
 import ssl
 from Calendar import Calendar
 import time
+import network
 
 c=Calendar()
 c.start(time.localtime())
@@ -23,10 +24,21 @@ m = Matrix8x8(8,20)
 
 m.clear()
 m.init()
+
+
+# Get version
+sta_if = network.WLAN(network.STA_IF)
+filename = "version.txt"
+f = open(filename, "r")
+version = f.read().replace("\n", "")
+m.marquee(sta_if.ifconfig()[0] + " " + version)
+while not m.scroll():
+    pass
+
 (year, month, day, hour, min, sec, _, _) = time.localtime()
 print("{}:{:02}:{:02}".format(hour, min, sec))
-m.write("{}:{:02}:{:02}".format(hour, min, sec))
-time.sleep(1)  # import time(1)
+m.write("{}/{} {:02}:{:02}".format(day, month, hour, min), True)
+time.sleep(3)  # import time(1)
 event = c.first()
 m.marquee(dayText(event))
 done = False
@@ -35,7 +47,10 @@ while True:
     if done:
         (year, month, day, hour, min, sec, _, _) = time.localtime()
         while sec != 0:
-            m.write("{}:{:02}:{:02}".format(hour, min, sec))
+            if sec % 2 == 0:
+                m.write("{:02}/{:02} {:02}:{:02}".format(day, month, hour, min), True)
+            else:
+                m.write("{:02}/{:02} {:02} {:02}".format(day, month, hour, min), True)
             (year, month, day, hour, min, sec, _, _) = time.localtime()
         event = c.next()
         if not event:

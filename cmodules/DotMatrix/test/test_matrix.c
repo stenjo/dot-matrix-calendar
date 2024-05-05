@@ -111,6 +111,33 @@ void test_copyText_WhenTextIsRegularChars_UpdateFrameBufferWithPattern(void) {
     TEST_ASSERT_EQUAL_UINT8_ARRAY(expected, dev.frameBuffer, sizeof(expected));
 }
 
+void test_copyText_WhenTextHasSpace_WriteBlankPixels(void) {
+    
+    max7219_t dev;
+    dev.cascade_size = 8;
+    memset(dev.frameBuffer, 0, 8*dev.cascade_size);
+
+    char * textToTest = "a c";
+    uint8_t expected[]={
+        //0x20,0x54,0x54,0x54,0x78,
+        0b00100000,0b01010100,0b01010100,0b01010100,0b01111000,
+        0b00000000,
+        0b00000000, // space
+        0b00000000, // space
+        0b00000000,
+        //0x38 0x44 0x44 0x44 0x28
+        0b00111000,0b01000100,0b01000100,0b01000100,0b00101000,
+        0b00000000
+        };
+    display_set_segment_Ignore();
+    copyText(&dev, "a:c", false);
+
+    copyText(&dev, textToTest, false);
+    uint8_t* actual = dev.frameBuffer;
+
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(expected, dev.frameBuffer, sizeof(expected));
+}
+
 void test_copyText_WhenTextIsVariableWidthChars_UpdateFrameBufferWithPattern(void) {
     
     max7219_t dev;

@@ -352,7 +352,9 @@ void copyText(max7219_t * dev, const char * text, bool center) {
     
     if (chr == ' ') {
       // If the character is a space, skip 2 columns
-      bufferIndex += 3;
+      dev->frameBuffer[bufferIndex++] = 0;  // space
+      dev->frameBuffer[bufferIndex++] = 0;  // space
+      dev->frameBuffer[bufferIndex++] = 0;
       continue;
     }
     
