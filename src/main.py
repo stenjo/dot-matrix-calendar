@@ -1,4 +1,4 @@
-from max7219 import Matrix8x8
+from DotMatrix import Matrix8x8
 from dateHandling import dayText
 from datetime import datetime
 import ujson
@@ -12,7 +12,7 @@ c.end(datetime(2024, 6, 1, 0,0,0).timetuple())
 
 c.parseURL('webcal://files-f3.motorsportcalendars.com/no/f3-calendar_p_q_sprint_feature.ics')
 c.parseURL('webcal://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics')
-c.parseURL('https://calendar.google.com/calendar/ical/c_bbd06d1ace0398da9397cae670201961dc43e8e1f37c017e5261650ed94c9192%40group.calendar.google.com/public/basic.ics')
+# c.parseURL('https://calendar.google.com/calendar/ical/c_bbd06d1ace0398da9397cae670201961dc43e8e1f37c017e5261650ed94c9192%40group.calendar.google.com/public/basic.ics')
 event = c.first()
 
 print(event)  # Should print a tuple like ("Test Event", "20230412T160000Z")

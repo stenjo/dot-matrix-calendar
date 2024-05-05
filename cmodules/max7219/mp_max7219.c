@@ -156,7 +156,7 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_3(max7219_setDigit_obj, mp_max7219_setDigit);
 STATIC mp_obj_t mp_max7219_draw8x8(mp_obj_t self_in, mp_obj_t pos, mp_obj_t image) {
     max7219_obj_t *self = MP_OBJ_TO_PTR(self_in);
     void * img = MP_OBJ_TO_PTR(image);
-    max7219_draw_image_8x8(&(self->dev), mp_obj_get_int(pos), img);
+    drawBlock(&(self->dev), mp_obj_get_int(pos), img);
     // mp_printf(&mp_plat_print, "max7219 draw called\n");
     return mp_const_none;
 }
@@ -190,7 +190,7 @@ STATIC mp_obj_t mp_max7219_write(mp_obj_t self_in, mp_obj_t text_obj) {
 
     // Convert the MicroPython string to a C string
     const char *text = mp_obj_str_get_str(text_obj);
-    matrixWrite(&(self->dev), text);
+    matrixWrite(&(self->dev), text, true);
     // mp_printf(&mp_plat_print, "max7219 matrixWrite called: %s\n", text);
     return mp_const_none;
 }

@@ -1,0 +1,15 @@
+{
+    "ceedlingExplorer.debugConfiguration": "(lldb) Launch",
+    "files.associations": {
+        "matrix.h": "c",
+        "max7219.h": "c",
+        "mockspi_master.h": "c",
+        "mpconfigport.h": "c",
+        "mp_dotmatrix.h": "c",
+        "ios": "c",
+        "string": "c"
+    },
+    "cSpell.words": [
+        "dotmatrix"
+    ]
+}

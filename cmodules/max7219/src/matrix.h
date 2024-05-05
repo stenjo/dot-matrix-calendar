@@ -41,7 +41,7 @@ void printBuffer(max7219_t * dev);
  * @param text null-terminated string to calculate
  * @return Length in number of pixels from first to last including
  */
-int textLength(max7219_t * dev, const char * text);
+size_t textLength(const char * text);
 
 SpecialCharInfo getSpecialCharInfo(uint8_t chr);
 
@@ -90,8 +90,9 @@ void marquee(max7219_t *dev, const char *text);
  *
  * @param dev Display descriptor
  * @param text Null-terminated string to write
+ * @param centered Center text on available display
  * @return void
  */
-void matrixWrite(max7219_t *dev, const char *text);
+void matrixWrite(max7219_t *dev, const char *text, bool centered);
 
 #endif // _MATRIX_H_

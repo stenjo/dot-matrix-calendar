@@ -1,7 +1,7 @@
 #ifndef _MATRIX_H_
 #define _MATRIX_H_
 
-#include "max7219.h"
+#include "driver.h"
 
 typedef struct {
     uint16_t offset;
@@ -37,11 +37,10 @@ void printBuffer(max7219_t * dev);
 /**
  * @brief Get the pixel length of a text string displayed on a cascaded 8x8 Led Matrix 
  *
- * @param dev Display descriptor
  * @param text null-terminated string to calculate
  * @return Length in number of pixels from first to last including
  */
-int textLength(max7219_t * dev, const char * text);
+size_t textLength(const char * text);
 
 SpecialCharInfo getSpecialCharInfo(uint8_t chr);
 
@@ -90,8 +89,9 @@ void marquee(max7219_t *dev, const char *text);
  *
  * @param dev Display descriptor
  * @param text Null-terminated string to write
+ * @param centered True if text to be centered on display
  * @return void
  */
-void matrixWrite(max7219_t *dev, const char *text);
+void matrixWrite(max7219_t *dev, const char *text, bool centered);
 
 #endif // _MATRIX_H_

@@ -275,20 +275,19 @@ uint8_t getCharColumn(uint8_t chr, uint8_t pos) {
 }
 
 void copyText(max7219_t * dev, const char * text, bool center) {
-  size_t textLength = strlen(text); // Calculate the length of the text once
+  size_t txtLen = textLength(text); // Calculate the length of the text once
   int16_t bufferIndex = 0;
   int16_t padding = 0;
+  bool specialChar = false;
 
-  // printf("textLength: %d, ", textLength);
-  if (textLength < dev->cascade_size*8 && center) {
-    padding = (dev->cascade_size*8 - textLength)/2;
-    // printf("padding: %d\n", padding);
+  if (txtLen < dev->cascade_size*8 && center) {
+    padding = (dev->cascade_size*8 - txtLen)/2;
     for (int16_t i = 0; i < padding; i++) {
       dev->frameBuffer[bufferIndex++] = 0;
     }
   }
 
-  for (size_t strIdx = 0; strIdx < textLength && bufferIndex < MAX7219_MAX_CASCADE_SIZE*8; strIdx++) {
+  for (size_t strIdx = 0; strIdx < strlen(text) && bufferIndex < MAX7219_MAX_CASCADE_SIZE*8; strIdx++) {
     uint8_t chr = text[strIdx];
     
     if (chr == ' ') {
@@ -300,26 +299,25 @@ void copyText(max7219_t * dev, const char * text, bool center) {
     if (chr == ESCAPE_CHAR) {
       // If the character is an escape character, handle it specially
       strIdx++; // Move to the escaped char
-      if (strIdx < textLength ) {
+      if (strIdx < strlen(text) ) {
         chr = text[strIdx];
+        specialChar = true;
       } else {
         // Error handling if ESCAPE_CHAR is the last character in the text
         break;
       }
     }
     
-    // Process each column of the character
     for (int16_t charColumn = 0; ; charColumn++) {
-      uint8_t col = (chr == ESCAPE_CHAR) 
+      uint8_t col = (specialChar) 
                     ? getSpecials(text[strIdx], charColumn) 
                     : getCharColumn(chr, charColumn);
 
-      // Exit the loop if the column data is zero (i.e., column processing is complete)
       if (col == 0 || bufferIndex >= MAX7219_MAX_CASCADE_SIZE*8) break;
 
-      // Write to the buffer and increment the buffer index
       dev->frameBuffer[bufferIndex++] = col;
     }
+    specialChar = false;
     if (bufferIndex < MAX7219_MAX_CASCADE_SIZE*8) {
       dev->frameBuffer[bufferIndex++] = 0;
     }
@@ -401,7 +399,7 @@ void printBuffer(max7219_t * dev)
   }
 }
 
-int textLength(max7219_t * dev, const char * text)
+size_t textLength(const char * text)
 {
   int len = 0;
   for (uint16_t i = 0; i < strlen(text); i++) {
@@ -455,10 +453,10 @@ void marquee(max7219_t *dev, const char *text)
     max7219_clear(dev);
 }
 
-void matrixWrite(max7219_t *dev, const char *text)
+void matrixWrite(max7219_t *dev, const char *text, bool centered)
 {
     // clear(dev);
     // max7219_clear(dev);
 
-    copyText(dev, text, false);
+    copyText(dev, text, centered);
 }

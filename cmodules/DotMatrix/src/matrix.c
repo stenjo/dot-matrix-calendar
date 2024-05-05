@@ -1,7 +1,8 @@
 #include "matrix.h"
 #include <string.h>
 #include <stdint.h>
-#include "max7219.h"
+// #include "max7219.h"
+#include "driver.h"
 #include <esp_timer.h> // Include the header for ESP timer functions
 #if defined(ESP32)
 #elif defined(ESP8266)
@@ -108,7 +109,7 @@
  *    }
  *  
  */
-static const uint8_t font[515] = {
+static const uint8_t font[] = {
   2,0b00000000,0b00000000,                                  /* 032 =   */
   2,0b01101111,0b01101111,                                  /* 033 = ! */
   3,0b00000011,0b00000000,0b00000011,                       /* 034 = " */
@@ -203,7 +204,66 @@ static const uint8_t font[515] = {
   3,0b00001000,0b00110110,0b01000001,                       /* 123 = { */
   1,0b01111111,                                             /* 124 = | */
   3,0b01000001,0b00110110,0b00001000,                       /* 125 = } */
-  5,0b00011000,0b00000100,0b00001000,0b00010000,0b00001100  /* 126 = ~ */
+  5,0b00011000,0b00000100,0b00001000,0b00010000,0b00001100, /* 126 = ~ */
+  1,0b00000000,                                             /* 127 =   */
+  1,0b00000000,                                             /* 128 =   */
+  1,0b00000000,                                             /* 129 =   */
+  1,0b00000000,                                             /* 130 =   */
+  1,0b00000000,                                             /* 131 =   */
+  1,0b00000000,                                             /* 132 =   */
+  5,0b01111000,0b00010100,0b00010101,0b00010100,0b01111000, /* 133 = Å */
+  6,0b01111110,0b00001001,0b00001001,0b01111111,0b01001001,0b01001001,   /* 134 = Æ */
+  1,0b00000000,                                             /* 135 =   */
+  1,0b00000000,                                             /* 136 =   */
+  1,0b00000000,                                             /* 137 =   */
+  1,0b00000000,                                             /* 138 =   */
+  1,0b00000000,                                             /* 139 =   */
+  1,0b00000000,                                             /* 140 =   */
+  1,0b00000000,                                             /* 141 =   */
+  1,0b00000000,                                             /* 142 =   */
+  1,0b00000000,                                             /* 143 =   */
+  1,0b00000000,                                             /* 144 =   */
+  1,0b00000000,                                             /* 145 =   */
+  1,0b00000000,                                             /* 146 =   */
+  1,0b00000000,                                             /* 147 =   */
+  1,0b00000000,                                             /* 148 =   */
+  1,0b00000000,                                             /* 149 =   */
+  1,0b00000000,                                             /* 150 =   */
+  1,0b00000000,                                             /* 151 =   */
+  5,0b01011110,0b00100001,0b01011001,0b01000110,0b00111101, /* 152 = Ø */
+  1,0b00000000,                                             /* 153 =   */
+  1,0b00000000,                                             /* 154 =   */
+  1,0b00000000,                                             /* 155 =   */
+  1,0b00000000,                                             /* 156 =   */
+  1,0b00000000,                                             /* 157 =   */
+  1,0b00000000,                                             /* 158 =   */
+  1,0b00000000,                                             /* 159 =   */
+  1,0b00000000,                                             /* 160 =   */
+  1,0b00000000,                                             /* 161 =   */
+  1,0b00000000,                                             /* 162 =   */
+  1,0b00000000,                                             /* 163 =   */
+  1,0b00000000,                                             /* 164 =   */
+  5,0b00100000,0b01010100,0b01010101,0b01010100,0b01111000, /* 165 = å */
+  5,0b01011000,0b00100100,0b01010100,0b01001000,0b00110100, /* 166 = ø */
+  1,0b00000000,                                             /* 167 =   */
+  1,0b00000000,                                             /* 168 =   */
+  1,0b00000000,                                             /* 169 =   */
+  1,0b00000000,                                             /* 170 =   */
+  1,0b00000000,                                             /* 171 =   */
+  1,0b00000000,                                             /* 172 =   */
+  1,0b00000000,                                             /* 173 =   */
+  1,0b00000000,                                             /* 174 =   */
+  1,0b00000000,                                             /* 175 =   */
+  1,0b00000000,                                             /* 176 =   */
+  1,0b00000000,                                             /* 177 =   */
+  1,0b00000000,                                             /* 178 =   */
+  1,0b00000000,                                             /* 179 =   */
+  1,0b00000000,                                             /* 180 =   */
+  1,0b00000000,                                             /* 181 =   */
+  1,0b00000000,                                             /* 182 =   */
+  1,0b00000000,                                             /* 183 =   */
+  6,0b00100000,0b01010100,0b01010100,0b01111100,0b01010100,0b01011000,   /* 184 = æ */
+  1,0b00000000
 };
 
 static const uint16_t font_index[95] = {
@@ -275,20 +335,19 @@ uint8_t getCharColumn(uint8_t chr, uint8_t pos) {
 }
 
 void copyText(max7219_t * dev, const char * text, bool center) {
-  size_t textLength = strlen(text); // Calculate the length of the text once
+  size_t txtLen = textLength(text); // Calculate the length of the text once
   int16_t bufferIndex = 0;
   int16_t padding = 0;
+  bool specialChar = false;
 
-  // printf("textLength: %d, ", textLength);
-  if (textLength < dev->cascade_size*8 && center) {
-    padding = (dev->cascade_size*8 - textLength)/2;
-    // printf("padding: %d\n", padding);
+  if (txtLen < dev->cascade_size*8 && center) {
+    padding = (dev->cascade_size*8 - txtLen)/2;
     for (int16_t i = 0; i < padding; i++) {
       dev->frameBuffer[bufferIndex++] = 0;
     }
   }
 
-  for (size_t strIdx = 0; strIdx < textLength && bufferIndex < MAX7219_MAX_CASCADE_SIZE*8; strIdx++) {
+  for (size_t strIdx = 0; strIdx < strlen(text) && bufferIndex < MAX7219_MAX_CASCADE_SIZE*8; strIdx++) {
     uint8_t chr = text[strIdx];
     
     if (chr == ' ') {
@@ -300,8 +359,9 @@ void copyText(max7219_t * dev, const char * text, bool center) {
     if (chr == ESCAPE_CHAR) {
       // If the character is an escape character, handle it specially
       strIdx++; // Move to the escaped char
-      if (strIdx < textLength ) {
+      if (strIdx < strlen(text) ) {
         chr = text[strIdx];
+        specialChar = true;
       } else {
         // Error handling if ESCAPE_CHAR is the last character in the text
         break;
@@ -310,7 +370,7 @@ void copyText(max7219_t * dev, const char * text, bool center) {
     
     // Process each column of the character
     for (int16_t charColumn = 0; ; charColumn++) {
-      uint8_t col = (chr == ESCAPE_CHAR) 
+      uint8_t col = (specialChar) 
                     ? getSpecials(text[strIdx], charColumn) 
                     : getCharColumn(chr, charColumn);
 
@@ -320,6 +380,7 @@ void copyText(max7219_t * dev, const char * text, bool center) {
       // Write to the buffer and increment the buffer index
       dev->frameBuffer[bufferIndex++] = col;
     }
+    specialChar = false;
     if (bufferIndex < MAX7219_MAX_CASCADE_SIZE*8) {
       dev->frameBuffer[bufferIndex++] = 0;
     }
@@ -401,9 +462,9 @@ void printBuffer(max7219_t * dev)
   }
 }
 
-int textLength(max7219_t * dev, const char * text)
+size_t textLength(const char * text)
 {
-  int len = 0;
+  size_t len = 0;
   for (uint16_t i = 0; i < strlen(text); i++) {
  
     if ((uint8_t)(text[i]) == ESCAPE_CHAR) {
@@ -421,7 +482,7 @@ int textLength(max7219_t * dev, const char * text)
 void drawBlock(max7219_t *dev, uint8_t pos, const void *image)
 {
     for (uint8_t i = pos, offs = 0; i < dev->cascade_size*8 && offs < 8; i++, offs++)
-        max7219_set_digit(dev, i, *((uint8_t *)image + offs));
+        display_set_segment(dev, i, *((uint8_t *)image + offs));
 }
 void clear(max7219_t *dev) {memset(dev->frameBuffer, 0, 8*dev->cascade_size);}
 
@@ -451,14 +512,14 @@ void marquee(max7219_t *dev, const char *text)
     dev->scroll_whitespace = 0;
     dev->char_escaped = false;
     clear(dev);
-    max7219_init(dev);
-    max7219_clear(dev);
+    init_display(dev);
+    display_clear(dev);
 }
 
-void matrixWrite(max7219_t *dev, const char *text)
+void matrixWrite(max7219_t *dev, const char *text, bool centered)
 {
     // clear(dev);
     // max7219_clear(dev);
 
-    copyText(dev, text, false);
+    copyText(dev, text, centered);
 }

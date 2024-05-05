@@ -11,7 +11,7 @@
   :use_auxiliary_dependencies: TRUE
   :build_root: build
 #  :release_build: TRUE
-  :test_file_prefix: Test
+  :test_file_prefix: test_
   :which_ceedling: vendor/ceedling
   :ceedling_version: 0.31.1
   :default_tasks:
@@ -83,7 +83,10 @@
   :gcovr:
     :html_medium_threshold: 75
     :html_high_threshold: 90
-
+  :utilities:
+    - gcovr           # Use gcovr to create the specified reports (default).
+    - ReportGenerator # Use ReportGenerator to create the specified reports.
+    
 #:tools:
 # Ceedling defaults to using gcc for compiling, linking, etc.
 # As [:tools] is blank, gcc will be used (so long as it's in your system path)
@@ -101,12 +104,19 @@
   :test: []
   :release: []
 
+:module_generator:
+  :project_root: ./
+  :source_root: src/
+  :test_root: test/
+
 :plugins:
   :load_paths:
     - vendor/ceedling/plugins
   :enabled:
-    - stdout_pretty_tests_report
     - module_generator
+    - stdout_ide_tests_report
+    - compile_commands_json
+    - colour_report
     - raw_output_report
     - xml_tests_report
     - gcov

@@ -54,7 +54,7 @@
         "max7219_priv.h": "c"
     },
     "cmake.configureOnOpen": false,
-    "idf.port": "/dev/cu.usbserial-0001",
+    "idf.port": "/dev/cu.usbmodem1234561",
     "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild",
     "C_Cpp.default.compileCommands": "/Users/sten.johnsen/git/dot-matrix-calendar/cmodules/ics/builddir/compile_commands.json",
     "unityExplorer.unitUnderTestFolder": "./test"
