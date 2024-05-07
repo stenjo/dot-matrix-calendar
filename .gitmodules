@@ -8,3 +8,9 @@
 [submodule "modules/micropython-wifi-setup"]
 	path = modules/micropython-wifi-setup
 	url = https://github.com/george-hawkins/micropython-wifi-setup
+[submodule "boards/vfs_merge"]
+	path = boards/vfs_merge
+	url = https://github.com/Josverl/vfs_merge.git
+[submodule "vfs_merge"]
+	path = vfs_merge
+	url = https://github.com/Josverl/vfs_merge.git

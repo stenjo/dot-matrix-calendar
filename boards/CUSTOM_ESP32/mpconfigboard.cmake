@@ -14,4 +14,4 @@ set(USER_C_MODULES
 )
 
 # Set the manifest file for frozen Python code.
-set(MICROPY_FROZEN_MANIFEST ${MICROPY_BOARD_DIR}/manifest.py)
+set(MICROPY_FROZEN_MANIFEST ${PROJECT_DIR}/manifest.py)

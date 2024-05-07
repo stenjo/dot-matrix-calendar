@@ -9,7 +9,8 @@ on:
 jobs:
 
   esp8266:
-
+    # cannnot compile and build for ESP8266
+    if: false 
     runs-on: ubuntu-latest
 
     steps:
@@ -95,7 +96,7 @@ jobs:
     - name: Make frozen extractable files    
       working-directory: modules
       run: |
-        git submodule update --init modules/micropython-wifi-setup
+        git submodule update --init micropython-wifi-setup
         python -m freezefs micropython-wifi-setup/lib/wifi_setup frozen_wifi_setup.py -ov always
         python -m freezefs micropython-wifi-setup/lib/micro_web_srv_2 frozen_micro_web_srv_2.py -ov always
         python -m freezefs src src.py --target=/. --on-import=extract --compress

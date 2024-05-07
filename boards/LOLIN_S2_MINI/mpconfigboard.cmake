@@ -10,7 +10,7 @@ set(SDKCONFIG_DEFAULTS
 # Set the user C modules to include in the build.
 set(USER_C_MODULES
     ${PROJECT_DIR}/cmodules/ics/micropython.cmake
-    ${PROJECT_DIR}/cmodules/max7219/micropython.cmake
+    ${PROJECT_DIR}/cmodules/DotMatrix/micropython.cmake
 )
 
-set(MICROPY_FROZEN_MANIFEST ${MICROPY_BOARD_DIR}/manifest.py)
+set(MICROPY_FROZEN_MANIFEST ${PROJECT_DIR}/manifest.py)
