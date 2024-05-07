@@ -1,30 +1,18 @@
-# base modules
+# include default manifest
 include("$(PORT_DIR)/boards/manifest.py")
-freeze("$(PROJECT_TOP)/modules", "dateHandling.py")
-freeze("$(PROJECT_TOP)/modules", "datetime.py")
-freeze("$(PROJECT_TOP)/modules", "time.py")
-freeze("$(PROJECT_TOP)/modules", "mpy_env.py")
-freeze("$(PROJECT_TOP)/modules", "msgpack.py")
-freeze("$(PROJECT_TOP)/modules", "uuid.py")
 
-require("contextlib")
-require("warnings")
-# require("collections")
-
-# asyncio
-include("$(MPY_DIR)/extmod/asyncio")
-
-# drivers
-require("ssd1306")
-
-# micropython-lib: file utilities
-require("upysh")
-
-# micropython-lib: umqtt
-require("umqtt.simple")
-require("umqtt.robust")
-
-require("urequests")
-require("ssl")
-
-# package("ics", base_path="../../modules")
+# include our own extra...
+module("datetime.py", base_path="$(BOARD_DIR)/../../modules")
+module("dateHandling.py", base_path="$(BOARD_DIR)/../../modules")
+module("time.py", base_path="$(BOARD_DIR)/../../modules")
+module("mpy_env.py", base_path="$(BOARD_DIR)/../../modules")
+module("msgpack.py", base_path="$(BOARD_DIR)/../../modules")
+module("Calendar.py", base_path="$(BOARD_DIR)/../../modules")
+package("slim", base_path="$(BOARD_DIR)/../../modules/micropython-wifi-setup/lib")
+# package("micro_web_srv_2", base_path="$(BOARD_DIR)/../../modules/micropython-wifi-setup/lib")
+module("logging.py","$(BOARD_DIR)/../../modules/micropython-wifi-setup/lib")
+module("micro_dns_srv.py","$(BOARD_DIR)/../../modules/micropython-wifi-setup/lib")
+module("shim.py","$(BOARD_DIR)/../../modules/micropython-wifi-setup/lib")
+module("schedule.py","$(BOARD_DIR)/../../modules/micropython-wifi-setup/lib")
+module("frozen_wifi_setup.py", base_path="$(BOARD_DIR)/../../modules")
+module("frozen_micro_web_srv_2.py", base_path="$(BOARD_DIR)/../../modules")

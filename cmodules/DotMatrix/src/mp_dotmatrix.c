@@ -2,8 +2,8 @@
 #include "py/binary.h"
 #include "py/objstr.h"
 #include "py/obj.h"
-#include "src/matrix.h"
-#include "src/driver.h"
+#include "matrix.h"
+#include "driver.h"
 
 #if defined(ESP32)
 #include <driver/spi_master.h>

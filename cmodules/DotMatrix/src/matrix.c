@@ -244,7 +244,7 @@ static const uint8_t font[] = {
   1,0b00000000,                                             /* 163 =   */
   1,0b00000000,                                             /* 164 =   */
   5,0b00100000,0b01010100,0b01010101,0b01010100,0b01111000, /* 165 = å */
-  5,0b01011000,0b00100100,0b01010100,0b01001000,0b00110100, /* 166 = ø */
+  6,0b00100000,0b01010100,0b01010100,0b01111100,0b01010100,0b01011000,   /* 166 = æ */
   1,0b00000000,                                             /* 167 =   */
   1,0b00000000,                                             /* 168 =   */
   1,0b00000000,                                             /* 169 =   */
@@ -262,31 +262,45 @@ static const uint8_t font[] = {
   1,0b00000000,                                             /* 181 =   */
   1,0b00000000,                                             /* 182 =   */
   1,0b00000000,                                             /* 183 =   */
-  6,0b00100000,0b01010100,0b01010100,0b01111100,0b01010100,0b01011000,   /* 184 = æ */
+  5,0b01011000,0b00100100,0b01010100,0b01001000,0b00110100, /* 184 = ø */
   1,0b00000000
 };
 
-static const uint16_t font_index[95] = {
-  0,3,6,10,16,22,28,34,36,40,44,48,54,57,63,66,72,78,82,88,94,
-  100,106,112,118,124,130,133,136,141,147,152,158,164,170,176,
-  182,188,194,200,206,212,218,224,230,236,242,248,254,260,266,
-  272,278,284,290,296,302,308,314,320,324,330,334,340,346,348,
-  354,360,366,372,378,384,390,396,400,405,411,415,421,427,433,
-  439,445,451,457,463,469,475,481,487,493,499,503,505,509
-};
+void generate_font_index_table() {
 
-static const uint8_t specials[] = { // Escaped by char 195
-6, 0b00100000,0b01010100,0b01010100,0b01111100,0b01010100,0b01011000,   /* 184 = æ */
-5, 0b01011000,0b00100100,0b01010100,0b01001000,0b00110100,              /* 166 = ø */
-5, 0b00100000,0b01010100,0b01010101,0b01010100,0b01111000,              /* 165 = å */
-6, 0b01111110,0b00001001,0b00001001,0b01111111,0b01001001,0b01001001,   /* 134 = Æ */
-5, 0b01011110,0b00100001,0b01011001,0b01000110,0b00111101,              /* 152 = Ø */
-5, 0b01111000,0b00010100,0b00010101,0b00010100,0b01111000,0b00000000    /* 133 = Å */
-};
+    int cur_idx = 0;
+    for(size_t i = 0; i <= 184-32+1; i++)
+    {
+      printf("%d",cur_idx);
+      printf(",");
+      cur_idx += font[cur_idx] + 1;
+    }
 
-static const uint16_t specials_map[] = {
-  0,7,13,19,26,32
-};
+}
+
+static const uint16_t font_index[] = {
+  0,3,6,10,16,22,28,34,36,40,44,48,54,57,63,66,72,78,82,88,94,100,106,
+  112,118,124,130,133,136,141,147,152,158,164,170,176,182,188,194,200,
+  206,212,218,224,230,236,242,248,254,260,266,272,278,284,290,296,302,
+  308,314,320,324,330,334,340,346,348,354,360,366,372,378,384,390,396,
+  400,405,411,415,421,427,433,439,445,451,457,463,469,475,481,487,493,
+  499,503,505,509,515,517,519,521,523,525,527,533,540,542,544,546,548,
+  550,552,554,556,558,560,562,564,566,568,570,572,574,580,582,584,586,
+  588,590,592,594,596,598,600,602,604,610,617,619,621,623,625,627,629,
+  631,633,635,637,639,641,643,645,647,649,651,657};
+
+// static const uint8_t specials[] = { // Escaped by char 195
+// 6, 0b00100000,0b01010100,0b01010100,0b01111100,0b01010100,0b01011000,   /* 166 = æ */
+// 5, 0b01011000,0b00100100,0b01010100,0b01001000,0b00110100,              /* 184 = ø */
+// 5, 0b00100000,0b01010100,0b01010101,0b01010100,0b01111000,              /* 165 = å */
+// 6, 0b01111110,0b00001001,0b00001001,0b01111111,0b01001001,0b01001001,   /* 134 = Æ */
+// 5, 0b01011110,0b00100001,0b01011001,0b01000110,0b00111101,              /* 152 = Ø */
+// 5, 0b01111000,0b00010100,0b00010101,0b00010100,0b01111000,0b00000000    /* 133 = Å */
+// };
+
+// static const uint16_t specials_map[] = {
+//   0,7,13,19,26,32
+// };
 
 static const uint8_t ESCAPE_CHAR = 195;
 
@@ -302,29 +316,29 @@ void rotateImageCounterClockwise(const uint8_t* frameBuffer, uint8_t* rotatedBuf
     }
 }
 
-SpecialCharInfo getSpecialCharInfo(uint8_t chr) {
-    SpecialCharInfo info = {0, 0}; // Initialize to zero, indicating an invalid character (by default)
-    switch (chr) {
-        case 166: info.offset = specials_map[0]; break;
-        case 184: info.offset = specials_map[1]; break;
-        case 165: info.offset = specials_map[2]; break;
-        case 134: info.offset = specials_map[3]; break;
-        case 152: info.offset = specials_map[4]; break;
-        case 133: info.offset = specials_map[5]; break;
-        default: return info; // If the character is not special, we return zeros
-    }
-    info.width = specials[info.offset]; // Determine width using offset
-    return info;
-}
+// SpecialCharInfo getSpecialCharInfo(uint8_t chr) {
+//     SpecialCharInfo info = {0, 0}; // Initialize to zero, indicating an invalid character (by default)
+//     switch (chr) {
+//         case 166: info.offset = specials_map[0]; break;
+//         case 184: info.offset = specials_map[1]; break;
+//         case 165: info.offset = specials_map[2]; break;
+//         case 134: info.offset = specials_map[3]; break;
+//         case 152: info.offset = specials_map[4]; break;
+//         case 133: info.offset = specials_map[5]; break;
+//         default: return info; // If the character is not special, we return zeros
+//     }
+//     info.width = specials[info.offset]; // Determine width using offset
+//     return info;
+// }
 
-uint8_t getSpecials(uint8_t chr, const uint8_t col) {
-    SpecialCharInfo info = getSpecialCharInfo(chr);
+// uint8_t getSpecials(uint8_t chr, const uint8_t col) {
+//     SpecialCharInfo info = getSpecialCharInfo(chr);
   
-    if (col >= info.width) {
-        return 0;
-    }
-    return specials[col + 1 + info.offset];
-}
+//     if (col >= info.width) {
+//         return 0;
+//     }
+//     return specials[col + 1 + info.offset];
+// }
 
 uint8_t getCharColumn(uint8_t chr, uint8_t pos) {
   uint8_t asc = chr - 32;
@@ -338,7 +352,7 @@ void copyText(max7219_t * dev, const char * text, bool center) {
   size_t txtLen = textLength(text); // Calculate the length of the text once
   int16_t bufferIndex = 0;
   int16_t padding = 0;
-  bool specialChar = false;
+  // bool specialChar = false;
 
   if (txtLen < dev->cascade_size*8 && center) {
     padding = (dev->cascade_size*8 - txtLen)/2;
@@ -363,7 +377,7 @@ void copyText(max7219_t * dev, const char * text, bool center) {
       strIdx++; // Move to the escaped char
       if (strIdx < strlen(text) ) {
         chr = text[strIdx];
-        specialChar = true;
+        // specialChar = true;
       } else {
         // Error handling if ESCAPE_CHAR is the last character in the text
         break;
@@ -372,9 +386,7 @@ void copyText(max7219_t * dev, const char * text, bool center) {
     
     // Process each column of the character
     for (int16_t charColumn = 0; ; charColumn++) {
-      uint8_t col = (specialChar) 
-                    ? getSpecials(text[strIdx], charColumn) 
-                    : getCharColumn(chr, charColumn);
+      uint8_t col = getCharColumn(chr, charColumn);
 
       // Exit the loop if the column data is zero (i.e., column processing is complete)
       if (col == 0 || bufferIndex >= MAX7219_MAX_CASCADE_SIZE*8) break;
@@ -382,7 +394,7 @@ void copyText(max7219_t * dev, const char * text, bool center) {
       // Write to the buffer and increment the buffer index
       dev->frameBuffer[bufferIndex++] = col;
     }
-    specialChar = false;
+    // specialChar = false;
     if (bufferIndex < MAX7219_MAX_CASCADE_SIZE*8) {
       dev->frameBuffer[bufferIndex++] = 0;
     }
@@ -397,6 +409,15 @@ void copyText(max7219_t * dev, const char * text, bool center) {
   printBuffer(dev);
 }
 
+/**
+ * @brief Shifts all pixels in the frame-buffer left one position and 
+ *        adds column of current char at the end
+ * 
+ * @param dev Descriptor object keeping the status of the shifting.
+ * 
+ * @returns True when all text is shifted out to the left of the display. 
+ *          False otherwise
+*/
 bool scrollBuffer(max7219_t *dev) {
     size_t bufferSize = dev->cascade_size * 8;
     size_t textLength = strlen(dev->text);
@@ -418,10 +439,7 @@ bool scrollBuffer(max7219_t *dev) {
         uint8_t chr = dev->text[dev->text_index];
         uint8_t col = 0;
 
-        if (dev->char_escaped) {
-            // Fetch the column for the special character
-            col = getSpecials(chr, dev->col_index);
-        } else if (chr == ' ' && dev->col_index < 1) {
+        if (chr == ' ' && dev->col_index < 1) {
             dev->col_index++;
             return false; 
         } else {
@@ -429,9 +447,8 @@ bool scrollBuffer(max7219_t *dev) {
             col = getCharColumn(chr, dev->col_index);
             // Check if the character is an escape character
             if (chr == ESCAPE_CHAR) {
-                dev->char_escaped = true;
                 chr = dev->text[++dev->text_index];  // Move to the next character and use as special character
-                col = getSpecials(chr, dev->col_index);
+                col = getCharColumn(chr, dev->col_index);
             }
         }
 
@@ -444,7 +461,6 @@ bool scrollBuffer(max7219_t *dev) {
             dev->frameBuffer[bufferSize - 1] = 0;
             dev->col_index = 0;
             dev->text_index++;  // Increment text index to move to next character
-            dev->char_escaped = false;  // Reset escape flag after processing a special character
         }
         // Reset whitespace count as long as we're displaying text
         dev->scroll_whitespace = bufferSize;
@@ -464,6 +480,13 @@ void printBuffer(max7219_t * dev)
   }
 }
 
+/**
+ * @brief Returns the length of the passed text in display pixels
+ * 
+ * @param text The text to return pixel length of.
+ * 
+ * @returns Number of pixels the text occupies.
+*/
 size_t textLength(const char * text)
 {
   size_t len = 0;
@@ -471,16 +494,15 @@ size_t textLength(const char * text)
  
     if ((uint8_t)(text[i]) == ESCAPE_CHAR) {
       i++;
-      SpecialCharInfo info = getSpecialCharInfo(text[i]);
-      len += info.width + 1;
     }
-    else {
-      len += font[font_index[text[i]-32]]+1;
-    }
+    len += font[font_index[(uint8_t)(text[i])-32]]+1;
   }
   return len-1;
 }
 
+/**
+ * 
+*/
 void drawBlock(max7219_t *dev, uint8_t pos, const void *image)
 {
     for (uint8_t i = pos, offs = 0; i < dev->cascade_size*8 && offs < 8; i++, offs++)
@@ -488,7 +510,9 @@ void drawBlock(max7219_t *dev, uint8_t pos, const void *image)
 }
 void clear(max7219_t *dev) {memset(dev->frameBuffer, 0, 8*dev->cascade_size);}
 
-
+/**
+ * @brief Shift text displayed one pixel left if scroll delay is passed.
+*/
 bool scroll(max7219_t *dev, bool wrap)
 {
 
@@ -512,7 +536,7 @@ void marquee(max7219_t *dev, const char *text)
     dev->text_index = 0;
     dev->col_index = 0;
     dev->scroll_whitespace = 0;
-    dev->char_escaped = false;
+    dev->mrqTmstmp = 0;
     clear(dev);
     init_display(dev);
     display_clear(dev);
@@ -520,8 +544,5 @@ void marquee(max7219_t *dev, const char *text)
 
 void matrixWrite(max7219_t *dev, const char *text, bool centered)
 {
-    // clear(dev);
-    // max7219_clear(dev);
-
     copyText(dev, text, centered);
 }

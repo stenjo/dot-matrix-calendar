@@ -1,7 +1,9 @@
 # This file is executed on every boot (including wake-boot from deepsleep)
-#import esp
-#esp.osdebug(None)
-from time import sleep
+# import frozen_wifi_setup.py
+import frozen_wifi_setup
+import frozen_micro_web_srv_2
+
+# from time import sleep
 import os, machine
 #os.dupterm(None, 1) # disable REPL on UART(0)
 import gc
@@ -9,7 +11,7 @@ gc.collect()
 
 # boot.py -- run on boot-up
 import network
-import mpy_env
+# import mpy_env
 
 import ntptime
 import time

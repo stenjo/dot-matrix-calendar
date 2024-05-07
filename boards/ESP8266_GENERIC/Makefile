@@ -35,7 +35,9 @@ firmware:
 		PROJECT_TOP=$(PROJECT_TOP) \
 		BOARD=$(BOARD) \
 		BOARD_DIR=$(BOARD_DIR) \
-		BUILD=$(BUILD)
+		BUILD=$(BUILD) \
+		CFLAGS=$(CFLAGS)
+		
 
 deploy: $(FWBIN)
 	$(ECHO) "Writing $< to the board"

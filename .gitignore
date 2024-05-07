@@ -162,7 +162,10 @@ cython_debug/
 #.idea/
 env.json
 .creds.json
-.DS_Store
+**/.DS_Store
+**/.DS_Store/**
 log
 **/build/**
 **/managed_components/**
+**/unity-app
+.DS_Store

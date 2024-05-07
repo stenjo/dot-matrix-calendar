@@ -23,13 +23,7 @@ void test_IceBreaker(void)
 
     TEST_ASSERT_EQUAL(6, strlen(textToTest));
 
-    SpecialCharInfo ci;
-    ci = getSpecialCharInfo(textToTest[1]);
-    TEST_ASSERT_EQUAL(6, ci.width);
-    ci = getSpecialCharInfo(textToTest[3]);
-    TEST_ASSERT_EQUAL(5, ci.width);
-    ci = getSpecialCharInfo(textToTest[5]);
-    TEST_ASSERT_EQUAL(5, ci.width);
+
 }
 
 void test_textLengthInPixels_0123(void) {
@@ -209,7 +203,41 @@ void test_copyText_WhenLongTextIsCentered_AddNoPaddingAndStartWithFirst(void) {
     // TEST_PRINTF("\n%b %b %b %b %b %b %b %b %b %b %b %b %b %b %b %b", actual[0], actual[1], actual[2], actual[3], actual[4], actual[5], actual[6], actual[7], actual[8], actual[9], actual[10], actual[11], actual[12], actual[13], actual[14], actual[15] );
     TEST_ASSERT_EQUAL_UINT8_ARRAY(expected, dev.frameBuffer, sizeof(expected));
 }
+void test_matrixWrite(void) {
+    
+    max7219_t dev;
+    dev.cascade_size = 4;
+    memset(dev.frameBuffer, 0, 8*dev.cascade_size);
 
+    char * textToTest = "ÆøÅ";
+    int length = 18;
+    uint8_t expected[]={
+        0b01111110,0b00001001,0b00001001,0b01111111,0b01001001,0b01001001,
+        0b00000000,
+        0b01011000,0b00100100,0b01010100,0b01001000,0b00110100,
+        0b00000000,
+        0b01111000,0b00010100,0b00010101,0b00010100,0b01111000,
+        0b00000000};
+
+    init_display_Ignore();
+    display_clear_Ignore();
+    display_set_segment_Ignore();    
+
+    marquee(&dev, textToTest);
+    for (int i = 0; i < 32; i++) {
+        esp_timer_get_time_ExpectAndReturn(40*(i+1)*1000);
+        scroll(&dev, false);
+    }
+    uint8_t* actual = dev.frameBuffer;
+
+    // TEST_PRINTF("frameBuffer(%d): \n", sizeof(expected));
+    // for (size_t i = 0; i < sizeof(expected); i++)
+    // {
+    //     TEST_PRINTF("%X ", dev.frameBuffer[i]);
+    // }
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(expected, dev.frameBuffer, sizeof(expected));
+    
+}
 // TEST_RANGE(["0123"], [21])
 // void test_textLengthInPixels(char* textToTest, int expectedLength) {
 

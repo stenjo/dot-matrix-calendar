@@ -42,8 +42,6 @@ void printBuffer(max7219_t * dev);
  */
 size_t textLength(const char * text);
 
-SpecialCharInfo getSpecialCharInfo(uint8_t chr);
-
 
 /**
  * @brief Draw 64-bit image on 8x8 matrix

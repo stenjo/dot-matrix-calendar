@@ -24,7 +24,7 @@ jobs:
         wget https://github.com/jepler/esp-open-sdk/releases/download/2018-06-10/xtensa-lx106-elf-standalone.tar.gz
         sudo tar zxvf xtensa-lx106-elf-standalone.tar.gz -C /usr/lib/espressif
         sudo rm /usr/lib/espressif/xtensa-lx106-elf/bin/esptool.py
-        pip install esptool
+        pip install esptool freezefs
         
     - name: Update repos
       run: |
@@ -35,6 +35,13 @@ jobs:
       working-directory: lib/micropython
       run: |
         git submodule update --init lib/stm32lib lib/berkeley-db-1.xx
+        make -C ports/esp8266 submodules
+        
+    - name: Make frozen extractable files    
+      run: |
+        git submodule update --init micropython-wifi-setup
+        python -m freezefs modules/micropython-wifi-setup frozen-wifi-setup.py
+        freezefs.py src src.py --target=. --on_import=extract --compress
         make -C ports/esp8266 submodules
         
     - name: Compile firmware
@@ -70,6 +77,7 @@ jobs:
         cd esp-idf
         ./install.sh
         source export.sh
+        pip install esptool freezefs
         
     - name: Update repos
       run: |
@@ -84,6 +92,14 @@ jobs:
         make submodules
         make
       
+    - name: Make frozen extractable files    
+      working-directory: modules
+      run: |
+        git submodule update --init modules/micropython-wifi-setup
+        python -m freezefs micropython-wifi-setup/lib/wifi_setup frozen_wifi_setup.py -ov always
+        python -m freezefs micropython-wifi-setup/lib/micro_web_srv_2 frozen_micro_web_srv_2.py -ov always
+        python -m freezefs src src.py --target=/. --on-import=extract --compress
+        
     - name: Compile firmware
       working-directory: boards/CUSTOM_ESP32
       run: |

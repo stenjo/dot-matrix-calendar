@@ -48,9 +48,9 @@ while True:
         (year, month, day, hour, min, sec, _, _) = time.localtime()
         while sec != 0:
             if sec % 2 == 0:
-                m.write("{:02}/{:02} {:02}:{:02}".format(day, month, hour, min), True)
+                m.write("{}/{} {:02}:{:02}".format(day, month, hour, min), True)
             else:
-                m.write("{:02}/{:02} {:02} {:02}".format(day, month, hour, min), True)
+                m.write("{}/{} {:02} {:02}".format(day, month, hour, min), True)
             (year, month, day, hour, min, sec, _, _) = time.localtime()
         event = c.next()
         if not event:

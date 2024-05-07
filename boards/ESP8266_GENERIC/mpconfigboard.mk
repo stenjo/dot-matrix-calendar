@@ -7,7 +7,7 @@ MICROPY_VFS_FAT ?= 1
 MICROPY_VFS_LFS2 ?= 1
 
 # Add asyncio and extra micropython-lib packages (in addition to the port manifest).
-FROZEN_MANIFEST ?= $(BOARD_DIR)/manifest.py
+FROZEN_MANIFEST ?= $(PROJECT_TOP)/manifest.py
 
 # Custom C modules
 USER_C_MODULES = $(PROJECT_TOP)/cmodules
