@@ -96,6 +96,7 @@ jobs:
     - name: Make frozen extractable files    
       working-directory: modules
       run: |
+        pip install freezefs
         git submodule update --init micropython-wifi-setup
         python -m freezefs micropython-wifi-setup/lib/wifi_setup frozen_wifi_setup.py -ov always
         python -m freezefs micropython-wifi-setup/lib/micro_web_srv_2 frozen_micro_web_srv_2.py -ov always
@@ -106,6 +107,11 @@ jobs:
       run: |
         source ../../esp-idf/export.sh
         idf.py build
+      
+    - name: Merge with src files
+      run: |
+        pip install vfsmerge
+        vfsmerge --port esp32 --firmware ./boards/CUSTOM_ESP32/build/micropython.bin
       
     - name: Check output
       working-directory: boards/CUSTOM_ESP32
