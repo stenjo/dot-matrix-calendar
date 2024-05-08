@@ -110,10 +110,8 @@ jobs:
     - name: Merge with src files
       run: |
         pip install vfs_merge
-        pip install esptool
         mkdir build
         vfsmerge --port esp32 --firmware ./boards/CUSTOM_ESP32/build/micropython.bin
-        esptool --chip esp32 merge_bin -o build/firmware_lfs.bin --flash_mode dio --flash_size 4MB 0x1000 boards/CUSTOM_ESP32/build/micropython.bin 0x00200000 build/littlefs.img
       
     - name: Check output
       working-directory: boards/CUSTOM_ESP32
@@ -124,7 +122,10 @@ jobs:
       with:
         name: esp32-binary
         path: boards/CUSTOM_ESP32/build/micropython.bin
-
+        
+    - name: Check output
+      run: ls -al build/
+  
     - name: Save binary
       uses: actions/upload-artifact@v4
       with:
@@ -140,9 +141,26 @@ jobs:
     - name: Check output
       working-directory: boards/LOLIN_S2_MINI
       run: ls -al build/micropython.bin
-
+      
     - name: Save binary
       uses: actions/upload-artifact@v4
       with:
         name: esp32-S2-binary
         path: boards/LOLIN_S2_MINI/build/micropython.bin
+
+    - name: Merge with src files
+      run: |
+        pip install vfs_merge
+        mkdir build
+        vfsmerge --port esp32 --firmware ./boards/LOLIN_S2_MINI/build/micropython.bin
+
+    - name: Check output
+      run: ls -al build/
+    
+    - name: Save binary
+      uses: actions/upload-artifact@v4
+      with:
+          name: esp32-S2-binary-src
+          path: build/firmware_lfs.bin
+  
+  
