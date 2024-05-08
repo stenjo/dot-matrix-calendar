@@ -110,6 +110,7 @@ jobs:
     - name: Merge with src files
       run: |
         pip install vfs_merge
+        mkdir build
         vfsmerge --port esp32 --firmware ./boards/CUSTOM_ESP32/build/micropython.bin
       
     - name: Check output
@@ -121,7 +122,13 @@ jobs:
       with:
         name: esp32-binary
         path: boards/CUSTOM_ESP32/build/micropython.bin
-     
+
+    - name: Save binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: esp32-binary-src
+        path: build/firmware_lfs.bin
+        
     - name: Compile firmware LOLIN_S2_MINI
       working-directory: boards/LOLIN_S2_MINI
       run: |
