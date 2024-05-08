@@ -150,8 +150,6 @@ jobs:
 
     - name: Merge with src files
       run: |
-        pip install vfs_merge
-        mkdir build
         vfsmerge --port esp32 --firmware ./boards/LOLIN_S2_MINI/build/micropython.bin
 
     - name: Check output
