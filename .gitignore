@@ -27,7 +27,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
-
+!lib/usermod
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
@@ -162,3 +162,11 @@ cython_debug/
 #.idea/
 env.json
 .creds.json
+.DS_Store
+**/.DS_Store
+**/.DS_Store/**
+log
+**/build/**
+**/managed_components/**
+**/unity-app
+**/frozen_*
