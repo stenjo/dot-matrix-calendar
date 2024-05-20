@@ -10,11 +10,52 @@
     "python.testing.pytestEnabled": false,
     "python.testing.unittestEnabled": true,
     "python.analysis.extraPaths": [
-        "modules"
+        "./modules",
+        "./modules/ics"
     ],
     "cSpell.words": [
-        "micropython"
+        "ICAL",
+        "icalendar",
+        "micropython",
+        "rrule"
     ],
     "python.languageServer": "Pylance",
-    "coverage-gutters.coverageReportFileName": "coverage.lcov"
+    "coverage-gutters.coverageReportFileName": "coverage.lcov",
+    "terminal.integrated.env.windows": {
+        "PYTHONPATH": "C:/Users/sten.johnsen/git/dot-matrix-calendar/modules;${env:PYTHONPATH}",
+        "PATH": "C:/Users/sten.johnsen/git/dot-matrix-calendar/modules;${env:PATH}"  
+    },
+    "C_Cpp.default.compilerArgs": [
+        "-I lib/micropython"
+    ],
+    "files.associations": {
+        "obj.h": "c",
+        "rruleiter.h": "c",
+        "rrule.h": "c",
+        "binary.h": "c",
+        "nlr.h": "c",
+        "mphal.h": "c",
+        "mpconfig.h": "c",
+        "base.h": "c",
+        "runtime.h": "c",
+        "iosfwd": "cpp",
+        "mpstate.h": "c",
+        "pystack.h": "c",
+        "regex": "c",
+        "modmachine.h": "c",
+        "max7219.h": "c",
+        "misc.h": "c",
+        "mp_rrule.h": "c",
+        "vector": "cpp",
+        "stdlib.h": "c",
+        "setjmp.h": "c",
+        "ics_parser.h": "c",
+        "__locale": "c",
+        "max7219_priv.h": "c"
+    },
+    "cmake.configureOnOpen": false,
+    "idf.port": "/dev/cu.usbmodem1234561",
+    "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild",
+    "C_Cpp.default.compileCommands": "/Users/sten.johnsen/git/dot-matrix-calendar/cmodules/ics/builddir/compile_commands.json",
+    "unityExplorer.unitUnderTestFolder": "./test"
 }
