@@ -1,0 +1,1 @@
+set(MICROPY_FROZEN_MANIFEST ${PROJECT_TOP}/manifest.py)
