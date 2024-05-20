@@ -1,11 +1,9 @@
-from DotMatrix import Matrix8x8
-from dateHandling import dayText
-from datetime import datetime, timezone, timedelta
-import ujson
-import ssl
-from Calendar import Calendar
 import time
 import network
+from datetime import datetime, timezone, timedelta
+from dateHandling import dayText
+from DotMatrix import Matrix8x8
+from Calendar import Calendar
 
 # (8x8 blocks, spi host, clock speed, CS pin)
 m = Matrix8x8(8,20,1)
@@ -34,16 +32,12 @@ c.end((datetime.now() + timedelta(30)).timetuple())
 
 c.parseURL('webcal://files-f3.motorsportcalendars.com/no/f3-calendar_p_q_sprint_feature.ics')
 c.parseURL('webcal://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics')
-# c.parseURL('https://calendar.google.com/calendar/ical/c_bbd06d1ace0398da9397cae670201961dc43e8e1f37c017e5261650ed94c9192%40group.calendar.google.com/public/basic.ics')
-event = c.first()
-
-print(event)  # Should print a tuple like ("Test Event", "20230412T160000Z")
-print(dayText(event))
-
+c.parseURL('https://calendar.google.com/calendar/ical/c_eae215482ecd0bf862ff838cb81657e12281bff2f104c0986f78b20d90e4917c%40group.calendar.google.com/private-5cf4e55067a529ddd245d8a2f15a5e49/basic.ics')
 
 event = c.first()
-m.marquee(dayText(event))
+if event: m.marquee(dayText(event))
 done = False
+
 def displayClock(m):
     (_, _, _, hour, min, sec, _, _) = time.localtime()
     while sec != 0:
@@ -60,9 +54,11 @@ try:
             displayClock(m)
             event = c.next()
             if not event:
-                c.refresh(time.gmtime(), (datetime.now() + timedelta(30)).timetuple())
+                items = c.refresh(time.gmtime(), (datetime.now() + timedelta(30)).timetuple())
                 event = c.first()
-            m.marquee(dayText(event))
+                # print("Refetched {:02} calendar items.".format(items))
+            if event:
+                m.marquee(dayText(event))
 except KeyboardInterrupt:
     print("\nControl-C pressed. Cleaning up and exiting.")
 finally:
