@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/stenjo/dot-matrix-calendar/compare/v0.1.0...v0.2.0) (2024-05-20)
+
+
+### Features
+
+* **calendar:** parse ical feed ([#12](https://github.com/stenjo/dot-matrix-calendar/issues/12)) ([540a37b](https://github.com/stenjo/dot-matrix-calendar/commit/540a37bcd0a443d24226fdaf2bc335c9187a93e4))
+
 ## [0.1.0](https://github.com/stenjo/dot-matrix-calendar/compare/v0.0.1...v0.1.0) (2024-03-04)
 
 
