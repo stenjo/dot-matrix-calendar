@@ -3,7 +3,7 @@
 #include "py/objstr.h"
 #include "py/obj.h"
 #include "matrix.h"
-#include "driver.h"
+#include "max7219.h"
 
 #if defined(ESP32)
 #include <driver/spi_master.h>
@@ -33,7 +33,7 @@ STATIC mp_obj_t dotmatrix_make_new(const mp_obj_type_t *type, size_t n_args, siz
 
     uint32_t cascade_size = DEFAULT_CASCADE_SIZE;
     uint16_t scroll_delay = DEFAULT_SCROLL_DELAY;
-    uint32_t host_device = SPI2_HOST;
+    uint32_t host_device = SPI1_HOST;
 
     if (n_args > 0) {
         cascade_size = mp_obj_get_int(args[0]);

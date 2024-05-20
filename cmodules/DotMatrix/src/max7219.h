@@ -1,5 +1,5 @@
-#ifndef DRIVER_H
-#define DRIVER_H
+#ifndef MAX7219_H
+#define MAX7219_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -10,7 +10,9 @@
 #include <driver/spi_master.h>
 #include <driver/gpio.h> // add by nopnop2002
 #elif defined(ESP8266)
-#include <esp8266/spi.h>
+#include <esp_log.h>
+#include <esp_timer.h> // Include the header for ESP timer functions
+#include <hspi.h>
 #else
 #include <driver/spi_master.h>
 #include <driver/gpio.h> // add by nopnop2002
@@ -24,6 +26,7 @@
 
 #define DEFAULT_SCROLL_DELAY 30
 #define DEFAULT_CASCADE_SIZE 8
+#define DEFAULT_SPI_HOST        MICROPY_HW_SPI_HOST
 #define DEFAULT_PIN_NUM_MOSI    MICROPY_HW_SPI1_MOSI //19
 #define DEFAULT_PIN_NUM_CLK     MICROPY_HW_SPI1_SCK //18
 #define DEFAULT_PIN_CS 5
@@ -68,4 +71,4 @@ void display_clear(max7219_t *dev);
 
 
 
-#endif // DRIVER_H
+#endif // MAX7219_H

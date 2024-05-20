@@ -1,5 +1,5 @@
 # include default manifest
-# include("$(PORT_DIR)/boards/manifest.py")s
+include("$(PORT_DIR)/boards/manifest.py")
 
 # include our own extra...
 module("datetime.py", base_path="$(BOARD_DIR)/../../modules")

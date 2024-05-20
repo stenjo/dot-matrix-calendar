@@ -5,3 +5,4 @@
 #define MICROPY_HW_SPI1_MOSI                (19)
 #define MICROPY_HW_SPI1_MISO                (23)
 #define MICROPY_HW_SPI1_SCK                 (18)
+#define MICROPY_HW_SPI_HOST                 SPI1_HOST

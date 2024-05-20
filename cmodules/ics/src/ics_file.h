@@ -11,4 +11,6 @@
 */
 size_t parseFile(ics_t * ics, const char *file_path);
 
+size_t loadFileRef(const char *file_path);
+
 #endif // ICS_FILE_H

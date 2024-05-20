@@ -1,8 +1,8 @@
 #include "matrix.h"
 #include <string.h>
 #include <stdint.h>
-// #include "max7219.h"
-#include "driver.h"
+#include "max7219.h"
+// #include "driver.h"
 #include <esp_timer.h> // Include the header for ESP timer functions
 #if defined(ESP32)
 #elif defined(ESP8266)

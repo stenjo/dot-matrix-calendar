@@ -56,6 +56,7 @@ class Calendar(ICS):
     def __init__(self, filename=None, start=None, end=None):
         super().__init__()
         self.reset()
+        self.sources = []
         if start is not None:
             self.start(start)
             
@@ -73,6 +74,11 @@ class Calendar(ICS):
 
     def parseURL(self, url):
         url = url.replace('webcal://', 'http://')
+        if url not in self.sources:
+            self.sources.append(url)
+        return self._parse(url)
+
+    def _parse(self, url):
         response = urequests.get(url)
         if response.status_code == 200:
             # Successfully fetched the calendar data, now parse it.
@@ -83,7 +89,21 @@ class Calendar(ICS):
             response.close()
             raise Exception(f"Failed to fetch calendar data, status code: {response.status_code}")
 
-    
+    def refresh(self, start_date=None, end_date=None):
+        self.reset()
+        if start_date is not None:
+            self.start(start_date)
+            
+        if end_date is not None:
+            self.end(end_date)
+            
+
+        for url in self.sources:
+            try:
+                self._parse(url)
+            except:
+                print("Error parsing url: {}".format(url))
+            
     def first(self):
         return toDict(self.getFirst())
         

@@ -4,7 +4,7 @@ add_library(usermod_dotmatrix INTERFACE)
 # Add our source files to the library.
 target_sources(usermod_dotmatrix INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}/src/mp_dotmatrix.c
-    ${CMAKE_CURRENT_LIST_DIR}/src/driver.c
+    ${CMAKE_CURRENT_LIST_DIR}/src/max7219.c
     ${CMAKE_CURRENT_LIST_DIR}/src/matrix.c
 )
 

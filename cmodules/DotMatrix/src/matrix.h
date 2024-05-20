@@ -1,7 +1,7 @@
 #ifndef _MATRIX_H_
 #define _MATRIX_H_
 
-#include "driver.h"
+#include "max7219.h"
 
 typedef struct {
     uint16_t offset;

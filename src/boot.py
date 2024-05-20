@@ -16,6 +16,7 @@ ws = WiFiSetup("dot-matrix-calendar")
 sta = ws.connect_or_setup()
 del ws
 
+
 #if needed, overwrite default time server
 ntptime.host = "1.europe.pool.ntp.org"
 
