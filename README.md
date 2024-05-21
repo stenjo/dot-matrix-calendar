@@ -24,8 +24,41 @@ Connect the dot matrix module to the S2 mini:
 
 ![Wiring](wiring.png)
 
+### Install tools for building and loading binary
+
+To be able to build the firmware locally, the following tools are needed:
+
+Install version 5.0.4 of the Espressif toolchain.
+
+```bash
+    pipx install pyelftools
+    mkdir ~/esp
+    cd ~/esp
+    git clone https://github.com/espressif/esp-idf.git
+    git -C esp-idf checkout v5.0.2
+    ./esp-idf/install.sh
+```
+
+For programming and erasing the flash, use esptools.py
+
+```bash
+    pipx install esptools
+```
+
+For loading python files and running repl
+
+```bash
+    pipx install rshell
+```
+
 ### Load binary
 
+Ready built binary can be downloaded from the latest build from github, [latest release](https://github.com/stenjo/dot-matrix-calendar/releases/latest). Click `esp32-S2-binary` and download the zipped binary. Extract the file into `micropython.bin`.
+
+
+
+
+### Build binary
 
 ## Dependencies
 |-----------------|------------------|
