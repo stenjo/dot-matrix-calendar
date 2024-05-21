@@ -1,6 +1,31 @@
 # dot-matrix-calendar
 
-Displaying a marquee list of events from a google calendar on a Wemos D1 mini and a max7219-driven dot matrix led using Micropython
+Displaying a marquee list of events from one or more ics calendar feeds on an ESP32 based Lolin S2 Mini and a max7219-driven dot matrix led using Micropython.
+
+## Getting started
+
+For this project to work, you need the following:
+
+- [Wemos Lolin S2 Mini](https://elkim.no/produkt/esp32-s2-mini-v1-0-0/)
+- [8 module 8x8 dot matrix led displays with an SPI interface](https://www.aliexpress.com/item/1005006246992859.html?channel=twinner)
+- 3D printed [stand](stand/README.md)
+
+### Wiring
+
+Connect the dot matrix module to the S2 mini:
+
+| S2 mini | Dot Matrix | signal      |
+|---------|------------|-------------|
+| 3V3     | VCC        | Power       |
+| GND     | GND        | Ground      |
+| GPIO 11 | DIN        | Data        |
+| GPIO 5  | CS         | Chip select |
+| GPIO 7  | CLK        | Clock       |
+
+![Wiring](wiring.png)
+
+### Load binary
+
 
 ## Dependencies
 |-----------------|------------------|
