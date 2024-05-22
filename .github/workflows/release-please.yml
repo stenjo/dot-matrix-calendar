@@ -20,6 +20,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
       - name: Install tools
         run: |
             git clone -b v5.0.4 --recursive https://github.com/espressif/esp-idf.git
@@ -27,6 +28,7 @@ jobs:
             ./install.sh
             source export.sh
             pip install esptool freezefs
+            cd ..
             git submodule update --init lib/micropython
             git submodule update --init modules/micropython-wifi-setup
             make -C lib/micropython/mpy-cross
