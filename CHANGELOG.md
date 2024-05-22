@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/stenjo/dot-matrix-calendar/compare/v0.2.1...v0.2.2) (2024-05-22)
+
+
+### Bug Fixes
+
+* **release:** missing platform esp32 on installing tools ([3f059f0](https://github.com/stenjo/dot-matrix-calendar/commit/3f059f0946885efb46fc7af60dab6682b69b2018))
+
 ## [0.2.1](https://github.com/stenjo/dot-matrix-calendar/compare/v0.2.0...v0.2.1) (2024-05-22)
 
 
