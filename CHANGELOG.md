@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](https://github.com/stenjo/dot-matrix-calendar/compare/v0.2.2...v0.2.3) (2024-05-22)
+
+
+### Bug Fixes
+
+* **release:** use uploaded binary ([eb56568](https://github.com/stenjo/dot-matrix-calendar/commit/eb5656877d758a6f53fc40ed362c7a632144c68d))
+
 ## [0.2.2](https://github.com/stenjo/dot-matrix-calendar/compare/v0.2.1...v0.2.2) (2024-05-22)
 
 
