@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.6](https://github.com/stenjo/dot-matrix-calendar/compare/v0.2.5...v0.2.6) (2024-05-22)
+
+
+### Bug Fixes
+
+* **release:** wrong path ([e129354](https://github.com/stenjo/dot-matrix-calendar/commit/e1293543bb74d9e69327613a86572f9710e3ce3f))
+
 ## [0.2.5](https://github.com/stenjo/dot-matrix-calendar/compare/v0.2.4...v0.2.5) (2024-05-22)
 
 
