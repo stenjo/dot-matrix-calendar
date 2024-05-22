@@ -26,7 +26,7 @@ jobs:
         run: |
             git clone -b v5.0.4 --recursive https://github.com/espressif/esp-idf.git
             cd esp-idf
-            ./install.sh esp32s2
+            ./install.sh esp32s2,esp32,esp32s3
             source export.sh
             pip install esptool freezefs
             cd ..
