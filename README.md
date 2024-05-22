@@ -1,6 +1,8 @@
 # dot-matrix-calendar
 
-Displaying a marquee list of events from one or more ics calendar feeds on an ESP32 based Lolin S2 Mini and a max7219-driven dot matrix led using Micropython.
+Displaying a marquee list of events from one or more ics calendar feeds on an ESP32 based Lolin S2 Mini and a max7219-driven dot matrix led using Micropython. The firmware is set up with a captive portal, enabling 
+connection to a wifi network with password.
+Application allows for several calendar feeds to be fetched and displayed at the same time.
 
 ## Getting started
 
@@ -9,6 +11,8 @@ For this project to work, you need the following:
 - [Wemos Lolin S2 Mini](https://elkim.no/produkt/esp32-s2-mini-v1-0-0/)
 - [8 module 8x8 dot matrix led displays with an SPI interface](https://www.aliexpress.com/item/1005006246992859.html?channel=twinner)
 - 3D printed [stand](stand/README.md)
+
+4- or more than 8 module led matrix displays will also work - just need to set up the display config for that.
 
 ### Wiring
 
@@ -23,6 +27,7 @@ Connect the dot matrix module to the S2 mini:
 | GPIO 7  | CLK        | Clock       |
 
 ![Wiring](wiring.png)
+![Soldered](soldered.jpg)
 
 ### Install tools for building and loading binary
 
@@ -55,7 +60,14 @@ For loading python files and running repl
 
 Ready built binary can be downloaded from the latest build from github, [latest release](https://github.com/stenjo/dot-matrix-calendar/releases/latest). Click `esp32-S2-binary` and download the zipped binary. Extract the file into `micropython.bin`.
 
+Clone and extract this repo and move into the repository root:
 
+```bash
+git clone https://github.com/stenjo/dot-matrix-calendar.git
+cd dot-matrix-calendar
+```
+
+Connect your esp32-S2 to your Mac via usb cable. Set the board 
 
 
 ### Build binary
@@ -99,12 +111,6 @@ docker run --rm -v $HOME:$HOME -u $UID -w $PWD larsks/esp-open-sdk make PYTHON=p
 
 Add a env.json in the format:
 
-```json
-{
-    "WIFI_SSID":"<network ssid>",
-    "WIFI_PASSWD":"<network password>"
-}
-```
 
 ## Credits
 

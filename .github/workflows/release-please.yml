@@ -20,18 +20,22 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
       - name: Install tools
+        if: ${{ steps.release.outputs.release_created }}
         run: |
             git clone -b v5.0.4 --recursive https://github.com/espressif/esp-idf.git
             cd esp-idf
-            ./install.sh
+            ./install.sh esp32s2
             source export.sh
             pip install esptool freezefs
+            cd ..
             git submodule update --init lib/micropython
             git submodule update --init modules/micropython-wifi-setup
             make -C lib/micropython/mpy-cross
             
       - name: Make submodules    
+        if: ${{ steps.release.outputs.release_created }}
         working-directory: lib/micropython/ports/esp32
         run: |
             source ../../../../esp-idf/export.sh
@@ -39,6 +43,7 @@ jobs:
             make
           
       - name: Make frozen extractable files    
+        if: ${{ steps.release.outputs.release_created }}
         working-directory: modules
         run: |
           pip install freezefs
@@ -47,16 +52,14 @@ jobs:
           python -m freezefs micropython-wifi-setup/lib/micro_web_srv_2 frozen_micro_web_srv_2.py -ov always
               
       - name: Compile firmware LOLIN_S2_MINI
+        if: ${{ steps.release.outputs.release_created }}
         working-directory: boards/LOLIN_S2_MINI
         run: |
           source ../../esp-idf/export.sh
           idf.py build
           
-      - name: Check output
-        working-directory: boards/LOLIN_S2_MINI
-        run: ls -al build/micropython.bin
-        
       - name: Save binary
+        if: ${{ steps.release.outputs.release_created }}
         uses: actions/upload-artifact@v4
         with:
           name: esp32-S2-binary
@@ -70,6 +73,7 @@ jobs:
 
       - name: Update version.txt
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        continue-on-error: true
         run: |
           # Extract the version number from the latest git tag
           VERSION=$(git describe --tags $(git rev-list --tags --max-count=1))
