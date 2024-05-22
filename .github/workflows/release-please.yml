@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: google-github-actions/release-please-action@v4
+        id: release
         with:
           release-type: simple
           token: ${{secrets.RELEASE_PLEASE}}
@@ -19,6 +20,53 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      - name: Install tools
+        run: |
+            git clone -b v5.0.4 --recursive https://github.com/espressif/esp-idf.git
+            cd esp-idf
+            ./install.sh
+            source export.sh
+            pip install esptool freezefs
+            git submodule update --init lib/micropython
+            git submodule update --init modules/micropython-wifi-setup
+            make -C lib/micropython/mpy-cross
+            
+      - name: Make submodules    
+        working-directory: lib/micropython/ports/esp32
+        run: |
+            source ../../../../esp-idf/export.sh
+            make submodules
+            make
+          
+      - name: Make frozen extractable files    
+        working-directory: modules
+        run: |
+          pip install freezefs
+          git submodule update --init micropython-wifi-setup
+          python -m freezefs micropython-wifi-setup/lib/wifi_setup frozen_wifi_setup.py -ov always
+          python -m freezefs micropython-wifi-setup/lib/micro_web_srv_2 frozen_micro_web_srv_2.py -ov always
+              
+      - name: Compile firmware LOLIN_S2_MINI
+        working-directory: boards/LOLIN_S2_MINI
+        run: |
+          source ../../esp-idf/export.sh
+          idf.py build
+          
+      - name: Check output
+        working-directory: boards/LOLIN_S2_MINI
+        run: ls -al build/micropython.bin
+        
+      - name: Save binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: esp32-S2-binary
+          path: boards/LOLIN_S2_MINI/build/micropython.bin
+  
+      - name: Upload Release Artifact
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload ${{ steps.release.outputs.tag_name }} ./artifact/esp32-S2-binary.zip
 
       - name: Update version.txt
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
