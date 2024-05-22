@@ -64,6 +64,7 @@ jobs:
           cp binaries/micropython.bin build/
           cp binaries/bootloader/bootloader.bin build/bootloader/
           cp binaries/partition_table/partition-table.bin build/partition_table/
+          ls -al build
           
       - name: Save binary
         if: ${{ steps.release.outputs.release_created }}
@@ -77,13 +78,12 @@ jobs:
         with:
           name: esp32-S2-binary
 
-      - run: ls -al build
       
       - name: Upload Release Artifact
         if: ${{ steps.release.outputs.release_created }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ steps.release.outputs.tag_name }} ./build
+        run: gh release upload ${{ steps.release.outputs.tag_name }} ./boards/LOLIN_S2_MINI/build
 
       - name: Update version.txt
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
