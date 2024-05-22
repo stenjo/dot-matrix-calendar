@@ -69,12 +69,14 @@ jobs:
         if: ${{ steps.release.outputs.release_created }}
         with:
           name: esp32-S2-binary
-  
+
+      - run: ls -al
+      
       - name: Upload Release Artifact
         if: ${{ steps.release.outputs.release_created }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ steps.release.outputs.tag_name }} ./esp32-S2-binary.zip
+        run: gh release upload ${{ steps.release.outputs.tag_name }} esp32-S2-binary
 
       - name: Update version.txt
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
