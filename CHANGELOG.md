@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.5](https://github.com/stenjo/dot-matrix-calendar/compare/v0.2.4...v0.2.5) (2024-05-22)
+
+
+### Bug Fixes
+
+* **binaries:** include bootloadere.bin and partition_table.bin too ([f5c6c6a](https://github.com/stenjo/dot-matrix-calendar/commit/f5c6c6a1c7f814be9ad0e01e57a432da3d5009cf))
+
 ## [0.2.4](https://github.com/stenjo/dot-matrix-calendar/compare/v0.2.3...v0.2.4) (2024-05-22)
 
 
