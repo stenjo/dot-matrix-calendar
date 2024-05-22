@@ -47,7 +47,7 @@ Install version 5.0.4 of the Espressif toolchain.
 For programming and erasing the flash, use esptools.py
 
 ```bash
-    pipx install esptools
+    pipx install esptool
 ```
 
 For loading python files and running repl
@@ -67,12 +67,76 @@ git clone https://github.com/stenjo/dot-matrix-calendar.git
 cd dot-matrix-calendar
 ```
 
-Connect your esp32-S2 to your Mac via usb cable. Set the board 
+Connect your esp32-S2 to your Mac via usb cable. Set the board into programming mode by holding button 0, pressing the reset button and releasing the button 0 when the board is connected.
 
+Check what usb port the board is connected to by running the following command:
+
+```bash
+ls /dev/tty.*
+```
+
+You should get a listing of connected usb devices like:
+![usb list](usb-name.png)
+Make a note of the usb name - you are going to use this for the erasing a loading of the board flash.
+
+Erase the flash specifying the port found in the list above:
+
+```bash
+esptool.py --port /dev/tty.usbmodem01 --baud 460800 erase_flash
+```
+
+You should get a result something like this:
+![erase result](erasing-flash.png)
+
+Program the board flash with the `micropython.bin` file that you either downloaded from latest release or built locally:
+
+```bash
+esptool.py --port /dev/tty.usbmodem01 --baud 460800 write_flash -z 0x1000 micropython.bin
+```
+
+Reset the board by pressing the reset button.
+Add python files to the board by using rshell:
+
+```bash
+rshell
+```
+
+Command should generate a response like this:
+
+```bash
+>$ rshell
+Connecting to /dev/cu.usbmodem1234561 (buffer-size 256)...
+Trying to connect to REPL  connected
+Retrieving sysname ... esp32
+Testing if sys.stdin.buffer exists ... Y
+Retrieving root directories ... /boot.py/
+Setting time ... May 22, 2024 07:15:35
+Evaluating board_name ... pyboard
+Retrieving time epoch ... Jan 01, 2000
+Welcome to rshell. Use Control-D (or the exit command) to exit rshell.
+```
+
+Within rshell, run the command to copy `boot.py` and `main.py` to the board
+
+```bash
+rsync src /pyboard
+```
+
+Should result in something like:
+
+```bash
+> rsync src /pyboard
+Adding /pyboard/version.txt
+Adding /pyboard/idle-timeout.txt
+Adding /pyboard/main.py
+Checking /pyboard/boot.py
+dot-matrix-calendar/src/boot.py is newer than /pyboard/boot.py - copying
+```
 
 ### Build binary
 
 ## Dependencies
+
 |-----------------|------------------|
 | `esptool.py` | https://docs.espressif.com/projects/esptool/en/latest/esp32/ |
 | xtensa gcc | see lib/micropython/ports/esp8266/README.md |
@@ -107,13 +171,7 @@ Build firmware for downloading to device using docker:
 docker run --rm -v $HOME:$HOME -u $UID -w $PWD larsks/esp-open-sdk make PYTHON=python3
 ```
 
-## Setup
-
-Add a env.json in the format:
-
 
 ## Credits
 
-[MicroPython Max7219 8x8 LED Matrix]()
-[micropython-env](https://github.com/ShenTengTu/micropython-env/tree/master): Shen-Teng Tu ([ShengTengtu](https://github.com/ShenTengTu))
 [MicroPython WiFi setup](https://github.com/george-hawkins/micropython-wifi-setup)

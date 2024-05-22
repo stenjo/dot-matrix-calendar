@@ -25,7 +25,7 @@ deploy:
 	$(ECHO) "Writing $< to the board"
 	$(Q)esptool.py --chip esp32s2 -p $(PORT) -b $(BAUD) \
 	--before default_reset \
-	--after hard_reset \
+	--after no_reset \
 	write_flash \
 	--flash_mode=$(FLASH_MODE) \
 	--flash_size=$(FLASH_SIZE) \
@@ -46,6 +46,16 @@ merge:
 	0x10000 $(MPBIN) \
 	0x00200000 $(LFS)
 
+merge-firmware:
+	$(ECHO) "Merge micropython binary with bootloader and partition-table"
+	$(Q)esptool.py --chip esp32s2 merge_bin -o $(FWBIN) \
+	--flash_mode=keep \
+	--flash_size=$(FLASH_SIZE) \
+	--flash_freq keep \
+	0x1000 $(BUILD)/bootloader/bootloader.bin \
+	0x8000 $(BUILD)/partition_table/partition-table.bin \
+	0x10000 $(MPBIN)
+
 deploy-merged:
 	$(ECHO) "Writing $< to the board"
 	$(Q)esptool.py --chip esp32s2 -p $(PORT) -b $(BAUD) \
@@ -65,7 +75,7 @@ deploy-merged:
 
 erase:
 	$(ECHO) "Erase flash"
-	$(Q)esptool.py --port /dev/cu.usbmodem1234561 --baud $(BAUD) erase_flash
+	$(Q)esptool.py --port /dev/cu.usbmodem01 --baud $(BAUD) erase_flash
 
 reset:
 	echo -e "\r\nimport machine; machine.reset()\r\n" >$(PORT)
