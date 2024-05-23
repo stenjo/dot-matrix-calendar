@@ -1,5 +1,47 @@
 # Changelog
 
+## [0.2.6](https://github.com/stenjo/dot-matrix-calendar/compare/v0.2.5...v0.2.6) (2024-05-22)
+
+
+### Bug Fixes
+
+* **release:** wrong path ([e129354](https://github.com/stenjo/dot-matrix-calendar/commit/e1293543bb74d9e69327613a86572f9710e3ce3f))
+
+## [0.2.5](https://github.com/stenjo/dot-matrix-calendar/compare/v0.2.4...v0.2.5) (2024-05-22)
+
+
+### Bug Fixes
+
+* **binaries:** include bootloadere.bin and partition_table.bin too ([f5c6c6a](https://github.com/stenjo/dot-matrix-calendar/commit/f5c6c6a1c7f814be9ad0e01e57a432da3d5009cf))
+
+## [0.2.4](https://github.com/stenjo/dot-matrix-calendar/compare/v0.2.3...v0.2.4) (2024-05-22)
+
+
+### Bug Fixes
+
+* **artifact:** upload artifact on release ([ecd3af6](https://github.com/stenjo/dot-matrix-calendar/commit/ecd3af6d61b02ce0e60c8b0777861c8761ff3efa))
+
+## [0.2.3](https://github.com/stenjo/dot-matrix-calendar/compare/v0.2.2...v0.2.3) (2024-05-22)
+
+
+### Bug Fixes
+
+* **release:** use uploaded binary ([eb56568](https://github.com/stenjo/dot-matrix-calendar/commit/eb5656877d758a6f53fc40ed362c7a632144c68d))
+
+## [0.2.2](https://github.com/stenjo/dot-matrix-calendar/compare/v0.2.1...v0.2.2) (2024-05-22)
+
+
+### Bug Fixes
+
+* **release:** missing platform esp32 on installing tools ([3f059f0](https://github.com/stenjo/dot-matrix-calendar/commit/3f059f0946885efb46fc7af60dab6682b69b2018))
+
+## [0.2.1](https://github.com/stenjo/dot-matrix-calendar/compare/v0.2.0...v0.2.1) (2024-05-22)
+
+
+### Bug Fixes
+
+* **release:** update release flow to include binary ([#17](https://github.com/stenjo/dot-matrix-calendar/issues/17)) ([1a1870c](https://github.com/stenjo/dot-matrix-calendar/commit/1a1870c712da813a45bf8fc2da4f285a2d20bd1c))
+
 ## [0.2.0](https://github.com/stenjo/dot-matrix-calendar/compare/v0.1.0...v0.2.0) (2024-05-20)
 
 
