@@ -106,6 +106,13 @@ jobs:
       run: |
         source ../../esp-idf/export.sh
         idf.py build
+        mv build binaries
+        mkdir build
+        mkdir build/bootloader
+        mkdir build/partition_table
+        cp binaries/micropython.bin build/
+        cp binaries/bootloader/bootloader.bin build/bootloader/
+        cp binaries/partition_table/partition-table.bin build/partition_table/
       
     - name: Merge with src files
       run: |
@@ -115,7 +122,7 @@ jobs:
       
     - name: Check output
       working-directory: boards/CUSTOM_ESP32
-      run: ls -al build/micropython.bin
+      run: ls -al build/*
 
     - name: Save binary
       uses: actions/upload-artifact@v4

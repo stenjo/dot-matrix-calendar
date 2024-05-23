@@ -8,7 +8,7 @@ import time
 import network
 
 # (8x8 blocks, spi host, clock speed, CS pin)
-m = Matrix8x8(8,20,1)
+m = Matrix8x8(4,20,1)
 
 m.clear()
 m.init()
@@ -32,7 +32,7 @@ c=Calendar()
 c.start(time.gmtime())
 c.end((datetime.now() + timedelta(30)).timetuple())
 
-c.parseURL('webcal://files-f3.motorsportcalendars.com/no/f3-calendar_p_q_sprint_feature.ics')
+# c.parseURL('webcal://files-f3.motorsportcalendars.com/no/f3-calendar_p_q_sprint_feature.ics')
 c.parseURL('webcal://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics')
 # c.parseURL('https://calendar.google.com/calendar/ical/c_bbd06d1ace0398da9397cae670201961dc43e8e1f37c017e5261650ed94c9192%40group.calendar.google.com/public/basic.ics')
 event = c.first()

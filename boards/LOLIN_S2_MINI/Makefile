@@ -8,6 +8,7 @@ FWSRC = $(BUILD)/firmware_lfs.bin
 PARTBIN = $(BUILD)/partition-table.bin
 LFS = $(BUILD)/littlefs.img
 PORT ?= /dev/cu.usbmodem01
+REPL ?= /dev/cu.usbmodem1234561
 BAUD ?= 460800
 FLASH_MODE ?= qio
 FLASH_SIZE ?= 4MB #detect
@@ -78,4 +79,4 @@ erase:
 	$(Q)esptool.py --port /dev/cu.usbmodem01 --baud $(BAUD) erase_flash
 
 reset:
-	echo -e "\r\nimport machine; machine.reset()\r\n" >$(PORT)
+	echo -e "\r\nimport machine; machine.reset()\r\n" >$(REPL)
