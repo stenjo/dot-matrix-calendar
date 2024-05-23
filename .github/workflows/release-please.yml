@@ -57,19 +57,33 @@ jobs:
         run: |
           source ../../esp-idf/export.sh
           idf.py build
+          mv build binaries
+          mkdir build
+          mkdir build/bootloader
+          mkdir build/partition_table
+          cp binaries/micropython.bin build/
+          cp binaries/bootloader/bootloader.bin build/bootloader/
+          cp binaries/partition_table/partition-table.bin build/partition_table/
+          ls -al build
           
       - name: Save binary
         if: ${{ steps.release.outputs.release_created }}
         uses: actions/upload-artifact@v4
         with:
           name: esp32-S2-binary
-          path: boards/LOLIN_S2_MINI/build/micropython.bin
-  
+          path: boards/LOLIN_S2_MINI/build
+
+      - uses: actions/download-artifact@v4
+        if: ${{ steps.release.outputs.release_created }}
+        with:
+          name: esp32-S2-binary
+
+      
       - name: Upload Release Artifact
         if: ${{ steps.release.outputs.release_created }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ steps.release.outputs.tag_name }} ./artifact/esp32-S2-binary.zip
+        run: gh release upload ${{ steps.release.outputs.tag_name }} ./boards/LOLIN_S2_MINI/build
 
       - name: Update version.txt
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
