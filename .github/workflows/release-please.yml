@@ -48,8 +48,7 @@ jobs:
         run: |
           pip install freezefs
           git submodule update --init micropython-wifi-setup
-          python -m freezefs micropython-wifi-setup/lib/wifi_setup frozen_wifi_setup.py -ov always
-          python -m freezefs micropython-wifi-setup/lib/micro_web_srv_2 frozen_micro_web_srv_2.py -ov always
+          python -m freezefs micropython-wifi-setup/lib frozen_setup.py -ov always
               
       - name: Compile firmware LOLIN_S2_MINI
         if: ${{ steps.release.outputs.release_created }}
