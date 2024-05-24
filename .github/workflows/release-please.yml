@@ -7,11 +7,11 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
-      - uses: google-github-actions/release-please-action@v4
+      - uses: googleapis/release-please-action@v4
         id: release
         with:
           release-type: simple
-          token: ${{secrets.RELEASE_PLEASE}}
+          token: ${{secrets.PERSONAL_ACCESS_TOKEN}}
 
       # Additional step that updates version.txt in the src/ subfolder
       - name: Checkout repo
@@ -100,7 +100,7 @@ jobs:
       - name: Upload Release Artifact
         if: ${{ steps.release.outputs.release_created }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: gh release upload ${{ steps.release.outputs.tag_name }} ./boards/LOLIN_S2_MINI/esp32s2.zip
   
   
