@@ -82,7 +82,7 @@ Make a note of the usb name - you are going to use this for the erasing a loadin
 Erase the flash specifying the port found in the list above:
 
 ```bash
-esptool.py --port /dev/tty.usbmodem01 --baud 460800 erase_flash
+make erase
 ```
 
 You should get a result something like this:
