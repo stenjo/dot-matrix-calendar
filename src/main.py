@@ -4,6 +4,7 @@ from datetime import datetime, timezone, timedelta
 from dateHandling import dayText
 from DotMatrix import Matrix8x8
 from Calendar import Calendar
+from wifi_setup.wifi_setup import WiFiSetup
 
 # (8x8 blocks, spi host, clock speed, CS pin)
 m = Matrix8x8(8,20,1)
@@ -57,6 +58,9 @@ try:
                 items = c.refresh(time.gmtime(), (datetime.now() + timedelta(30)).timetuple())
                 event = c.first()
                 # print("Refetched {:02} calendar items.".format(items))
+                ws = WiFiSetup("dot-matrix-calendar")
+                sta = ws.connect_or_setup()
+                del ws
             if event:
                 m.marquee(dayText(event))
 except KeyboardInterrupt:
