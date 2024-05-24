@@ -91,14 +91,14 @@ You should get a result something like this:
 Program the board flash with the `micropython.bin` file that you either downloaded from latest release or built locally:
 
 ```bash
-esptool.py --port /dev/tty.usbmodem01 --baud 460800 write_flash -z 0x1000 micropython.bin
+make deploy
 ```
 
 Reset the board by pressing the reset button.
 Add python files to the board by using rshell:
 
 ```bash
-rshell
+rshell rsync ../../src /pyboard
 ```
 
 Command should generate a response like this:
@@ -153,10 +153,12 @@ git submodule update --init modules/micropython-wifi-setup
 ```
 
 Update wifi setup library
+
 ``` bash
+
 git submodule update --init modules/micropython-wifi-setup
-python -m freezefs modules/micropython-wifi-setup/lib/wifi_setup modules/frozen_wifi_setup.py -ov always
-python -m freezefs modules/micropython-wifi-setup/lib/frozen_micro_web_srv_2 modules/frozen_frozen_micro_web_srv_2.py -ov always
+python -m freezefs modules/micropython-wifi-setup/lib modules/frozen_setup.py -ov always
+
 ```
 
 ## Building for ESP8266
