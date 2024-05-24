@@ -48,7 +48,8 @@ jobs:
         run: |
           pip install freezefs
           git submodule update --init micropython-wifi-setup
-          python -m freezefs micropython-wifi-setup/lib frozen_setup.py -ov always
+          python -m freezefs micropython-wifi-setup/lib/wifi_setup frozen_wifi_setup.py -ov always
+          python -m freezefs micropython-wifi-setup/lib/micro_web_srv_2 frozen_micro_web_srv_2.py -ov always
               
       - name: Compile firmware LOLIN_S2_MINI
         if: ${{ steps.release.outputs.release_created }}
@@ -56,14 +57,7 @@ jobs:
         run: |
           source ../../esp-idf/export.sh
           idf.py build
-          mv build binaries
-          mkdir build
-          mkdir build/bootloader
-          mkdir build/partition_table
-          cp binaries/micropython.bin build/
-          cp binaries/bootloader/bootloader.bin build/bootloader/
-          cp binaries/partition_table/partition-table.bin build/partition_table/
-          zip -r esp32s2.zip build
+          zip -r esp32s2.zip build -x build/CMakeFiles/**/*.bin -x build/bootloader/CMakeFiles/**/*.bin  -i *.bin -i *.elf
           ls -al build
           
       - name: Save binary
