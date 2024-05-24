@@ -98,8 +98,8 @@ jobs:
       run: |
         pip install freezefs
         git submodule update --init micropython-wifi-setup
-        python -m freezefs micropython-wifi-setup/lib/wifi_setup frozen_wifi_setup.py -ov always
-        python -m freezefs micropython-wifi-setup/lib/micro_web_srv_2 frozen_micro_web_srv_2.py -ov always
+        python -m freezefs micropython-wifi-setup/lib frozen_setup.py -ov always
+
         
     - name: Compile firmware
       working-directory: boards/CUSTOM_ESP32
@@ -113,6 +113,7 @@ jobs:
         cp binaries/micropython.bin build/
         cp binaries/bootloader/bootloader.bin build/bootloader/
         cp binaries/partition_table/partition-table.bin build/partition_table/
+        zip -r esp32.zip build
       
     - name: Merge with src files
       run: |
@@ -128,7 +129,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: esp32-binary
-        path: boards/CUSTOM_ESP32/build/micropython.bin
+        path: boards/CUSTOM_ESP32/build/esp32.zip
         
     - name: Check output
       run: ls -al build/
@@ -144,6 +145,14 @@ jobs:
       run: |
         source ../../esp-idf/export.sh
         idf.py build
+        mv build binaries
+        mkdir build
+        mkdir build/bootloader
+        mkdir build/partition_table
+        cp binaries/micropython.bin build/
+        cp binaries/bootloader/bootloader.bin build/bootloader/
+        cp binaries/partition_table/partition-table.bin build/partition_table/
+        zip -r esp32s2.zip build
       
     - name: Check output
       working-directory: boards/LOLIN_S2_MINI
@@ -153,7 +162,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: esp32-S2-binary
-        path: boards/LOLIN_S2_MINI/build/micropython.bin
+        path: boards/LOLIN_S2_MINI/build/esp32s2.zip
 
     - name: Merge with src files
       run: |
