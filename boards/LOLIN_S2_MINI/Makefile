@@ -8,8 +8,9 @@ FWSRC = $(BUILD)/firmware_lfs.bin
 PARTBIN = $(BUILD)/partition-table.bin
 LFS = $(BUILD)/littlefs.img
 PORT ?= /dev/cu.usbmodem01
+REPL ?= /dev/cu.usbmodem1234561
 BAUD ?= 460800
-FLASH_MODE ?= qio
+FLASH_MODE ?= dio
 FLASH_SIZE ?= 4MB #detect
 V=1
 
@@ -29,22 +30,32 @@ deploy:
 	write_flash \
 	--flash_mode=$(FLASH_MODE) \
 	--flash_size=$(FLASH_SIZE) \
-	--flash_freq 40m \
+	--flash_freq 80m \
 	0x1000  $(BUILD)/bootloader/bootloader.bin \
 	0x8000  $(BUILD)/partition_table/partition-table.bin \
 	0x10000 $(MPBIN)
 
 merge:
 	$(ECHO) "Merge binary with src/ folder files"
-	$(Q)vfsmerge  --port esp32s2 --firmware $(MPBIN)
+	$(Q)vfsmerge  --port esp32-s2 --firmware $(MPBIN)
 	$(Q)esptool.py --chip esp32s2 merge_bin -o $(FWSRC) \
 	--flash_mode=$(FLASH_MODE) \
 	--flash_size=$(FLASH_SIZE) \
-	--flash_freq 40m \
+	--flash_freq 80m \
 	0x1000 $(BUILD)/bootloader/bootloader.bin \
 	0x8000 $(BUILD)/partition_table/partition-table.bin \
 	0x10000 $(MPBIN) \
 	0x00200000 $(LFS)
+
+merge-firmware:
+	$(ECHO) "Merge micropython binary with bootloader and partition-table"
+	$(Q)esptool.py --chip esp32s2 merge_bin -o $(FWBIN) \
+	--flash_mode=keep \
+	--flash_size=$(FLASH_SIZE) \
+	--flash_freq keep \
+	0x1000 $(BUILD)/bootloader/bootloader.bin \
+	0x8000 $(BUILD)/partition_table/partition-table.bin \
+	0x10000 $(MPBIN)
 
 deploy-merged:
 	$(ECHO) "Writing $< to the board"
@@ -65,7 +76,7 @@ deploy-merged:
 
 erase:
 	$(ECHO) "Erase flash"
-	$(Q)esptool.py --port /dev/cu.usbmodem1234561 --baud $(BAUD) erase_flash
+	$(Q)esptool.py --port $(PORT) --baud $(BAUD) erase_flash
 
 reset:
-	echo -e "\r\nimport machine; machine.reset()\r\n" >$(PORT)
+	echo -e "\r\nimport machine; machine.reset()\r\n" >$(REPL)
