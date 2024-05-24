@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.7](https://github.com/stenjo/dot-matrix-calendar/compare/v0.2.6...v0.2.7) (2024-05-24)
+
+
+### Bug Fixes
+
+* **binaries:** upload zipped binaries on release ([a1d14c7](https://github.com/stenjo/dot-matrix-calendar/commit/a1d14c7a60928177bd72c447e355f7a1f8fa0c47))
+* **calendar:** crashes when refetch fails ([#15](https://github.com/stenjo/dot-matrix-calendar/issues/15)) ([aab1cff](https://github.com/stenjo/dot-matrix-calendar/commit/aab1cff617fc20bc3b0c41403c663b738ba74169))
+
 ## [0.2.6](https://github.com/stenjo/dot-matrix-calendar/compare/v0.2.5...v0.2.6) (2024-05-22)
 
 
