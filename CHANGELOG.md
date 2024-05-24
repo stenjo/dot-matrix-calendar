@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/stenjo/dot-matrix-calendar/compare/v0.2.7...v0.3.0) (2024-05-24)
+
+
+### Features
+
+* **doc:** add documentation ([#16](https://github.com/stenjo/dot-matrix-calendar/issues/16)) ([c559b04](https://github.com/stenjo/dot-matrix-calendar/commit/c559b04ebf316d850ce32f03a851b48203ad63f9))
+
 ## [0.2.7](https://github.com/stenjo/dot-matrix-calendar/compare/v0.2.6...v0.2.7) (2024-05-24)
 
 
