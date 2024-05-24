@@ -79,12 +79,6 @@ jobs:
           name: esp32-S2-binary
 
       
-      - name: Upload Release Artifact
-        if: ${{ steps.release.outputs.release_created }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ steps.release.outputs.tag_name }} ./boards/LOLIN_S2_MINI/esp32s2.zip
-
       - name: Update version.txt
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         continue-on-error: true
@@ -102,3 +96,11 @@ jobs:
           git add src/version.txt
           git commit -m "chore: update version.txt to $VERSION"
           git push
+
+      - name: Upload Release Artifact
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload ${{ steps.release.outputs.tag_name }} ./boards/LOLIN_S2_MINI/esp32s2.zip
+  
+  
