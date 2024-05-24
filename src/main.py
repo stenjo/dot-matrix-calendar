@@ -4,6 +4,8 @@ from datetime import datetime, timezone, timedelta
 from dateHandling import dayText
 from DotMatrix import Matrix8x8
 from Calendar import Calendar
+import time
+import network
 from wifi_setup.wifi_setup import WiFiSetup
 
 # (8x8 blocks, spi host, clock speed, CS pin)
@@ -58,6 +60,7 @@ try:
                 items = c.refresh(time.gmtime(), (datetime.now() + timedelta(30)).timetuple())
                 event = c.first()
                 # print("Refetched {:02} calendar items.".format(items))
+                sta_if = network.WLAN(network.STA_IF); sta_if.active(True)
                 ws = WiFiSetup("dot-matrix-calendar")
                 sta = ws.connect_or_setup()
                 del ws
