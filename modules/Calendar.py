@@ -91,6 +91,7 @@ class Calendar(ICS):
 
     def refresh(self, start_date=None, end_date=None):
         self.reset()
+        items = 0
         if start_date is not None:
             self.start(start_date)
             
@@ -100,10 +101,11 @@ class Calendar(ICS):
 
         for url in self.sources:
             try:
-                self._parse(url)
+                items += self._parse(url)
             except:
                 print("Error parsing url: {}".format(url))
-            
+        return items
+    
     def first(self):
         return toDict(self.getFirst())
         
