@@ -1,7 +1,7 @@
 # This file is executed on every boot (including wake-boot from deepsleep)
 # import frozen_wifi_setup.py
-import frozen_wifi_setup
-import frozen_micro_web_srv_2
+import frozen_setup
+# import frozen_micro_web_srv_2
 import os, machine
 import gc
 gc.collect()
@@ -9,6 +9,13 @@ gc.collect()
 import network
 import ntptime
 import time
+
+from DotMatrix import Matrix8x8
+m = Matrix8x8(4,20,1)
+
+m.clear()
+m.init()
+m.write(" setup")
 
 from wifi_setup.wifi_setup import WiFiSetup
 
