@@ -61,9 +61,12 @@ try:
                 event = c.first()
                 # print("Refetched {:02} calendar items.".format(items))
                 sta_if = network.WLAN(network.STA_IF); sta_if.active(True)
-                ws = WiFiSetup("dot-matrix-calendar")
-                sta = ws.connect_or_setup()
-                del ws
+                while not sta_if.isconnected():
+                    ws = WiFiSetup("dot-matrix-calendar")
+                    sta = ws.connect_or_setup()
+                    del ws
+                    time.delay(1)
+                    
             if event:
                 m.marquee(dayText(event))
 except KeyboardInterrupt:
