@@ -65,7 +65,7 @@ deploy-merged:
 	write_flash \
 	--flash_mode=$(FLASH_MODE) \
 	--flash_size=$(FLASH_SIZE) \
-	--flash_freq 40m 0x0 \
+	--flash_freq 80m 0x0 \
 	$(FWSRC)
 
 
@@ -80,3 +80,7 @@ erase:
 
 reset:
 	echo -e "\r\nimport machine; machine.reset()\r\n" >$(REPL)
+
+clean:
+	idf.py fullclean
+	rm -rf build
