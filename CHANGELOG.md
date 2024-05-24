@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/stenjo/dot-matrix-calendar/compare/v0.3.1...v0.3.2) (2024-05-24)
+
+
+### Bug Fixes
+
+* **network:** reconnect when disconnected ([7c33406](https://github.com/stenjo/dot-matrix-calendar/commit/7c33406c13bbb291fc84e7de13952fd4b12fc6d5))
+
 ## [0.3.1](https://github.com/stenjo/dot-matrix-calendar/compare/v0.3.0...v0.3.1) (2024-05-24)
 
 
