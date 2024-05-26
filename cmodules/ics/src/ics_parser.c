@@ -156,7 +156,7 @@ event_t getEvent(const char *ics_data, const char **next) {
     event.summary = strndup(summary_start, summary_len);
     
     size_t dtstart_len = dtstart_end - dtstart_start;
-    char *temp_dtstart = strndup(dtstart_start, dtstart_len);
+    // char *temp_dtstart = strndup(dtstart_start, dtstart_len);
 
     event.dtstart = strndup(dtstart_start, dtstart_len);
 
@@ -264,7 +264,7 @@ event_t getCurrentEvent(ics_t *ics)
 
 size_t setCurrentEvent(ics_t *ics, size_t index)
 {
-    if (ics == NULL || ics->count == 0 || index >= MAX_EVENT_COUNT || index >= ics->count || index < 0) {
+    if (ics == NULL || ics->count == 0 || index >= MAX_EVENT_COUNT || index >= ics->count) {
         printf("Error index outside boundaries: index: %zu, max: %d\n", index, MAX_EVENT_COUNT);
         return -1; 
     }

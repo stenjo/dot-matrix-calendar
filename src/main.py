@@ -7,6 +7,8 @@ from Calendar import Calendar
 import time
 import network
 from wifi_setup.wifi_setup import WiFiSetup
+import gc
+gc.collect()
 
 # (8x8 blocks, spi host, clock speed, CS pin)
 m = Matrix8x8(4,20,1)
@@ -24,6 +26,8 @@ m.marquee(sta_if.ifconfig()[0] + " " + version)
 while not m.scroll():
     pass
 
+print(gc.mem_free())
+
 (year, month, day, hour, min, sec, _, _) = time.localtime()
 print("{}:{:02}:{:02}".format(hour, min, sec))
 m.write("{}/{} {:02}:{:02}".format(day, month, hour, min), True)
@@ -34,8 +38,14 @@ c.start(time.gmtime())
 c.end((datetime.now() + timedelta(30)).timetuple())
 
 c.parseURL('webcal://files-f3.motorsportcalendars.com/no/f3-calendar_p_q_sprint_feature.ics')
+print(gc.mem_free())
 c.parseURL('webcal://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics')
+print(gc.mem_free())
+# c.parseURL('https://calendar.google.com/calendar/ical/no.norwegian%23holiday%40group.v.calendar.google.com/public/basic.ics')
+# print(gc.mem_free())
+# c.parseURL('https://calendar.google.com/calendar/ical/i_213.236.150.86%23sunrise%40group.v.calendar.google.com/public/basic.ics')
 # c.parseURL('https://calendar.google.com/calendar/ical/c_eae215482ecd0bf862ff838cb81657e12281bff2f104c0986f78b20d90e4917c%40group.calendar.google.com/private-5cf4e55067a529ddd245d8a2f15a5e49/basic.ics')
+# print(gc.mem_free())
 
 event = c.first()
 if event: m.marquee(dayText(event))
@@ -57,15 +67,21 @@ try:
             displayClock(m)
             event = c.next()
             if not event:
+                gc.collect()
                 items = c.refresh(time.gmtime(), (datetime.now() + timedelta(30)).timetuple())
+                print(gc.mem_free())
                 event = c.first()
                 # print("Refetched {:02} calendar items.".format(items))
                 sta_if = network.WLAN(network.STA_IF); sta_if.active(True)
-                while not sta_if.isconnected():
+                if not sta_if.isconnected():
+                    while not sta_if.isconnected():
+                        sta_if.active(True)
+                        print("Trying to connect...")
+                        time.delay(1)
+
                     ws = WiFiSetup("dot-matrix-calendar")
                     sta = ws.connect_or_setup()
                     del ws
-                    time.delay(1)
                     
             if event:
                 m.marquee(dayText(event))
