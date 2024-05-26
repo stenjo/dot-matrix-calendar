@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.3](https://github.com/stenjo/dot-matrix-calendar/compare/v0.3.2...v0.3.3) (2024-05-26)
+
+
+### Bug Fixes
+
+* **upload:** upload artifact ([3eb96d2](https://github.com/stenjo/dot-matrix-calendar/commit/3eb96d22debdc1127a998494d53c66d306f51389))
+
 ## [0.3.2](https://github.com/stenjo/dot-matrix-calendar/compare/v0.3.1...v0.3.2) (2024-05-24)
 
 
