@@ -4,6 +4,7 @@ Displaying a marquee list of events from one or more ics calendar feeds on an ES
 connection to a wifi network with password.
 Application allows for several calendar feeds to be fetched and displayed at the same time.
 
+
 ## Getting started
 
 For this project to work, you need the following:
@@ -26,8 +27,8 @@ Connect the dot matrix module to the S2 mini:
 | GPIO 5  | CS         | Chip select |
 | GPIO 7  | CLK        | Clock       |
 
-![Wiring](wiring.png)
-![Soldered](soldered.jpg)
+![Wiring](resources/wiring.png)
+![Soldered](resources/soldered.jpg)
 
 ### Install tools for building and loading binary
 
@@ -76,7 +77,7 @@ ls /dev/tty.*
 ```
 
 You should get a listing of connected usb devices like:
-![usb list](usb-name.png)
+![usb list](resources/usb-name.png)
 Make a note of the usb name - you are going to use this for the erasing a loading of the board flash.
 
 Erase the flash specifying the port found in the list above:
@@ -86,7 +87,7 @@ make erase
 ```
 
 You should get a result something like this:
-![erase result](erasing-flash.png)
+![erase result](resources/erasing-flash.png)
 
 Program the board flash with the `micropython.bin` file that you either downloaded from latest release or built locally:
 

@@ -23,6 +23,8 @@ ws = WiFiSetup("dot-matrix-calendar")
 sta = ws.connect_or_setup()
 del ws
 
+m.clear()
+m.init()
 
 #if needed, overwrite default time server
 ntptime.host = "1.europe.pool.ntp.org"
@@ -34,3 +36,5 @@ try:
     print("Local time after synchronization: %s" %str(time.localtime()))
 except:
     print("Error syncing time")
+
+print(gc.mem_free())
