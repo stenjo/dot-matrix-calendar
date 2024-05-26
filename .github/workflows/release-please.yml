@@ -96,11 +96,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: gh release upload ${{ steps.release.outputs.tag_name }} ./boards/LOLIN_S2_MINI/esp32s2.zip
-  
-      - name: Upload Release Artifact
-        if: ${{ steps.release.outputs.release_created }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-        run: gh release upload ${{ steps.release.outputs.tag_name }} ./esp32-S2-binary
-  
-  
+
+      - run: unzip boards/LOLIN_S2_MINI/esp32s2.zip 
+      - uses: AButler/upload-release-assets@v3.0
+        with:
+          files: "build"
+          release-tag: ${{ steps.release.outputs.tag_name }}
+          repo-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          # -x build/CMakeFiles/**/*.bin -x build/bootloader/CMakeFiles/**/*.bin  -i *.bin -i *.elf
