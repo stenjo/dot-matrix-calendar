@@ -76,7 +76,6 @@ jobs:
           source ../../esp-idf/export.sh
           idf.py build
           zip -r esp32s2.zip build -x build/CMakeFiles/**/*.bin -x build/bootloader/CMakeFiles/**/*.bin  -i *.bin -i *.elf
-          ls -al build
           
       - name: Save binary
         if: ${{ steps.release.outputs.release_created }}
@@ -90,21 +89,16 @@ jobs:
         with:
           name: esp32-S2-binary
 
-
       - name: Upload Release Artifact
         if: ${{ steps.release.outputs.release_created }}
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: gh release upload ${{ steps.release.outputs.tag_name }} ./boards/LOLIN_S2_MINI/esp32s2.zip
 
-      - name: extract binaries
-        if: ${{ steps.release.outputs.release_created }}
-        run: unzip boards/LOLIN_S2_MINI/esp32s2.zip 
-
       - uses: AButler/upload-release-assets@v3.0
         if: ${{ steps.release.outputs.release_created }}
         with:
-          files: "build"
+          files: "boards/LOLIN_S2_MINI/esp32s2.zip"
           release-tag: ${{ steps.release.outputs.tag_name }}
           repo-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           # -x build/CMakeFiles/**/*.bin -x build/bootloader/CMakeFiles/**/*.bin  -i *.bin -i *.elf
