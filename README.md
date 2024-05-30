@@ -45,6 +45,12 @@ Install version 5.0.4 of the Espressif toolchain.
     ./esp-idf/install.sh
 ```
 
+Install pipx for python tools:
+
+```bash
+brew install pipx
+```
+
 For programming and erasing the flash, use esptools.py
 
 ```bash
@@ -59,7 +65,34 @@ For loading python files and running repl
 
 ### Load binary
 
-Ready built binary can be downloaded from the latest build from github, [latest release](https://github.com/stenjo/dot-matrix-calendar/releases/latest). Click `esp32-S2-binary` and download the zipped binary. Extract the file into `micropython.bin`.
+The easy way:
+Move to the esp32s2 directory:
+
+```bash
+cd boards/LOLIN_S2_MINI
+```
+Ready built binary can be downloaded from the latest build from github, [latest release](https://github.com/stenjo/dot-matrix-calendar/releases/latest). Click `esp32-S2-binary` and download the zipped binary to the `boards/LOLIN_S2_MINI` folder.
+Extract the files so that you have a `build` folder where all the binary files are located in the original folder structure.
+
+Connect your esp32-S2 to your Mac via usb cable. Set the board into programming mode by holding button 0, pressing the reset button and releasing the button 0 when the board is connected.
+
+Run the following commands:
+
+```bash
+make erase
+make deploy
+```
+
+You should see successful deploy.
+Press the reset button on the board.
+Now deploy python files:
+
+```bash
+rshell rsync ../../src /pyboard
+```
+Reset the board again and it should be running displaying `setup-` on the dot matrix if everything is connected OK. 
+
+### Set up repo and build your own firmware
 
 Clone and extract this repo and move into the repository root:
 
@@ -67,8 +100,6 @@ Clone and extract this repo and move into the repository root:
 git clone https://github.com/stenjo/dot-matrix-calendar.git
 cd dot-matrix-calendar
 ```
-
-Connect your esp32-S2 to your Mac via usb cable. Set the board into programming mode by holding button 0, pressing the reset button and releasing the button 0 when the board is connected.
 
 Check what usb port the board is connected to by running the following command:
 
