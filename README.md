@@ -66,20 +66,25 @@ For loading python files and running repl
 ### Load binary
 
 The easy way:
-Clone and extract this repo and move into the repository root:
+Clone and extract this repo and move into the esp32-S2 folder:
 
 ```bash
 git clone https://github.com/stenjo/dot-matrix-calendar.git
-cd dot-matrix-calendar
+cd dot-matrix-calendar/boards/LOLIN_S2_MINI
 ```
 
-Move to the esp32s2 directory:
+Ready built binary can be downloaded from the latest build from github, [latest release](https://github.com/stenjo/dot-matrix-calendar/releases/latest). Click `esp32-S2-binary` and download the zipped binary to the `boards/LOLIN_S2_MINI` folder, or run the following commands:
 
 ```bash
-cd boards/LOLIN_S2_MINI
+wget https://github.com/stenjo/dot-matrix-calendar/releases/latest/download/esp32s2.zip
+mv esp32s2.zip.1 esp32s2.zip
 ```
-Ready built binary can be downloaded from the latest build from github, [latest release](https://github.com/stenjo/dot-matrix-calendar/releases/latest). Click `esp32-S2-binary` and download the zipped binary to the `boards/LOLIN_S2_MINI` folder.
+
 Extract the files so that you have a `build` folder where all the binary files are located in the original folder structure.
+
+```bash
+unzip esp32s2.zip
+```
 
 Connect your esp32-S2 to your Mac via usb cable. Set the board into programming mode by holding button 0, pressing the reset button and releasing the button 0 when the board is connected.
 
@@ -175,11 +180,11 @@ dot-matrix-calendar/src/boot.py is newer than /pyboard/boot.py - copying
 ### Build binary
 
 ## Dependencies
-
+| tool            | reference        |
 |-----------------|------------------|
-| `esptool.py` | https://docs.espressif.com/projects/esptool/en/latest/esp32/ |
-| xtensa gcc | see lib/micropython/ports/esp8266/README.md |
-| freezefs | https://github.com/bixb922/freezefs |
+| `esptool.py`    | https://docs.espressif.com/projects/esptool/en/latest/esp32/ |
+| xtensa gcc      | see lib/micropython/ports/esp8266/README.md |
+| freezefs        | https://github.com/bixb922/freezefs |
 
 Make sure micropython lib is upated
 
