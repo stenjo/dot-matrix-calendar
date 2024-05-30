@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.4](https://github.com/stenjo/dot-matrix-calendar/compare/v0.3.3...v0.3.4) (2024-05-30)
+
+
+### Bug Fixes
+
+* **docs:** added missing step on cloning repo ([c7ac7f9](https://github.com/stenjo/dot-matrix-calendar/commit/c7ac7f947ab1d351df642deb5e3aef209555609d))
+* **docs:** update README.md with easy programming instructions ([e8f79fe](https://github.com/stenjo/dot-matrix-calendar/commit/e8f79feb862c9ed76d05aadc3916014c71d6483e))
+
 ## [0.3.3](https://github.com/stenjo/dot-matrix-calendar/compare/v0.3.2...v0.3.3) (2024-05-26)
 
 
