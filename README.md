@@ -66,6 +66,13 @@ For loading python files and running repl
 ### Load binary
 
 The easy way:
+Clone and extract this repo and move into the repository root:
+
+```bash
+git clone https://github.com/stenjo/dot-matrix-calendar.git
+cd dot-matrix-calendar
+```
+
 Move to the esp32s2 directory:
 
 ```bash
