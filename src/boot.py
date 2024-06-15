@@ -11,7 +11,7 @@ import ntptime
 import time
 
 from DotMatrix import Matrix8x8
-m = Matrix8x8(4,20,1)
+m = Matrix8x8(8,20,1)
 
 m.clear()
 m.init()
