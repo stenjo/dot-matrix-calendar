@@ -48,7 +48,7 @@ Install version 5.0.4 of the Espressif toolchain.
 Install pipx for python tools:
 
 ```bash
-brew install pipx
+brew install pipx picocom
 ```
 
 For programming and erasing the flash, use esptools.py
