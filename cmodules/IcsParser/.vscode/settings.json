@@ -1,0 +1,24 @@
+{
+    "ceedlingExplorer.debugConfiguration":      "(lldb) Launch",
+    "files.associations": {
+        "ics_parser.h": "c",
+        "max7219.h": "c",
+        "mockspi_master.h": "c",
+        "mpconfigport.h": "c",
+        "mp_dotmatrix.h": "c",
+        "ios": "c",
+        "string": "c",
+        "stdbool.h": "c"
+    },
+    "cSpell.words": [
+        "dotmatrix",
+        "DTEND",
+        "DTSTAMP",
+        "DTSTART",
+        "Imola",
+        "Kvalifisering",
+        "VCALENDAR",
+        "VEVENT"
+    ],
+    "mesonbuild.selectRootDir": false
+}

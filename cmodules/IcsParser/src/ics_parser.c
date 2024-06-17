@@ -1,0 +1,184 @@
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <errno.h>
+#include <time.h>
+
+#include "ics_parser.h"
+#include "ics_event.h"
+#include "ics_utils.h"
+
+
+// Helper function to find the end of the line ('\r\n')
+static char *find_eol(char *s) {
+    if (s == NULL) return NULL;
+    while (*s != '\0' && !(s[0] == '\r' || s[0] == '\n')) {
+        s++;
+    }
+
+    if (*s == '\0') {
+        return NULL;  // Return NULL if we're at the end of the string
+    } else {
+        return s;
+    }
+}
+
+// Helper function to check if a key exists within a line
+int key_exists_within_line(char *line_start, char *line_end, const char *key)
+{
+    size_t key_length = strlen(key);
+    // Ensure the key doesn't overrun the line boundaries
+    if (line_start + key_length >= line_end) return 0;
+    return strncmp(line_start, key, key_length) == 0;
+}
+
+size_t parseFile(ics_t * ics, const char *file_path) {
+    // Allocate a buffer for the file's contents
+    char *buffer = NULL;
+    // initIcs(ics);
+    long length;
+    FILE *f = fopen(file_path, "rb");  // Open file for reading
+
+    if (f) {
+        fseek(f, 0, SEEK_END);
+        length = ftell(f);
+        fseek(f, 0, SEEK_SET);
+        buffer = malloc(length + 1);
+
+        if (buffer) {
+            fread(buffer, 1, length, f);
+            buffer[length] = '\0';  // Null-terminate the buffer
+        }
+        fclose(f);
+
+        if (buffer) {
+            // Parse the ICS data from the buffer
+            parse(ics, buffer);
+            free(buffer);  // Don't forget to free the allocated buffer
+        }
+     } else {
+        // Print an error message if the file could not be opened
+        printf("Error opening file '%s': %d\n", file_path, errno);
+    }
+
+    return ics->count;
+}
+
+bool startsWith(const char *pre, const char *str)
+{
+    size_t lenpre = strlen(pre),
+           lenstr = strlen(str);
+    return lenstr < lenpre ? false : memcmp(pre, str, lenpre) == 0;
+}
+
+
+size_t parse(ics_t *ics, const char *ics_data) {
+    printf("Parsing ICS data\n");
+    size_t new_data_len = strlen(ics_data);
+    size_t buffer_len = ics->buffer ? strlen(ics->buffer) : 0;
+    char *new_buffer = realloc(ics->buffer, buffer_len + new_data_len + 1);
+    if (!new_buffer) {
+        printf("Memory allocation failed\n");
+        return ics->count;
+    }
+    ics->buffer = new_buffer;
+    strcpy(ics->buffer + buffer_len, ics_data);
+
+    const char *next = ics->buffer;
+    event_t event;
+    while (next && (event = getEvent(next, &next)).dtstart != NULL) {
+        struct tm tm_event_start;
+        if (parse_date_string(event.dtstart, &tm_event_start)) {
+            time_t event_time = mktime(&tm_event_start);
+
+            if (
+                (ics->startTime == 0 || difftime(event_time, ics->startTime) >= 0) &&
+                (ics->endTime == 0 || difftime(ics->endTime, event_time) >= 0)
+            ) {
+                if (ics->count >= ics->capacity) {
+                    size_t new_capacity = ics->capacity * 2;
+                    event_t *new_events = realloc(ics->events, new_capacity * sizeof(event_t));
+                    if (new_events) {
+                        ics->events = new_events;
+                        ics->capacity = new_capacity;
+                    } else {
+                        printf("Memory allocation failed\n");
+                        break;
+                    }
+                }
+                ics->events[ics->count] = event;
+                ics->count++;
+            } else {
+                free(event.summary);
+                free(event.dtstart);
+                free(event.dtend);
+            }
+        } else {
+            free(event.summary);
+            free(event.dtstart);
+            free(event.dtend);
+        }
+    }
+
+    if (next && next != ics->buffer) {
+        size_t remaining_len = strlen(next);
+        memmove(ics->buffer, next, remaining_len + 1);
+    }
+
+    printf("Parsed %zu events\n", ics->count);
+    return ics->count;
+}
+
+
+time_t setStartDate(ics_t *ics, const char *start)
+{
+    struct tm tm_event_start;
+    if (parse_date_string(start, &tm_event_start)) {
+        time_t event_time = mktime(&tm_event_start);
+
+        ics->startTime = event_time;
+  
+        return event_time;
+    }
+    printf("setTimeFailed with %s", start);
+    return 0;
+}
+
+time_t setEndDate(ics_t *ics, const char *end)
+{
+    struct tm tm_event_start;
+    if (parse_date_string(end, &tm_event_start)) {
+        time_t event_time = mktime(&tm_event_start);
+
+        ics->endTime = event_time;
+    
+        return event_time;
+    }
+    return 0;
+}
+
+void initIcs(ics_t *ics) {
+    ics->buffer = NULL;
+    ics->events = malloc(10 * sizeof(event_t));
+    ics->count = 0;
+    ics->capacity = 10;
+    ics->startTime = 0;
+    ics->endTime = 0;
+}
+
+void freeIcs(ics_t *ics) {
+    for (size_t i = 0; i < ics->count; i++) {
+        free(ics->events[i].summary);
+        free(ics->events[i].dtstart);
+        free(ics->events[i].dtend);
+    }
+    free(ics->events);
+    free(ics->buffer);
+}
+
+void initIcsDates(ics_t *ics)
+{
+    ics->startTime = 0;
+    ics->endTime = 0;
+}
