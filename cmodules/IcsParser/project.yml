@@ -62,6 +62,10 @@
     - :expect_any_args
     - :array
     - :return_thru_ptr
+  :includes:
+    - ics_parser.h
+    - ics_event.h
+    - ics_utils.h
   :treat_as:
     uint8:    HEX8
     uint16:   HEX16
@@ -101,12 +105,10 @@
     - vendor/ceedling/plugins
   :enabled:
     - stdout_pretty_tests_report
-    - stdout_ide_tests_report
+    # - stdout_ide_tests_report
     - compile_commands_json
     - module_generator
-    - colour_report
-    - raw_output_report
+    # - raw_output_report
     - xml_tests_report
-    - junit_tests_report
     - gcov
 ...

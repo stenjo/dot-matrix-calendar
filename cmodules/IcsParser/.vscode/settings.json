@@ -8,7 +8,8 @@
         "mp_dotmatrix.h": "c",
         "ios": "c",
         "string": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "time.h": "c"
     },
     "cSpell.words": [
         "dotmatrix",
@@ -20,5 +21,8 @@
         "VCALENDAR",
         "VEVENT"
     ],
-    "mesonbuild.selectRootDir": false
+    "mesonbuild.selectRootDir": false,
+    "gcovViewer.buildDirectories": [
+        "/Users/sten.johnsen/git/dot-matrix-calendar/cmodules/IcsParser/build"
+    ]
 }

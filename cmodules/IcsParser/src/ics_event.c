@@ -2,71 +2,106 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "ics_parser.h"
 
-char* extract_property(const char *data, const char *property) {
-    char *property_start = strstr(data, property);
-    if (!property_start) {
-        return NULL;
+
+static char *next = NULL;
+
+void updateBuffer(const char *new_data) {
+    if (next == NULL) {
+        // Allocate initial buffer if next is NULL
+        next = malloc(strlen(new_data) + 1);
+        if (next == NULL) {
+            printf("Memory allocation failed\n");
+            return;
+        }
+        strcpy(next, new_data);
+    } else {
+        // Reallocate buffer if next is not NULL
+        size_t new_data_len = strlen(new_data);
+        size_t buffer_len = strlen(next);
+        char *new_buffer = realloc(next, buffer_len + new_data_len + 1);
+        if (!new_buffer) {
+            printf("Memory allocation failed\n");
+            return;
+        }
+        next = new_buffer;
+        strcat(next, new_data);
     }
-
-    // Move past the property name
-    property_start += strlen(property);
-
-    // Find the end of the property line
-    char *property_end = strstr(property_start, "\r\n");
-    if (!property_end) {
-        return NULL;
-    }
-
-    // Calculate the length of the property value
-    size_t property_length = property_end - property_start;
-
-    // Allocate memory for the property value
-    char *property_value = (char*)malloc(property_length + 1);
-    if (!property_value) {
-        return NULL;
-    }
-
-    // Copy the property value
-    strncpy(property_value, property_start, property_length);
-    property_value[property_length] = '\0';
-
-    return property_value;
 }
 
-event_t getEvent(const char *data, const char **next) {
+void resetGetEvent(void) {
+    free(next);
+    next = NULL;
+}
+
+event_t getEvent(void) {
     event_t event = {NULL, NULL, NULL, 0, 0};
-    const char *vevent_start = strstr(data, "BEGIN:VEVENT");
+
+    if (next == NULL || *next == '\0') {
+        return event;
+    }
+
+    const char *vevent_start = strstr(next, "BEGIN:VEVENT");
     if (!vevent_start) {
-        *next = NULL;
+        free(next);
+        next = NULL;
         return event;
     }
 
     const char *vevent_end = strstr(vevent_start, "END:VEVENT");
     if (!vevent_end) {
-        *next = vevent_start;
         return event;
     }
 
-    event.summary = extract_property(vevent_start, "SUMMARY:");
-    event.dtstart = extract_property(vevent_start, "DTSTART:");
-    event.dtend = extract_property(vevent_start, "DTEND:");
-
-    if (!event.summary || !event.dtstart || !event.dtend) {
-        free(event.summary);
-        free(event.dtstart);
-        free(event.dtend);
-        event.summary = NULL;
-        event.dtstart = NULL;
-        event.dtend = NULL;
+    event.summary = extract_property(vevent_start, "SUMMARY:", vevent_end);
+    event.dtstart = extract_property(vevent_start, "DTSTART;VALUE=DATE:", vevent_end);
+    if (!event.dtstart) {
+        event.dtstart = extract_property(vevent_start, "DTSTART:", vevent_end);
     }
 
-    *next = vevent_end + strlen("END:VEVENT") + 2;
-    if (**next == '\0') {
-        *next = NULL;
+    event.dtend = extract_property(vevent_start, "DTEND;VALUE=DATE:", vevent_end);
+    if (!event.dtend) {
+        event.dtend = extract_property(vevent_start, "DTEND:", vevent_end);
+    }
+
+    size_t offset = (vevent_end - next) + strlen("END:VEVENT") + 2;
+    if (offset >= strlen(next)) {
+        free(next);
+        next = NULL;
+    } else {
+        memmove(next, next + offset, strlen(next) - offset + 1);
     }
 
     return event;
+}
+
+char *extract_property(const char *data, const char *property, const char *end) {
+    char * src = strndup(data, end - data);
+    const char *start = strstr(src, property);
+    if (!start) {
+        return NULL;
+    }
+
+    start += strlen(property);
+
+    // Find the end of the property value (handle both \r\n and \n)
+    const char *terminator = strstr(start, "\r\n");
+    if (!terminator) {
+        terminator = strstr(start, "\n");
+    }
+
+    if (!terminator) {
+        return NULL;
+    }
+
+    size_t len = terminator - start;
+    char *value = malloc(len + 1);
+    if (value) {
+        strncpy(value, start, len);
+        value[len] = '\0';
+    }
+    return value;
 }
 
 event_t getFirstEvent(ics_t *ics)
@@ -156,6 +191,7 @@ int compare_events(const void *a, const void *b)
     }
 }
 
+
 // Function to sort the events in ics->events by their tstart field.
 void sortEventsByStart(ics_t *ics)
 {
@@ -163,9 +199,9 @@ void sortEventsByStart(ics_t *ics)
 }
 
 
-bool atEnd(ics_t *ics)
-{
-    if (ics == NULL || ics->count == 0)
-    { return true; }
-    return ics->current >= (MAX_EVENT_COUNT - 1) || ics->current >= (ics->count - 1);
+bool atEnd(ics_t *ics) {
+    if (ics == NULL || ics->count == 0) {
+        return true;
+    }
+    return ics->current >= (ics->capacity - 1) || ics->current >= (ics->count - 1);
 }

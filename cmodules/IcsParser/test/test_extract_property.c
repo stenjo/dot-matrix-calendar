@@ -15,7 +15,8 @@ void tearDown(void) {
 
 void test_extract_property_normal_case(void) {
     const char *data = "SUMMARY:Meeting with John\r\nDTSTART:20230615T090000\r\n";
-    char *result = extract_property(data, "SUMMARY:");
+    const char *end = data + strlen(data);
+    char *result = extract_property(data, "SUMMARY:", end);
     TEST_ASSERT_NOT_NULL(result);
     TEST_ASSERT_EQUAL_STRING("Meeting with John", result);
     free(result);
@@ -23,13 +24,15 @@ void test_extract_property_normal_case(void) {
 
 void test_extract_property_not_found(void) {
     const char *data = "DTSTART:20230615T090000\r\n";
-    char *result = extract_property(data, "SUMMARY:");
+    const char *end = data + strlen(data);
+    char *result = extract_property(data, "SUMMARY:", end);
     TEST_ASSERT_NULL(result);
 }
 
 void test_extract_property_value_ends_abruptly(void) {
     const char *data = "SUMMARY:Meeting with John\r\nDTSTART:20230615T090000";
-    char *result = extract_property(data, "SUMMARY:");
+    const char *end = data + strlen(data);
+    char *result = extract_property(data, "SUMMARY:", end);
     TEST_ASSERT_NOT_NULL(result);
     TEST_ASSERT_EQUAL_STRING("Meeting with John", result);
     free(result);
@@ -37,7 +40,8 @@ void test_extract_property_value_ends_abruptly(void) {
 
 void test_extract_property_empty_value(void) {
     const char *data = "SUMMARY:\r\nDTSTART:20230615T090000\r\n";
-    char *result = extract_property(data, "SUMMARY:");
+    const char *end = data + strlen(data);
+    char *result = extract_property(data, "SUMMARY:", end);
     TEST_ASSERT_NOT_NULL(result);
     TEST_ASSERT_EQUAL_STRING("", result);
     free(result);
@@ -45,7 +49,8 @@ void test_extract_property_empty_value(void) {
 
 void test_extract_property_multiple_properties(void) {
     const char *data = "SUMMARY:Meeting with John\r\nSUMMARY:Second Meeting\r\n";
-    char *result = extract_property(data, "SUMMARY:");
+    const char *end = data + strlen(data);
+    char *result = extract_property(data, "SUMMARY:", end);
     TEST_ASSERT_NOT_NULL(result);
     TEST_ASSERT_EQUAL_STRING("Meeting with John", result);
     free(result);

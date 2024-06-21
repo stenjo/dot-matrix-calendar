@@ -5,9 +5,9 @@
 #include <errno.h>
 #include <time.h>
 
-#include "ics_parser.h"
-#include "ics_event.h"
 #include "ics_utils.h"
+#include "ics_event.h"
+#include "ics_parser.h"
 
 
 // Helper function to find the end of the line ('\r\n')
@@ -74,28 +74,27 @@ bool startsWith(const char *pre, const char *str)
 
 
 size_t parse(ics_t *ics, const char *ics_data) {
-    printf("Parsing ICS data\n");
-    size_t new_data_len = strlen(ics_data);
-    size_t buffer_len = ics->buffer ? strlen(ics->buffer) : 0;
-    char *new_buffer = realloc(ics->buffer, buffer_len + new_data_len + 1);
-    if (!new_buffer) {
-        printf("Memory allocation failed\n");
-        return ics->count;
-    }
-    ics->buffer = new_buffer;
-    strcpy(ics->buffer + buffer_len, ics_data);
 
-    const char *next = ics->buffer;
+    updateBuffer(ics_data);
+
     event_t event;
-    while (next && (event = getEvent(next, &next)).dtstart != NULL) {
+    while ((event = getEvent()).dtstart != NULL) {
         struct tm tm_event_start;
+        struct tm tm_event_end;
         if (parse_date_string(event.dtstart, &tm_event_start)) {
             time_t event_time = mktime(&tm_event_start);
+            event.tstart = event_time;
+
+            double afterStartFilter = difftime(event_time, ics->startTime);
+            double beforeEndFilter = difftime(ics->endTime, event_time);
 
             if (
-                (ics->startTime == 0 || difftime(event_time, ics->startTime) >= 0) &&
-                (ics->endTime == 0 || difftime(ics->endTime, event_time) >= 0)
+                (ics->startTime == 0 || afterStartFilter >= 0) &&
+                (ics->endTime == 0 || beforeEndFilter >= 0)
             ) {
+                parse_date_string(event.dtstart, &tm_event_start);
+                time_t event_time_end = mktime(&tm_event_end);
+                event.tend = event_time;
                 if (ics->count >= ics->capacity) {
                     size_t new_capacity = ics->capacity * 2;
                     event_t *new_events = realloc(ics->events, new_capacity * sizeof(event_t));
@@ -121,15 +120,9 @@ size_t parse(ics_t *ics, const char *ics_data) {
         }
     }
 
-    if (next && next != ics->buffer) {
-        size_t remaining_len = strlen(next);
-        memmove(ics->buffer, next, remaining_len + 1);
-    }
-
-    printf("Parsed %zu events\n", ics->count);
+    // printf("Parsed %zu events\n", ics->count);
     return ics->count;
 }
-
 
 time_t setStartDate(ics_t *ics, const char *start)
 {
