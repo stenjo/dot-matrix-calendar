@@ -205,3 +205,10 @@ bool atEnd(ics_t *ics) {
     }
     return ics->current >= (ics->capacity - 1) || ics->current >= (ics->count - 1);
 }
+
+void freeEvent(event_t event) {
+    free(event.summary);
+    free(event.dtstart);
+    free(event.dtend);
+}
+

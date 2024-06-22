@@ -24,15 +24,6 @@ static char *find_eol(char *s) {
     }
 }
 
-// Helper function to check if a key exists within a line
-int key_exists_within_line(char *line_start, char *line_end, const char *key)
-{
-    size_t key_length = strlen(key);
-    // Ensure the key doesn't overrun the line boundaries
-    if (line_start + key_length >= line_end) return 0;
-    return strncmp(line_start, key, key_length) == 0;
-}
-
 size_t parseFile(ics_t * ics, const char *file_path) {
     // Allocate a buffer for the file's contents
     char *buffer = NULL;
@@ -63,13 +54,6 @@ size_t parseFile(ics_t * ics, const char *file_path) {
     }
 
     return ics->count;
-}
-
-bool startsWith(const char *pre, const char *str)
-{
-    size_t lenpre = strlen(pre),
-           lenstr = strlen(str);
-    return lenstr < lenpre ? false : memcmp(pre, str, lenpre) == 0;
 }
 
 
@@ -109,14 +93,10 @@ size_t parse(ics_t *ics, const char *ics_data) {
                 ics->events[ics->count] = event;
                 ics->count++;
             } else {
-                free(event.summary);
-                free(event.dtstart);
-                free(event.dtend);
+                freeEvent(event);
             }
         } else {
-            free(event.summary);
-            free(event.dtstart);
-            free(event.dtend);
+            freeEvent(event);
         }
     }
 
@@ -162,9 +142,7 @@ void initIcs(ics_t *ics) {
 
 void freeIcs(ics_t *ics) {
     for (size_t i = 0; i < ics->count; i++) {
-        free(ics->events[i].summary);
-        free(ics->events[i].dtstart);
-        free(ics->events[i].dtend);
+        freeEvent(ics->events[i]);
     }
     free(ics->events);
     free(ics->buffer);

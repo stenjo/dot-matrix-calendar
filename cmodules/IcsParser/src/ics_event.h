@@ -18,4 +18,6 @@ event_t getEventAt(ics_t *ics, size_t index);
 event_t getNextEventInRange(ics_t *ics, const char *start_date_str, const char *end_date_str);
 void sortEventsByStart(ics_t *ics);
 bool atEnd(ics_t *ics);
+void freeEvent(event_t event);
+
 #endif // ICS_EVENT_H
