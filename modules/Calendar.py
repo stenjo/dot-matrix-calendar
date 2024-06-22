@@ -1,5 +1,5 @@
 from ics_parser import ICS
-import urequests
+import mrequests
 
 def dtStrToIso(dtstart):
     # Assuming the format of dtstart is '20230412T165722Z'
@@ -79,7 +79,7 @@ class Calendar(ICS):
         return self._parse(url)
 
     def _parse(self, url):
-        response = urequests.get(url)
+        response = mrequests.get(url)
         if response.status_code == 200:
             # Successfully fetched the calendar data, now parse it.
             count = self.parse(response.text)
