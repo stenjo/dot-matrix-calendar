@@ -16,8 +16,6 @@ def dtStrToIso(dtstart):
     else:
         return date_iso
 
-
-
 def toDtStr(date_input):
     if date_input is None:
         return None
@@ -51,8 +49,19 @@ def toDict(event_tuple):
             "summary": event_tuple[0]
         }
 
+
+class ResponseWithProgress(mrequests.Response):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._total_read = 0
+
+    def readinto(self, buf, size=0):
+        bytes_read = super().readinto(buf, size)
+        self._total_read += bytes_read
+        print("Progress: {:.2f}%".format(self._total_read / (self._content_size * 0.01)))
+        return bytes_read
+
 class Calendar(ICS):
-    
     def __init__(self, filename=None, start=None, end=None):
         super().__init__()
         self.reset()
@@ -76,7 +85,7 @@ class Calendar(ICS):
         url = url.replace('webcal://', 'http://')
         if url not in self.sources:
             self.sources.append(url)
-        return self._parse(url)
+        return self._parseChunks(url)
 
     def _parse(self, url):
         response = mrequests.get(url)
@@ -120,6 +129,21 @@ class Calendar(ICS):
             raise Exception(f"Failed to fetch calendar data in chunks, status code: {response.status_code}")
 
         
+
+    def _parseChunks(self, url, chunkSize=1024):
+        response = mrequests.get(url, stream=True, response_class=ResponseWithProgress)
+        if response.status_code == 200:
+            count = 0
+            while True:
+                chunk = response.read(chunkSize)
+                if not chunk:
+                    break
+                count += self.parse(chunk.decode('utf-8'))
+            response.close()
+            return count
+        else:
+            response.close()
+            raise Exception(f"Failed to fetch calendar data in chunks, status code: {response.status_code}")
 
     def refresh(self, start_date=None, end_date=None):
         self.reset()
