@@ -88,6 +88,38 @@ class Calendar(ICS):
         else:
             response.close()
             raise Exception(f"Failed to fetch calendar data, status code: {response.status_code}")
+        
+    def _parseChunks(self, url, chunkSize):
+        response = mrequests.get(url, stream=True)
+        if response.status_code == 200:
+            buffer = ""
+            count = 0
+            for chunk in response.iter_content(chunk_size=chunkSize):
+                if chunk:
+                    buffer += chunk.decode('utf-8')
+                    # Find the last complete line in the buffer
+                    last_complete_line_pos = buffer.rfind('\n')
+                    if last_complete_line_pos != -1:
+                        # Split buffer into complete and incomplete parts
+                        complete_part = buffer[:last_complete_line_pos + 1]
+                        buffer = buffer[last_complete_line_pos + 1:]
+
+                        # Parse the complete part and add to count
+                        count += self.parse(complete_part)
+                        # Discard the complete part to save memory
+                        complete_part = ""
+
+            # Parse any remaining data in the buffer
+            if buffer:
+                count += self.parse(buffer)
+
+            response.close()
+            return count
+        else:
+            response.close()
+            raise Exception(f"Failed to fetch calendar data in chunks, status code: {response.status_code}")
+
+        
 
     def refresh(self, start_date=None, end_date=None):
         self.reset()

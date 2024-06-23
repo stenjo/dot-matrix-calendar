@@ -11,18 +11,18 @@
 
 
 // Helper function to find the end of the line ('\r\n')
-static char *find_eol(char *s) {
-    if (s == NULL) return NULL;
-    while (*s != '\0' && !(s[0] == '\r' || s[0] == '\n')) {
-        s++;
-    }
+// static char *find_eol(char *s) {
+//     if (s == NULL) return NULL;
+//     while (*s != '\0' && !(s[0] == '\r' || s[0] == '\n')) {
+//         s++;
+//     }
 
-    if (*s == '\0') {
-        return NULL;  // Return NULL if we're at the end of the string
-    } else {
-        return s;
-    }
-}
+//     if (*s == '\0') {
+//         return NULL;  // Return NULL if we're at the end of the string
+//     } else {
+//         return s;
+//     }
+// }
 
 size_t parseFile(ics_t * ics, const char *file_path) {
     // Allocate a buffer for the file's contents
@@ -64,7 +64,7 @@ size_t parse(ics_t *ics, const char *ics_data) {
     event_t event;
     while ((event = getEvent()).dtstart != NULL) {
         struct tm tm_event_start;
-        struct tm tm_event_end;
+        // struct tm tm_event_end;
         if (parse_date_string(event.dtstart, &tm_event_start)) {
             time_t event_time = mktime(&tm_event_start);
             event.tstart = event_time;
@@ -77,8 +77,8 @@ size_t parse(ics_t *ics, const char *ics_data) {
                 (ics->endTime == 0 || beforeEndFilter >= 0)
             ) {
                 parse_date_string(event.dtstart, &tm_event_start);
-                time_t event_time_end = mktime(&tm_event_end);
-                event.tend = event_time;
+                // time_t event_time_end = mktime(&tm_event_end);
+                // event.tend = event_time;
                 if (ics->count >= ics->capacity) {
                     size_t new_capacity = ics->capacity * 2;
                     event_t *new_events = realloc(ics->events, new_capacity * sizeof(event_t));
