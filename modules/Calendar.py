@@ -16,8 +16,6 @@ def dtStrToIso(dtstart):
     else:
         return date_iso
 
-
-
 def toDtStr(date_input):
     if date_input is None:
         return None
@@ -87,10 +85,10 @@ class Calendar(ICS):
         url = url.replace('webcal://', 'http://')
         if url not in self.sources:
             self.sources.append(url)
-        return self._parse(url)
+        return self._parseChunks(url)
 
     def _parse(self, url):
-        response = urequests.get(url)
+        response = mrequests.get(url)
         if response.status_code == 200:
             # Successfully fetched the calendar data, now parse it.
             count = self.parse(response.text)
