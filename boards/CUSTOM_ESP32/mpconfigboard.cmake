@@ -9,7 +9,7 @@ set(SDKCONFIG_DEFAULTS
 
 # Set the user C modules to include in the build.
 set(USER_C_MODULES
-    ${PROJECT_DIR}/cmodules/ics/micropython.cmake
+    ${PROJECT_DIR}/cmodules/IcsParser/micropython.cmake
     ${PROJECT_DIR}/cmodules/DotMatrix/micropython.cmake
 )
 
