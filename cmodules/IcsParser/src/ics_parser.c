@@ -45,7 +45,7 @@ size_t parseFile(ics_t * ics, const char *file_path) {
 
         if (buffer) {
             // Parse the ICS data from the buffer
-            parse(ics, buffer);
+            parseIcs(ics, buffer);
             free(buffer);  // Don't forget to free the allocated buffer
         }
      } else {
@@ -57,7 +57,7 @@ size_t parseFile(ics_t * ics, const char *file_path) {
 }
 
 
-size_t parse(ics_t *ics, const char *ics_data) {
+size_t parseIcs(ics_t *ics, const char *ics_data) {
 
     updateBuffer(ics_data);
 

@@ -13,7 +13,7 @@ typedef struct {
     ics_t ics;
 } ics_obj_t;
 
-mp_obj_t getEventObj(event_t event) {
+STATIC mp_obj_t getEventObj(event_t event) {
     mp_obj_t result;
 
     if (event.summary != NULL && event.dtstart != NULL) {
@@ -51,7 +51,7 @@ STATIC mp_obj_t parse_ics(mp_obj_t self_in, mp_obj_t ics_str_obj) {
     mp_check_self(mp_obj_is_str_or_bytes(ics_str_obj));
     GET_STR_DATA_LEN(ics_str_obj, ics_str, ics_str_len);
     
-    size_t count = parse(&self->ics, (const char *)ics_str);
+    size_t count = parseIcs(&self->ics, (const char *)ics_str);
     sortEventsByStart(&(self->ics));
     mp_obj_t result = mp_obj_new_int(count);
     
@@ -180,8 +180,8 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_1(reset_obj, mp_reset);
 
 STATIC const mp_rom_map_elem_t ics_parser_locals_dict_table[] = {
 
-    { MP_ROM_QSTR(MP_QSTR_parse), MP_ROM_PTR(&parse_ics_obj) },
-    { MP_ROM_QSTR(MP_QSTR_parse_file), MP_ROM_PTR(&parse_ics_file_obj) },
+    { MP_ROM_QSTR(MP_QSTR_parseIcs), MP_ROM_PTR(&parse_ics_obj) },
+    { MP_ROM_QSTR(MP_QSTR_parse_ics_file), MP_ROM_PTR(&parse_ics_file_obj) },
     { MP_ROM_QSTR(MP_QSTR_getFirst), MP_ROM_PTR(&getFirst_obj) },
     { MP_ROM_QSTR(MP_QSTR_getNext), MP_ROM_PTR(&getNext_obj) },
     { MP_ROM_QSTR(MP_QSTR_getCount), MP_ROM_PTR(&getCount_obj) },
@@ -203,9 +203,9 @@ MP_DEFINE_CONST_OBJ_TYPE(
     locals_dict, &ics_parser_locals_dict
 );
 
-STATIC const mp_map_elem_t ics_parser_module_globals_table[] = {
+STATIC const mp_rom_map_elem_t ics_parser_module_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_ics_parser) },
-    { MP_ROM_QSTR(MP_QSTR_ICS),    MP_ROM_PTR(&ics_parser_type_ICS) },
+    { MP_ROM_QSTR(MP_QSTR_ICS),     MP_ROM_PTR(&ics_parser_type_ICS) }
 };
 
 STATIC MP_DEFINE_CONST_DICT(ics_parser_module_globals, ics_parser_module_globals_table);

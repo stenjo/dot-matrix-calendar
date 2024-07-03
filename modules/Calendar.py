@@ -76,62 +76,35 @@ class Calendar(ICS):
             self.parseFile(filename)
     
     def parseFile(self, filename):
-        f=open(filename)
-        count = self.parse(f.read())
-        f.close()
+        print(f"Parsing file: {filename}")
+        with open(filename) as f:
+            count = self.parse(f.read())
+        print(f"Parsed {count} items from file")
         return count
 
     def parseURL(self, url):
+        print(f"Parsing URL: {url}")
         url = url.replace('webcal://', 'http://')
         if url not in self.sources:
             self.sources.append(url)
-        return self._parseChunks(url)
+        return self._parse(url)
 
     def _parse(self, url):
+        print(f"Fetching URL: {url}")
         response = mrequests.get(url)
         if response.status_code == 200:
-            # Successfully fetched the calendar data, now parse it.
-            count = self.parse(response.text)
+            print("Fetched calendar data successfully")
+            count = self.parseIcs(response.text)
             response.close()
+            print(f"Parsed {count} items from URL")
             return count
         else:
             response.close()
             raise Exception(f"Failed to fetch calendar data, status code: {response.status_code}")
         
-    def _parseChunks(self, url, chunkSize):
-        response = mrequests.get(url, stream=True)
-        if response.status_code == 200:
-            buffer = ""
-            count = 0
-            for chunk in response.iter_content(chunk_size=chunkSize):
-                if chunk:
-                    buffer += chunk.decode('utf-8')
-                    # Find the last complete line in the buffer
-                    last_complete_line_pos = buffer.rfind('\n')
-                    if last_complete_line_pos != -1:
-                        # Split buffer into complete and incomplete parts
-                        complete_part = buffer[:last_complete_line_pos + 1]
-                        buffer = buffer[last_complete_line_pos + 1:]
-
-                        # Parse the complete part and add to count
-                        count += self.parse(complete_part)
-                        # Discard the complete part to save memory
-                        complete_part = ""
-
-            # Parse any remaining data in the buffer
-            if buffer:
-                count += self.parse(buffer)
-
-            response.close()
-            return count
-        else:
-            response.close()
-            raise Exception(f"Failed to fetch calendar data in chunks, status code: {response.status_code}")
-
-        
-
     def _parseChunks(self, url, chunkSize=1024):
-        response = mrequests.get(url, stream=True, response_class=ResponseWithProgress)
+        print(f"Fetching URL in chunks: {url}")
+        response = mrequests.get(url, headers={b"accept": b"text/html"}, response_class=ResponseWithProgress)
         if response.status_code == 200:
             count = 0
             while True:
@@ -140,12 +113,14 @@ class Calendar(ICS):
                     break
                 count += self.parse(chunk.decode('utf-8'))
             response.close()
+            print(f"Parsed {count} items from URL in chunks")
             return count
         else:
             response.close()
             raise Exception(f"Failed to fetch calendar data in chunks, status code: {response.status_code}")
 
     def refresh(self, start_date=None, end_date=None):
+        print("Refreshing calendar")
         self.reset()
         items = 0
         if start_date is not None:
@@ -153,13 +128,13 @@ class Calendar(ICS):
             
         if end_date is not None:
             self.end(end_date)
-            
 
         for url in self.sources:
             try:
                 items += self._parse(url)
-            except:
-                print("Error parsing url: {}".format(url))
+            except Exception as e:
+                print(f"Error parsing url: {url}, {e}")
+        print(f"Refreshed {items} items")
         return items
     
     def first(self):
@@ -173,4 +148,3 @@ class Calendar(ICS):
         
     def end(self, endDate):
         self.setEndDate(toDtStr(endDate))
-        

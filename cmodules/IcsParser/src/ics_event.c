@@ -108,7 +108,7 @@ event_t getFirstEvent(ics_t *ics)
 {
     if (ics == NULL || ics->count == 0) {
 
-        return (event_t){NULL, NULL}; 
+        return (event_t){NULL, NULL, NULL,0,0}; 
     }
 
     ics->current = 0;
@@ -121,7 +121,7 @@ event_t getNextEvent(ics_t *ics)
 {
     if (atEnd(ics))
     {
-        return (event_t){NULL, NULL}; 
+        return (event_t){NULL, NULL, NULL,0,0}; 
     }
 
     ics->current++;
@@ -131,7 +131,7 @@ event_t getNextEvent(ics_t *ics)
 event_t getLastEvent(ics_t *ics)
 {
     if (ics == NULL || ics->count == 0) {
-        return (event_t){NULL, NULL}; 
+        return (event_t){NULL, NULL, NULL,0,0}; 
     }
     ics->current = ics->count - 1;
     return getCurrentEvent(ics);
@@ -140,12 +140,12 @@ event_t getLastEvent(ics_t *ics)
 event_t getCurrentEvent(ics_t *ics)
 {
     if (ics == NULL || ics->count == 0) {
-        return (event_t){NULL, NULL}; 
+        return (event_t){NULL, NULL, NULL,0,0}; 
     }
     return ics->events[ics->current];
 }
 
-size_t setCurrentEvent(ics_t *ics, size_t index)
+int setCurrentEvent(ics_t *ics, size_t index)
 {
     if (ics == NULL || ics->count == 0 || index >= MAX_EVENT_COUNT || index >= ics->count) {
         printf("Error index outside boundaries: index: %zu, max: %d\n", index, MAX_EVENT_COUNT);
@@ -158,13 +158,13 @@ size_t setCurrentEvent(ics_t *ics, size_t index)
 event_t getEventAt(ics_t *ics, size_t index) 
 {
     if (ics == NULL || ics->count == 0) {
-        return (event_t){NULL, NULL}; 
+        return (event_t){NULL, NULL, NULL,0,0}; 
     }
     size_t saved_index = ics->current;
 
-    size_t current = setCurrentEvent(ics, index);
+    int current = setCurrentEvent(ics, index);
     if (current == -1) {
-        return (event_t){NULL, NULL};
+        return (event_t){NULL, NULL, NULL,0,0};
     }
 
     event_t event = getCurrentEvent(ics);

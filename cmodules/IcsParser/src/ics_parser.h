@@ -5,7 +5,7 @@
 #include "ics.h"
 
 size_t parseFile(ics_t * ics, const char *file_path);
-size_t parse(ics_t * ics, const char *ics_data);
+size_t parseIcs(ics_t * ics, const char *ics_data);
 
 time_t setStartDate(ics_t *ics, const char *start);
 time_t setEndDate(ics_t *ics, const char *end);
