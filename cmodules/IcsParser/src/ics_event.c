@@ -175,7 +175,7 @@ event_t getEventAt(ics_t *ics, size_t index)
 }
 
 // Comparison function for qsort
-int compare_events(const void *a, const void *b)
+static int compare_events(const void *a, const void *b)
 {
     const event_t *event_a = (const event_t *)a;
     const event_t *event_b = (const event_t *)b;

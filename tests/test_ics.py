@@ -25,16 +25,24 @@ class TestCalendar(unittest.TestCase):
     def test_parseFile(self):
         calendar = Calendar()
         # Assuming you have a sample .ics file for testing purposes
-        count = calendar.parseFile('../../test/test-hendelse.ics')
-        self.assertGreater(count, 0)
+        count = calendar.parseFile('/Users/sten.johnsen/git/dot-matrix-calendar/tests/test-hendelse.ics')
+        self.assertEqual(count, 1)
 
     def test_parseURL(self):
         calendar = Calendar()
-        url = 'webcal://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics'
+        url = 'http://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics'
         # Mock the mrequests.get to return a dummy response
         calendar._parse = lambda url: 1
         count = calendar.parseURL(url)
         self.assertEqual(count, 1)
+        self.assertIn(url, calendar.sources)
+
+    def test_parseURL_chunks(self):
+        calendar = Calendar()
+        url = 'http://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics'
+        # Mock the mrequests.get to return a dummy response
+        count = calendar.parseURL(url)
+        self.assertEqual(count, 56)
         self.assertIn(url, calendar.sources)
 
     def test_refresh(self):
@@ -59,12 +67,12 @@ class TestCalendar(unittest.TestCase):
 
     def test_start(self):
         calendar = Calendar()
-        calendar.setStartDate = lambda x: self.assertEqual(x, '20230412T000000Z')
+        calendar.setStartDate = lambda x: self.assertEqual(x, '20230412')
         calendar.start('20230412')
 
     def test_end(self):
         calendar = Calendar()
-        calendar.setEndDate = lambda x: self.assertEqual(x, '20230412T000000Z')
+        calendar.setEndDate = lambda x: self.assertEqual(x, '20230412')
         calendar.end('20230412')
 
 if __name__ == "__main__":

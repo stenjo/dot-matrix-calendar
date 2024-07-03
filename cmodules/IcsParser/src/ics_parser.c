@@ -144,7 +144,7 @@ void freeIcs(ics_t *ics) {
     for (size_t i = 0; i < ics->count; i++) {
         freeEvent(ics->events[i]);
     }
-    free(ics->events);
+    // free(ics->events);
     free(ics->buffer);
 }
 

@@ -1,5 +1,5 @@
 from ics_parser import ICS
-import mrequests
+import mrequests, re
 
 def dtStrToIso(dtstart):
     # Assuming the format of dtstart is '20230412T165722Z'
@@ -22,23 +22,24 @@ def toDtStr(date_input):
     
     if isinstance(date_input, str):
         # Assume the string is already in the correct format.
-        return date_input
+        pattern = re.compile("^([A-Z0-9]+)+$")        
+        if pattern.match(date_input):
+            return date_input
     
-    elif isinstance(date_input, tuple) and len(date_input) >= 6:
+    if isinstance(date_input, tuple) and len(date_input) >= 6:
         # Format the time tuple to the datetime string.
         return "{:04d}{:02d}{:02d}T{:02d}{:02d}{:02d}Z".format(
             date_input[0], date_input[1], date_input[2],
             date_input[3], date_input[4], date_input[5]) 
    
-    else:
-        raise ValueError("Invalid date input type. Must be datetime string or time tuple.")
+    raise ValueError("Invalid date input type. Must be datetime string or time tuple.")
 
 def toDict(event_tuple):
     if not event_tuple:
         return None
     
     dt = dtStrToIso(event_tuple[1])
-    if len(dt) > 8:
+    if len(dt) > 10:
         return {
             "start": {"dateTime": dt},
             "summary": event_tuple[0]
@@ -78,7 +79,7 @@ class Calendar(ICS):
     def parseFile(self, filename):
         print(f"Parsing file: {filename}")
         with open(filename) as f:
-            count = self.parse(f.read())
+            count = self.parseIcs(f.read())
         print(f"Parsed {count} items from file")
         return count
 
@@ -122,6 +123,7 @@ class Calendar(ICS):
     def refresh(self, start_date=None, end_date=None):
         print("Refreshing calendar")
         self.reset()
+        print("reset")
         items = 0
         if start_date is not None:
             self.start(start_date)

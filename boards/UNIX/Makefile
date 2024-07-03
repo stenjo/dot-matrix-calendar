@@ -5,6 +5,7 @@
 
 # The board name.
 BOARD ?= UNIX
+VARIANT ?= "coverage"
 
 # Location of MicroPython repository.
 MICROPY_TOP ?= $(abspath ../../lib/micropython)
@@ -34,6 +35,7 @@ firmware:
 		BUILD=$(BUILD) \
 		FROZEN_MANIFEST=$(FROZEN_MANIFEST) \
 		USER_C_MODULES=$(USER_C_MODULES) \
+		VARIANT=$(VARIANT) \
 
 deploy:
 	$(PYTHON) $(MICROPY_TOP)/tools/pydfu.py -u $(BUILD)/firmware.dfu
