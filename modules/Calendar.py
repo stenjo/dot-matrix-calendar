@@ -22,7 +22,7 @@ def toDtStr(date_input):
     
     if isinstance(date_input, str):
         # Assume the string is already in the correct format.
-        pattern = re.compile("^([A-Z0-9]+)+$")        
+        pattern = re.compile("^([0-9]+T*[0-9]*)Z*$")        
         if pattern.match(date_input):
             return date_input
     
@@ -35,6 +35,7 @@ def toDtStr(date_input):
     raise ValueError("Invalid date input type. Must be datetime string or time tuple.")
 
 def toDict(event_tuple):
+    print(event_tuple)
     if not event_tuple:
         return None
     
@@ -88,7 +89,7 @@ class Calendar(ICS):
         url = url.replace('webcal://', 'http://')
         if url not in self.sources:
             self.sources.append(url)
-        return self._parse(url)
+        return self._parseChunks(url)
 
     def _parse(self, url):
         print(f"Fetching URL: {url}")
@@ -112,7 +113,7 @@ class Calendar(ICS):
                 chunk = response.read(chunkSize)
                 if not chunk:
                     break
-                count += self.parse(chunk.decode('utf-8'))
+                count = self.parseIcs(chunk.decode('utf-8'))
             response.close()
             print(f"Parsed {count} items from URL in chunks")
             return count

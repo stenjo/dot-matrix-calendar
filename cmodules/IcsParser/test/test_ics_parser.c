@@ -76,7 +76,7 @@ void test_parse_ShouldReturnEventList(void) {
     ics_t ics;
     initIcs(&ics);
     initIcsDates(&ics);
-    parse(&ics, ics_data);
+    parseIcs(&ics, ics_data);
     TEST_ASSERT_EQUAL_STRING("Meeting with John", ics.events[0].summary);
     TEST_ASSERT_EQUAL_STRING("20230412T160000Z", ics.events[0].dtstart);
     TEST_ASSERT_EQUAL(1, ics.count);
@@ -87,7 +87,7 @@ void test_parse_ShouldReturnEventListIterationOneEvent(void) {
     ics_t ics;
     initIcs(&ics);
     initIcsDates(&ics);
-    size_t count = parse(&ics, ics_data);
+    size_t count = parseIcs(&ics, ics_data);
     event_t event = getFirstEvent(&ics);
     TEST_ASSERT_EQUAL(1, count);
 
@@ -101,7 +101,7 @@ void test_parse_ShouldReturnEventListIterationThreeEvents(void) {
     ics_t ics;
     initIcs(&ics);
     initIcsDates(&ics);
-    size_t count = parse(&ics, ics_data3);
+    size_t count = parseIcs(&ics, ics_data3);
     event_t event = getFirstEvent(&ics);
 
     TEST_ASSERT_EQUAL(3, count);
@@ -129,7 +129,7 @@ void test_setCurrentEvent_verifyIndexWithinBounds(void) {
     ics_t ics;
     initIcs(&ics);
     initIcsDates(&ics);
-    size_t count = parse(&ics, ics_data3);
+    size_t count = parseIcs(&ics, ics_data3);
 
     TEST_ASSERT_EQUAL(3, count);
 
@@ -153,7 +153,7 @@ void test_getEventAt_verifyGettingEventAtGivenIndex(void) {
     ics_t ics;
     initIcs(&ics);
     initIcsDates(&ics);
-    size_t count = parse(&ics, ics_data3);
+    size_t count = parseIcs(&ics, ics_data3);
 
     TEST_ASSERT_EQUAL(3, count);
 
@@ -304,10 +304,15 @@ void test_withLargeCalendar(void) {
 
     int count = parseFile(&ics, "test/basic.ics");
     event_t event = getFirstEvent(&ics);
-    TEST_ASSERT_EQUAL(10, count);
 
     TEST_ASSERT_EQUAL_STRING("Service på bilen", event.summary);
     TEST_ASSERT_EQUAL_STRING("20240418T053000Z", event.dtstart);
+    while (!atEnd(&ics))  {
+        event = getNextEvent(&ics);
+        TEST_ASSERT_NOT_NULL(event.summary);
+        TEST_ASSERT_NOT_NULL(event.dtstart);
+    }
+    TEST_ASSERT_EQUAL(10, count);
     freeIcs(&ics);
 }
 
@@ -344,12 +349,44 @@ void test_withMultipleCalendars(void) {
     TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event.summary);
     TEST_ASSERT_EQUAL_STRING("20240517T090500Z", event.dtstart);
 
-    count = parseFile(&ics, "test/basic.ics");
+     count = parseFile(&ics, "test/basic.ics");
     sortEventsByStart(&ics);
 
     event = getFirstEvent(&ics);
     TEST_ASSERT_EQUAL_STRING("Rød curry med torsk", event.summary);
     TEST_ASSERT_EQUAL_STRING("20240416", event.dtstart);
+
+
+    freeIcs(&ics);
+}
+void test_withGoogleCalendars(void) {
+    ics_t ics;
+    initIcs(&ics);
+    initIcsDates(&ics);
+
+    // const char startDate[] = "20240401T000000Z";
+    // const char endDate[] = "20241201T000000Z";
+
+    // time_t start = setStartDate(&ics, startDate);
+    // TEST_ASSERT_EQUAL(1711922400, start);
+    // time_t end = setEndDate(&ics, endDate);
+    // TEST_ASSERT_EQUAL(1733007600, end);
+
+
+    int count = parseFile(&ics, "test/moon.ics");
+    TEST_ASSERT_EQUAL(148, count);
+
+    event_t event = getFirstEvent(&ics);
+    TEST_ASSERT_EQUAL_STRING("Full moon 11:08pm", event.summary);
+    TEST_ASSERT_EQUAL_STRING("20230106", event.dtstart);
+
+    sortEventsByStart(&ics);
+
+    event = getFirstEvent(&ics);
+    TEST_ASSERT_EQUAL_STRING("Full moon 11:08pm", event.summary);
+    TEST_ASSERT_EQUAL_STRING("20230106", event.dtstart);
+
+
     freeIcs(&ics);
 }
 
@@ -383,9 +420,9 @@ void test_parse_with_chunks(void) {
     const char *chunk3 = "SUMMARY:Event 2\r\nDTSTART:20230616T090000\r\nDTEND:20230616T100000\r\nEND:VEVENT\r\n";
 
     // Call the parse function with each chunk of data
-    parse(&ics, chunk1);
-    parse(&ics, chunk2);
-    parse(&ics, chunk3);
+    parseIcs(&ics, chunk1);
+    parseIcs(&ics, chunk2);
+    parseIcs(&ics, chunk3);
 
     // Verify that the events were parsed correctly
     TEST_ASSERT_EQUAL(2, ics.count);
@@ -413,7 +450,7 @@ void test_parse_single_event(void) {
     initIcs(&ics);
 
     const char *data = "BEGIN:VEVENT\r\nSUMMARY:Meeting with John\r\nDTSTART:20230615T090000\r\nDTEND:20230615T100000\r\nEND:VEVENT\r\n";
-    size_t count = parse(&ics, data);
+    size_t count = parseIcs(&ics, data);
 
     TEST_ASSERT_EQUAL(1, count);
     TEST_ASSERT_EQUAL_STRING("Meeting with John", ics.events[0].summary);
@@ -428,7 +465,7 @@ void test_parse_multiple_events(void) {
     initIcs(&ics);
 
     const char *data = "BEGIN:VEVENT\r\nSUMMARY:Event 1\r\nDTSTART:20230615T090000\r\nDTEND:20230615T100000\r\nEND:VEVENT\r\nBEGIN:VEVENT\r\nSUMMARY:Event 2\r\nDTSTART:20230616T090000\r\nDTEND:20230616T100000\r\nEND:VEVENT\r\n";
-    size_t count = parse(&ics, data);
+    size_t count = parseIcs(&ics, data);
 
     TEST_ASSERT_EQUAL(2, count);
     TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0].summary);
@@ -446,7 +483,7 @@ void test_parse_no_events(void) {
     initIcs(&ics);
 
     const char *data = "VERSION:2.0\r\nPRODID:-//XYZ Corp//NONSGML PDA Calendar Version 1.0//EN\r\n";
-    size_t count = parse(&ics, data);
+    size_t count = parseIcs(&ics, data);
 
     TEST_ASSERT_EQUAL(0, count);
     freeIcs(&ics);
@@ -457,7 +494,7 @@ void test_parse_incomplete_event(void) {
     initIcs(&ics);
 
     const char *data = "BEGIN:VEVENT\r\nSUMMARY:Meeting with John\r\nDTSTART:20230615T090000\r\n";
-    size_t count = parse(&ics, data);
+    size_t count = parseIcs(&ics, data);
 
     TEST_ASSERT_EQUAL(0, count);
     freeIcs(&ics);
@@ -468,7 +505,7 @@ void test_parse_all_day_event(void) {
     initIcs(&ics);
 
     const char *data = "BEGIN:VEVENT\r\nSUMMARY:Holiday\r\nDTSTART;VALUE=DATE:20230615\r\nDTEND;VALUE=DATE:20230616\r\nEND:VEVENT\r\n";
-    size_t count = parse(&ics, data);
+    size_t count = parseIcs(&ics, data);
 
     TEST_ASSERT_EQUAL(1, count);
     TEST_ASSERT_EQUAL_STRING("Holiday", ics.events[0].summary);
@@ -483,7 +520,7 @@ void test_parse_mixed_events(void) {
     initIcs(&ics);
 
     const char *data = "BEGIN:VEVENT\r\nSUMMARY:Event 1\r\nDTSTART:20230615T090000\r\nDTEND:20230615T100000\r\nEND:VEVENT\r\nBEGIN:VEVENT\r\nSUMMARY:Holiday\r\nDTSTART;VALUE=DATE:20230615\r\nDTEND;VALUE=DATE:20230616\r\nEND:VEVENT\r\n";
-    size_t count = parse(&ics, data);
+    size_t count = parseIcs(&ics, data);
 
     TEST_ASSERT_EQUAL(2, count);
     TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0].summary);
@@ -504,7 +541,7 @@ void test_parse_large_event_data(void) {
     memset(data, 'A', 1024 * 1024 - 1);
     data[1024 * 1024 - 1] = '\0';
 
-    size_t count = parse(&ics, data);
+    size_t count = parseIcs(&ics, data);
     TEST_ASSERT_EQUAL(0, count);
 
     free(data);
@@ -522,7 +559,7 @@ void test_parse_with_start_and_end_dates(void) {
     ics.endTime = setEndDate(&ics, endDate);
 
     const char *data = "BEGIN:VEVENT\r\nSUMMARY:Event 1\r\nDTSTART:20230615T090000Z\r\nDTEND:20230615T100000Z\r\nEND:VEVENT\r\nBEGIN:VEVENT\r\nSUMMARY:Event 2\r\nDTSTART:20230617T090000Z\r\nDTEND:20230617T100000Z\r\nEND:VEVENT\r\n";
-    size_t count = parse(&ics, data);
+    size_t count = parseIcs(&ics, data);
 
     TEST_ASSERT_EQUAL(1, count);
     TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0].summary);
@@ -541,9 +578,9 @@ void test_parse_with_chunks2(void) {
     const char *chunk2 = "20230615T090000Z\r\nDTEND:20230615T100000Z\r\nEND:VEVENT\r\nBEGIN:VEVENT\r\n";
     const char *chunk3 = "SUMMARY:Event 2\r\nDTSTART:20230616T090000Z\r\nDTEND:20230616T100000Z\r\nEND:VEVENT\r\n";
 
-    parse(&ics, chunk1);
-    parse(&ics, chunk2);
-    parse(&ics, chunk3);
+    parseIcs(&ics, chunk1);
+    parseIcs(&ics, chunk2);
+    parseIcs(&ics, chunk3);
 
     TEST_ASSERT_EQUAL(2, ics.count);
     TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0].summary);

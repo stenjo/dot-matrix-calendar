@@ -1,5 +1,6 @@
-import unittest
+import unittest, time
 from Calendar import Calendar, dtStrToIso, toDtStr, toDict
+from dateHandling import dayText
 
 class TestCalendar(unittest.TestCase):
 
@@ -28,21 +29,48 @@ class TestCalendar(unittest.TestCase):
         count = calendar.parseFile('/Users/sten.johnsen/git/dot-matrix-calendar/tests/test-hendelse.ics')
         self.assertEqual(count, 1)
 
+    def test_parseFile_large(self):
+        calendar = Calendar()
+        # Assuming you have a sample .ics file for testing purposes
+        # calendar.end((2024,8,3,0,0,0,0,0,0))
+        count = calendar.parseFile('/Users/sten.johnsen/git/dot-matrix-calendar/tests/moon.ics')
+        self.assertEqual(count, 148)
+
     def test_parseURL(self):
         calendar = Calendar()
         url = 'http://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics'
         # Mock the mrequests.get to return a dummy response
         calendar._parse = lambda url: 1
         count = calendar.parseURL(url)
-        self.assertEqual(count, 1)
+        self.assertEqual(count, 56)
         self.assertIn(url, calendar.sources)
 
     def test_parseURL_chunks(self):
         calendar = Calendar()
-        url = 'http://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics'
+        calendar.start((2024,7,3,0,0,0,0,0,0))
+        calendar.end((2024,8,3,0,0,0,0,0,0))
+        calendar.parseURL('webcal://files-f3.motorsportcalendars.com/no/f3-calendar_p_q_sprint_feature.ics')
+        count = calendar.parseURL('webcal://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics')
+        self.assertEqual(count, 24)
+        event = calendar.first()
+        self.assertEqual(event['summary'], "F3: Practice (British)")
+        event=calendar.next()
+        print(event)
+        self.assertEqual(event['summary'], "F2: Practice (British)")
+        calendar.refresh()
+        event = calendar.first()
+        self.assertEqual(event['summary'], "F3: Practice (Bahrain)")
+        print(dayText(event))
+        
+
+    def test_parseURL_large_chunks(self):
+        calendar = Calendar()
+        calendar.start((2025,5,3,0,0,0,0,0,0))
+        # calendar.end((2025,8,3,0,0,0,0,0,0))
+        url = 'https://calendar.google.com/calendar/ical/ht3jlfaac5lfd6263ulfh4tql8%40group.calendar.google.com/public/basic.ics'
         # Mock the mrequests.get to return a dummy response
         count = calendar.parseURL(url)
-        self.assertEqual(count, 56)
+        self.assertEqual(count, 33)
         self.assertIn(url, calendar.sources)
 
     def test_refresh(self):

@@ -11,7 +11,7 @@ import gc
 gc.collect()
 
 # (8x8 blocks, spi host, clock speed, CS pin)
-m = Matrix8x8(8,20,1)
+m = Matrix8x8(4,20,1)
 
 m.clear()
 m.init()
@@ -46,20 +46,24 @@ print(gc.mem_free())
 # c.parseURL('https://calendar.google.com/calendar/ical/i_213.236.150.86%23sunrise%40group.v.calendar.google.com/public/basic.ics')
 # c.parseURL('https://calendar.google.com/calendar/ical/c_eae215482ecd0bf862ff838cb81657e12281bff2f104c0986f78b20d90e4917c%40group.calendar.google.com/private-5cf4e55067a529ddd245d8a2f15a5e49/basic.ics')
 # print(gc.mem_free())
-
-event = c.first()
-if event: m.marquee(dayText(event))
 done = False
 
 def displayClock(m):
     (_, _, _, hour, min, sec, _, _) = time.localtime()
-    while sec != 0:
+    while sec % 10 != 0:
         if sec % 2 == 0:
             m.write("{:02}:{:02}".format(hour, min), True)
         else:
             m.write("{:02} {:02}".format(hour, min), True)
         (_, _, _, hour, min, sec, _, _) = time.localtime()
 
+try:
+    event = c.first()
+    if event: m.marquee(dayText(event))
+    
+finally:
+    displayClock(m)
+    
 try:
     while True:
         done = m.scroll(False)

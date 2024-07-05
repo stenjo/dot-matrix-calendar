@@ -8,6 +8,7 @@ typedef struct {
     char *summary;
     char *dtstart;
     char *dtend;
+    char *uid;
     time_t tstart;
     time_t tend;
 } event_t;

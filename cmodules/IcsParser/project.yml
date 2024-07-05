@@ -84,6 +84,13 @@
   :gcovr:
     :html_medium_threshold: 75
     :html_high_threshold: 90
+    :text_artifact_filename:
+  :utilities: 
+    - ReportGenerator
+    - gcov
+  :html_report: true
+    # Text report filename.
+    # The text report is printed to the console when no filename is provided.
 
 #:tools:
 # Ceedling defaults to using gcc for compiling, linking, etc.

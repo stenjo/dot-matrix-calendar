@@ -32,6 +32,19 @@ void test_parse_date_string_invalid_format(void) {
     TEST_ASSERT_FALSE(result);
 }
 
+void test_parse_date_string_valid_format(void) {
+    const char *date_string = "20240420";
+    struct tm tm_result = {0};
+    bool result = parse_date_string(date_string, &tm_result);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL_INT(2024 - 1900, tm_result.tm_year);
+    TEST_ASSERT_EQUAL_INT(4 - 1, tm_result.tm_mon);
+    TEST_ASSERT_EQUAL_INT(20, tm_result.tm_mday);
+    TEST_ASSERT_EQUAL_INT(0, tm_result.tm_hour);
+    TEST_ASSERT_EQUAL_INT(0, tm_result.tm_min);
+    TEST_ASSERT_EQUAL_INT(0, tm_result.tm_sec);
+}
+
 void test_parse_date_string_empty_string(void) {
     const char *date_string = "";
     struct tm tm_result = {0};

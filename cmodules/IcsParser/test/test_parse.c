@@ -31,8 +31,9 @@ void test_parse_should_handle_single_event(void) {
     getEvent_ExpectAndReturn(mock_event);
     getEvent_ExpectAndReturn(((event_t){NULL, NULL, NULL, 0, 0}));
     freeEvent_ExpectAnyArgs();
+    resetGetEvent_Ignore();
 
-    size_t count = parse(&ics, data);
+    size_t count = parseIcs(&ics, data);
 
     TEST_ASSERT_EQUAL(1, count);
     TEST_ASSERT_EQUAL_STRING("Meeting with John", ics.events[0].summary);
@@ -65,8 +66,9 @@ void test_parse_should_handle_multiple_events(void) {
     getEvent_ExpectAndReturn(((event_t){NULL, NULL, NULL, 0, 0}));
     freeEvent_ExpectAnyArgs();
     freeEvent_ExpectAnyArgs();
+    resetGetEvent_Ignore();
 
-    size_t count = parse(&ics, data);
+    size_t count = parseIcs(&ics, data);
 
     TEST_ASSERT_EQUAL(2, count);
     TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0].summary);
@@ -88,8 +90,9 @@ void test_parse_should_handle_no_events(void) {
     // Initialize buffer with data and then call getEvent
     updateBuffer_Expect(data);
     getEvent_ExpectAndReturn(((event_t){NULL, NULL, NULL, 0, 0}));
+    resetGetEvent_Ignore();
 
-    size_t count = parse(&ics, data);
+    size_t count = parseIcs(&ics, data);
 
     TEST_ASSERT_EQUAL(0, count);
     freeIcs(&ics);
@@ -104,8 +107,9 @@ void test_parse_should_handle_incomplete_event(void) {
     // Initialize buffer with data and then call getEvent
     updateBuffer_Expect(data);
     getEvent_ExpectAndReturn(((event_t){NULL, NULL, NULL, 0, 0}));
+    resetGetEvent_Ignore();
 
-    size_t count = parse(&ics, data);
+    size_t count = parseIcs(&ics, data);
 
     TEST_ASSERT_EQUAL(0, count);
     freeIcs(&ics);
@@ -139,9 +143,10 @@ void test_parse_should_handle_multiple_calls(void) {
     getEvent_ExpectAndReturn(((event_t){NULL, NULL, NULL, 0, 0}));
     freeEvent_ExpectAnyArgs();
     freeEvent_ExpectAnyArgs();
+    resetGetEvent_Ignore();
 
-    size_t count = parse(&ics, data1);
-    count = parse(&ics, data2);
+    size_t count = parseIcs(&ics, data1);
+    count = parseIcs(&ics, data2);
 
     TEST_ASSERT_EQUAL(2, count);
     TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0].summary);
@@ -181,9 +186,10 @@ void test_parse_should_handle_multiple_calls_split_at_timestamp(void) {
     getEvent_ExpectAndReturn(((event_t){NULL, NULL, NULL, 0, 0}));
     freeEvent_ExpectAnyArgs();
     freeEvent_ExpectAnyArgs();
+    resetGetEvent_Ignore();
 
-    size_t count = parse(&ics, data1);
-    count = parse(&ics, data2);
+    size_t count = parseIcs(&ics, data1);
+    count = parseIcs(&ics, data2);
 
     TEST_ASSERT_EQUAL(2, count);
     TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0].summary);
