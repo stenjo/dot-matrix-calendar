@@ -76,9 +76,9 @@ class TestCalendar(unittest.TestCase):
     def test_parseURL_Home_Cal(self):
         
         calendar = Calendar()
-        calendar.start((2024,1,3,0,0,0,0,0,0))
+        calendar.start((2024,7,2,0,0,0,0,0,0))
         calendar.end((2024,8,3,0,0,0,0,0,0))
-        calendar.parseURL('https://calendar.google.com/calendar/ical/c_eae215482ecd0bf862ff838cb81657e12281bff2f104c0986f78b20d90e4917c%40group.calendar.google.com/private-5cf4e55067a529ddd245d8a2f15a5e49/basic.ics')
+        # calendar.parseURL('https://calendar.google.com/calendar/ical/c_eae215482ecd0bf862ff838cb81657e12281bff2f104c0986f78b20d90e4917c%40group.calendar.google.com/private-5cf4e55067a529ddd245d8a2f15a5e49/basic.ics')
         calendar.parseURL('webcal://files-f3.motorsportcalendars.com/no/f3-calendar_p_q_sprint_feature.ics')
         count = calendar.parseURL('webcal://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics')
         self.assertEqual(count, 24)

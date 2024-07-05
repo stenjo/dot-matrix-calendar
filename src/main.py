@@ -11,7 +11,7 @@ import gc
 gc.collect()
 
 # (8x8 blocks, spi host, clock speed, CS pin)
-m = Matrix8x8(4,20,1)
+m = Matrix8x8(8,20,1)
 
 m.clear()
 m.init()
