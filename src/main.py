@@ -30,13 +30,15 @@ print(gc.mem_free())
 
 (year, month, day, hour, min, sec, _, _) = time.localtime()
 print("{}:{:02}:{:02}".format(hour, min, sec))
-m.write("{}/{} {:02}:{:02}".format(day, month, hour, min), True)
+m.write("{}/{}-{}".format(day, month, year), True)
 time.sleep(3)  # import time(1)
 
 c=Calendar()
 c.start(time.gmtime())
-c.end((datetime.now() + timedelta(30)).timetuple())
+c.end((datetime.now() + timedelta(7)).timetuple())
 
+# c.parseURL('https://calendar.google.com/calendar/ical/parterapeutene.no_e1or90m2lp6p523ma7u15v2pc0%40group.calendar.google.com/public/basic.ics')
+print(gc.mem_free())
 c.parseURL('webcal://files-f3.motorsportcalendars.com/no/f3-calendar_p_q_sprint_feature.ics')
 print(gc.mem_free())
 c.parseURL('webcal://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics')
@@ -44,13 +46,11 @@ print(gc.mem_free())
 # c.parseURL('https://calendar.google.com/calendar/ical/no.norwegian%23holiday%40group.v.calendar.google.com/public/basic.ics')
 # print(gc.mem_free())
 # c.parseURL('https://calendar.google.com/calendar/ical/i_213.236.150.86%23sunrise%40group.v.calendar.google.com/public/basic.ics')
-# c.parseURL('https://calendar.google.com/calendar/ical/c_eae215482ecd0bf862ff838cb81657e12281bff2f104c0986f78b20d90e4917c%40group.calendar.google.com/private-5cf4e55067a529ddd245d8a2f15a5e49/basic.ics')
-# print(gc.mem_free())
 done = False
 
 def displayClock(m):
     (_, _, _, hour, min, sec, _, _) = time.localtime()
-    while sec % 10 != 0:
+    while sec % 15 != 0:
         if sec % 2 == 0:
             m.write("{:02}:{:02}".format(hour, min), True)
         else:

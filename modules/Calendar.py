@@ -35,7 +35,7 @@ def toDtStr(date_input):
     raise ValueError("Invalid date input type. Must be datetime string or time tuple.")
 
 def toDict(event_tuple):
-    print(event_tuple)
+    # print(event_tuple)
     if not event_tuple:
         return None
     
@@ -134,7 +134,7 @@ class Calendar(ICS):
 
         for url in self.sources:
             try:
-                items += self._parse(url)
+                items = self._parse(url)
             except Exception as e:
                 print(f"Error parsing url: {url}, {e}")
         print(f"Refreshed {items} items")
