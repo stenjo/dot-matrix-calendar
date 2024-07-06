@@ -134,7 +134,7 @@ class Calendar(ICS):
 
         for url in self.sources:
             try:
-                items = self._parse(url)
+                items = self._parseChunks(url)
             except Exception as e:
                 print(f"Error parsing url: {url}, {e}")
         print(f"Refreshed {items} items")

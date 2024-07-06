@@ -33,19 +33,14 @@ print("{}:{:02}:{:02}".format(hour, min, sec))
 m.write("{}/{}-{}".format(day, month, year), True)
 time.sleep(3)  # import time(1)
 
+
+days_ahead = 7
 c=Calendar()
 c.start(time.gmtime())
-c.end((datetime.now() + timedelta(7)).timetuple())
+c.end((datetime.now() + timedelta(days_ahead)).timetuple())
 
-# c.parseURL('https://calendar.google.com/calendar/ical/parterapeutene.no_e1or90m2lp6p523ma7u15v2pc0%40group.calendar.google.com/public/basic.ics')
-print(gc.mem_free())
-c.parseURL('webcal://files-f3.motorsportcalendars.com/no/f3-calendar_p_q_sprint_feature.ics')
-print(gc.mem_free())
 c.parseURL('webcal://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics')
-print(gc.mem_free())
-# c.parseURL('https://calendar.google.com/calendar/ical/no.norwegian%23holiday%40group.v.calendar.google.com/public/basic.ics')
-# print(gc.mem_free())
-# c.parseURL('https://calendar.google.com/calendar/ical/i_213.236.150.86%23sunrise%40group.v.calendar.google.com/public/basic.ics')
+c.parseURL('webcal://files-f3.motorsportcalendars.com/no/f3-calendar_p_q_sprint_feature.ics')
 done = False
 
 def displayClock(m):
@@ -72,7 +67,7 @@ try:
             event = c.next()
             if not event:
                 gc.collect()
-                items = c.refresh(time.gmtime(), (datetime.now() + timedelta(30)).timetuple())
+                items = c.refresh(time.gmtime(), (datetime.now() + timedelta(days_ahead)).timetuple())
                 print(gc.mem_free())
                 event = c.first()
                 # print("Refetched {:02} calendar items.".format(items))
