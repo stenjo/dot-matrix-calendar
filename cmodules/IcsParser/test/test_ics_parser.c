@@ -278,7 +278,7 @@ void test_endDate_verifyEndDateAvailableOnEvents(void) {
     time_t start = setStartDate(&ics, startDate);
     TEST_ASSERT_EQUAL(1714521600, start);
     time_t end = setEndDate(&ics, endDate);
-    TEST_ASSERT_EQUAL(1719784800, end);
+    TEST_ASSERT_EQUAL(1719792000, end);
 
     int count = parseFile(&ics, "test/f2-calendar_p_q_sprint_feature.ics");
     event_t event = getFirstEvent(&ics);
@@ -327,7 +327,7 @@ void test_withMultipleCalendars(void) {
     time_t start = setStartDate(&ics, startDate);
     TEST_ASSERT_EQUAL(1711929600, start);
     time_t end = setEndDate(&ics, endDate);
-    TEST_ASSERT_EQUAL(1733007600, end);
+    TEST_ASSERT_EQUAL(1733011200, end);
 
     int count = parseFile(&ics, "test/f2-calendar_p_q_sprint_feature.ics");
     TEST_ASSERT_EQUAL(39, count);
