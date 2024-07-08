@@ -78,19 +78,36 @@ class TestCalendar(unittest.TestCase):
         calendar = Calendar()
         calendar.start((2024,7,2,0,0,0,0,0,0))
         calendar.end((2024,8,3,0,0,0,0,0,0))
-        # calendar.parseURL('https://calendar.google.com/calendar/ical/c_eae215482ecd0bf862ff838cb81657e12281bff2f104c0986f78b20d90e4917c%40group.calendar.google.com/private-5cf4e55067a529ddd245d8a2f15a5e49/basic.ics')
+        calendar.parseURL('https://calendar.google.com/calendar/ical/parterapeutene.no_e1or90m2lp6p523ma7u15v2pc0%40group.calendar.google.com/public/basic.ics')
+        print(dayText(calendar.first()))
+        
         calendar.parseURL('webcal://files-f3.motorsportcalendars.com/no/f3-calendar_p_q_sprint_feature.ics')
         count = calendar.parseURL('webcal://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics')
-        self.assertEqual(count, 24)
+        self.assertEqual(count, 25)
+        
+    def test_parseURL_Days_Ahead(self):
+        
+        calendar = Calendar(daysAhead=30)
+        count = calendar.parseURL('https://calendar.google.com/calendar/ical/ht3jlfaac5lfd6263ulfh4tql8%40group.calendar.google.com/public/basic.ics')
+        self.assertEqual(count, 4)
+        
+        print(dayText(calendar.first()))
+        print(dayText(calendar.next()))
+        print(dayText(calendar.next()))
+        print(dayText(calendar.next()))
+        
+        
+        count = calendar.refresh()
+        self.assertEqual(count, 4)
+        
         
 
     def test_refresh(self):
         calendar = Calendar()
-        url = 'webcal://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics'
+        url = 'http://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics'
         calendar.sources.append(url)
-        calendar._parse = lambda url: 1
         items = calendar.refresh()
-        self.assertEqual(items, 1)
+        self.assertEqual(items, 56)
 
     def test_first(self):
         calendar = Calendar()

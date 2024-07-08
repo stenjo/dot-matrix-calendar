@@ -25,8 +25,8 @@ firmware:
 deploy:
 	$(ECHO) "Writing $< to the board"
 	$(Q)esptool.py --chip esp32s2 -p $(PORT) -b $(BAUD) \
-	--before default_reset \
-	--after hard_reset \
+	--before no_reset \
+	--after no_reset \
 	write_flash \
 	--flash_mode=$(FLASH_MODE) \
 	--flash_size=$(FLASH_SIZE) \
@@ -76,7 +76,7 @@ deploy-merged:
 
 erase:
 	$(ECHO) "Erase flash"
-	$(Q)esptool.py --port $(PORT) --baud $(BAUD) erase_flash
+	$(Q)esptool.py --after no_reset --port $(PORT) --baud $(BAUD) erase_flash
 
 reset:
 	echo -e "\r\nimport machine; machine.reset()\r\n" >$(REPL)
