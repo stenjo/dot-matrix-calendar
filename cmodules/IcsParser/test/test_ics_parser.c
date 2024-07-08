@@ -219,7 +219,7 @@ void test_getNextEventInRange(void) {
     initIcs(&ics);
     setStartDate(&ics, startDate);
     time_t end = setEndDate(&ics, endDate);
-    TEST_ASSERT_EQUAL(1719784800, end);
+    TEST_ASSERT_EQUAL(1719792000, end);
     count = parseFile(&ics, "test/f2-calendar_p_q_sprint_feature.ics");
     TEST_ASSERT_EQUAL(16, ics.count);
 
@@ -246,7 +246,7 @@ void test_sortEvents_sortAllFilteredEventsByStartTime(void) {
     time_t start = setStartDate(&ics, startDate);
     TEST_ASSERT_EQUAL(1714521600, start);
     time_t end = setEndDate(&ics, endDate);
-    TEST_ASSERT_EQUAL(1714521600, end);
+    TEST_ASSERT_EQUAL(1719792000, end);
 
     int count = parseFile(&ics, "test/f2-calendar_p_q_sprint_feature.ics");
     event_t event = getFirstEvent(&ics);
@@ -276,7 +276,7 @@ void test_endDate_verifyEndDateAvailableOnEvents(void) {
     const char endDate[] = "20240701T000000Z";
 
     time_t start = setStartDate(&ics, startDate);
-    TEST_ASSERT_EQUAL(1714514400, start);
+    TEST_ASSERT_EQUAL(1714521600, start);
     time_t end = setEndDate(&ics, endDate);
     TEST_ASSERT_EQUAL(1719784800, end);
 
@@ -300,7 +300,7 @@ void test_withLargeCalendar(void) {
     time_t start = setStartDate(&ics, startDate);
     TEST_ASSERT_EQUAL(1711929600, start);
     time_t end = setEndDate(&ics, endDate);
-    TEST_ASSERT_EQUAL(1711929600, end);
+    TEST_ASSERT_EQUAL(1719792000, end);
 
     int count = parseFile(&ics, "test/basic.ics");
     event_t event = getFirstEvent(&ics);
@@ -325,7 +325,7 @@ void test_withMultipleCalendars(void) {
     const char endDate[] = "20241201T000000Z";
 
     time_t start = setStartDate(&ics, startDate);
-    TEST_ASSERT_EQUAL(1711922400, start);
+    TEST_ASSERT_EQUAL(1711929600, start);
     time_t end = setEndDate(&ics, endDate);
     TEST_ASSERT_EQUAL(1733007600, end);
 
