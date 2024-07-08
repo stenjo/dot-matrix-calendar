@@ -1,6 +1,6 @@
 import sys
 import unittest
-from modules.getopt import GetoptError
+from getopt import GetoptError
 
 class TestGetOpt(unittest.TestCase):
     def test_getOpt(self):

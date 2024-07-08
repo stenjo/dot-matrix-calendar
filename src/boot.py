@@ -26,15 +26,23 @@ del ws
 m.clear()
 m.init()
 
+done = False
 #if needed, overwrite default time server
 ntptime.host = "1.europe.pool.ntp.org"
+print("Local time before synchronization: %s" %str(time.localtime()))
+while done == False:
+    
+    try:
+        done = True
+        #make sure to have internet connection
+        ntptime.settime()
+        
+    except:
+        done = False        
+        print("Error syncing time. Trying again ...")
+        time.sleep(5)
 
-try:
-    print("Local time before synchronization: %s" %str(time.localtime()))
-    #make sure to have internet connection
-    ntptime.settime()
-    print("Local time after synchronization: %s" %str(time.localtime()))
-except:
-    print("Error syncing time")
+    finally:
+        print("Local time after synchronization: %s" %str(time.localtime()))
 
 print(gc.mem_free())

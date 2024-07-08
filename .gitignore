@@ -170,3 +170,4 @@ log
 **/managed_components/**
 **/unity-app
 **/frozen_*
+src/credentials

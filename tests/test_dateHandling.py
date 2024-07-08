@@ -1,6 +1,6 @@
 import unittest
-from modules.dateHandling import isNowInTimePeriod, dayText
-from modules.datetime import datetime, timedelta, timezone
+from dateHandling import isNowInTimePeriod, dayText
+from datetime import datetime, timedelta, timezone
 
 class TestIsNowInTimePeriod(unittest.TestCase):
     def test_isNowInTimePeriod(self):
