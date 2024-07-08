@@ -15,6 +15,7 @@
         "ICAL",
         "icalendar",
         "micropython",
+        "mrequests",
         "rrule"
     ],
     "python.languageServer": "Pylance",
