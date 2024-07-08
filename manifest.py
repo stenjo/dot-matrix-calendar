@@ -3,7 +3,7 @@ include("$(PORT_DIR)/boards/manifest.py")
 
 # include our own extra...
 module("datetime.py", base_path="$(BOARD_DIR)/../../modules")
-module("mrequests.py", base_path="$(BOARD_DIR)/../../modules/mrequests")
+package("mrequests", base_path="$(BOARD_DIR)/../../modules/mrequests")
 module("dateHandling.py", base_path="$(BOARD_DIR)/../../modules")
 module("time.py", base_path="$(BOARD_DIR)/../../modules")
 module("mpy_env.py", base_path="$(BOARD_DIR)/../../modules")
