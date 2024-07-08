@@ -69,3 +69,9 @@ erase:
 
 reset:
 	echo -e "\r\nimport machine; machine.reset()\r\n" >$(PORT)
+
+copy:
+	rshell -p /dev/cu.usbserial-0001 rsync ../../src /pyboard
+
+mon:
+	picocom /dev/tty.usbserial-0001 --b 115200

@@ -1,17 +1,15 @@
 {
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestEnabled": true,
     "python.testing.unittestArgs": [
         "-v",
         "-s",
-        "./tests",
+        "${workspaceFolder}/tests",
         "-p",
-        "test*.py",
-        "--coverage"
+        "test_*.py"
     ],
-    "python.testing.pytestEnabled": false,
-    "python.testing.unittestEnabled": true,
     "python.analysis.extraPaths": [
-        "./modules",
-        "./modules/ics"
+        "${workspaceFolder}/cmodules/IcsParser"
     ],
     "cSpell.words": [
         "ICAL",
@@ -22,8 +20,8 @@
     "python.languageServer": "Pylance",
     "coverage-gutters.coverageReportFileName": "coverage.lcov",
     "terminal.integrated.env.windows": {
-        "PYTHONPATH": "C:/Users/sten.johnsen/git/dot-matrix-calendar/modules;${env:PYTHONPATH}",
-        "PATH": "C:/Users/sten.johnsen/git/dot-matrix-calendar/modules;${env:PATH}"  
+        "PYTHONPATH": "${workspaceFolder}/modules",
+        "MICROPYPATH": "${workspaceFolder}/modules"
     },
     "C_Cpp.default.compilerArgs": [
         "-I lib/micropython"
