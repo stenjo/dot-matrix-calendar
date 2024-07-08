@@ -1,0 +1,62 @@
+name: Python tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  unix:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Exporting xtensa gcc path
+      run: echo "ESP_ESPRESSIF_ROOT=/usr/lib/espressif" >> $GITHUB_ENV
+
+    - name: Install tools
+      run: |
+        git clone -b v5.1.2 --recursive https://github.com/espressif/esp-idf.git
+        cd esp-idf
+        ./install.sh
+        source export.sh
+        pip install esptool freezefs
+        
+    - name: Update repos
+      run: |
+        git submodule update --init lib/micropython
+        git submodule update --init modules/micropython-wifi-setup
+        make -C lib/micropython/mpy-cross
+        
+    - name: Make submodules    
+      working-directory: lib/micropython/ports/unix
+      run: |
+        source ../../../../esp-idf/export.sh
+        make submodules
+        make
+      
+    - name: Make frozen extractable files    
+      working-directory: modules
+      run: |
+        pip install freezefs
+        git submodule update --init micropython-wifi-setup
+        python -m freezefs micropython-wifi-setup/lib/wifi_setup frozen_wifi_setup.py -ov always
+        python -m freezefs micropython-wifi-setup/lib/micro_web_srv_2 frozen_micro_web_srv_2.py -ov always
+
+        
+    - name: Compile firmware
+      working-directory: boards/UNIX
+      run: |
+        make all
+   
+    - name: Check output
+      working-directory: boards/UNIX
+      run: ls -al build/*
+
+    - name: Run test
+      working-directory: boards/UNIX
+      run: |
+        chmod a+x run_tests.sh
+        ./run_tests.sh
+    
