@@ -26,14 +26,14 @@ class TestCalendar(unittest.TestCase):
     def test_parseFile(self):
         calendar = Calendar()
         # Assuming you have a sample .ics file for testing purposes
-        count = calendar.parseFile('/Users/sten.johnsen/git/dot-matrix-calendar/tests/test-hendelse.ics')
+        count = calendar.parseFile('../../tests/test-hendelse.ics')
         self.assertEqual(count, 1)
 
     def test_parseFile_large(self):
         calendar = Calendar()
         # Assuming you have a sample .ics file for testing purposes
         # calendar.end((2024,8,3,0,0,0,0,0,0))
-        count = calendar.parseFile('/Users/sten.johnsen/git/dot-matrix-calendar/tests/moon.ics')
+        count = calendar.parseFile('../../tests/moon.ics')
         self.assertEqual(count, 148)
 
     def test_parseURL(self):
