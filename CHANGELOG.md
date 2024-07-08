@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.0](https://github.com/stenjo/dot-matrix-calendar/compare/v0.3.5...v0.4.0) (2024-07-08)
+
+
+### Features
+
+* **ical:** handle large ics files ([#35](https://github.com/stenjo/dot-matrix-calendar/issues/35)) ([0dda358](https://github.com/stenjo/dot-matrix-calendar/commit/0dda3589fb4dbd23b8faf7c4b0412f978c9eb8a3))
+
+
+### Bug Fixes
+
+* **main.py:** updated Calendar.py to handle days ahead param ([#37](https://github.com/stenjo/dot-matrix-calendar/issues/37)) ([2be6e9e](https://github.com/stenjo/dot-matrix-calendar/commit/2be6e9ea1485a81fbfc718aa276309b289535deb))
+
 ## [0.3.5](https://github.com/stenjo/dot-matrix-calendar/compare/v0.3.4...v0.3.5) (2024-05-30)
 
 
