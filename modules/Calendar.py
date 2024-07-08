@@ -1,5 +1,6 @@
 from ics_parser import ICS
-import mrequests, re
+from datetime import datetime, timezone, timedelta
+import mrequests, re, time
 
 def dtStrToIso(dtstart):
     # Assuming the format of dtstart is '20230412T165722Z'
@@ -53,6 +54,7 @@ def toDict(event_tuple):
 
 
 class ResponseWithProgress(mrequests.Response):
+    _total_read = 0
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._total_read = 0
@@ -64,7 +66,11 @@ class ResponseWithProgress(mrequests.Response):
         return bytes_read
 
 class Calendar(ICS):
-    def __init__(self, filename=None, start=None, end=None):
+    
+    startTime = None
+    endTime = None
+    sources = []
+    def __init__(self, filename=None, start=None, end=None, daysAhead=None, url=None):
         super().__init__()
         self.reset()
         self.sources = []
@@ -73,7 +79,13 @@ class Calendar(ICS):
             
         if end is not None:
             self.end(end)
-            
+        
+        if daysAhead is not None:
+            self.startTime = time.gmtime()
+            self.start(self.startTime)
+            self.endTime = (datetime.now() + timedelta(daysAhead)).timetuple()
+            self.end(self.endTime)
+
         if filename is not None:
             self.parseFile(filename)
     
@@ -91,35 +103,26 @@ class Calendar(ICS):
             self.sources.append(url)
         return self._parseChunks(url)
 
-    def _parse(self, url):
-        print(f"Fetching URL: {url}")
-        response = mrequests.get(url)
-        if response.status_code == 200:
-            print("Fetched calendar data successfully")
-            count = self.parseIcs(response.text)
-            response.close()
-            print(f"Parsed {count} items from URL")
-            return count
-        else:
-            response.close()
-            raise Exception(f"Failed to fetch calendar data, status code: {response.status_code}")
-        
     def _parseChunks(self, url, chunkSize=1024):
         print(f"Fetching URL in chunks: {url}")
-        response = mrequests.get(url, headers={b"accept": b"text/html"}, response_class=ResponseWithProgress)
-        if response.status_code == 200:
-            count = 0
-            while True:
-                chunk = response.read(chunkSize)
-                if not chunk:
-                    break
-                count = self.parseIcs(chunk.decode('utf-8'))
-            response.close()
-            print(f"Parsed {count} items from URL in chunks")
-            return count
-        else:
-            response.close()
-            raise Exception(f"Failed to fetch calendar data in chunks, status code: {response.status_code}")
+        try:
+            response = mrequests.get(url, headers={b"accept": b"text/html"}, response_class=ResponseWithProgress)
+        except:
+            pass
+        finally:
+            if response.status_code == 200:
+                count = 0
+                while True:
+                    chunk = response.read(chunkSize)
+                    if not chunk:
+                        break
+                    count = self.parseIcs(chunk.decode('utf-8'))
+                response.close()
+                print(f"Parsed {count} items from URL in chunks")
+                return count
+            else:
+                response.close()
+                print(f"Failed to fetch calendar data in chunks, status code: {response.status_code}")
 
     def refresh(self, start_date=None, end_date=None):
         print("Refreshing calendar")
@@ -128,9 +131,13 @@ class Calendar(ICS):
         items = 0
         if start_date is not None:
             self.start(start_date)
+        elif self.startTime is not None:
+            self.start(self.startTime)  
             
         if end_date is not None:
             self.end(end_date)
+        elif self.endTime is not None:
+            self.end(self.endTime)
 
         for url in self.sources:
             try:
@@ -141,10 +148,20 @@ class Calendar(ICS):
         return items
     
     def first(self):
-        return toDict(self.getFirst())
+        ev = None
+        try:
+            ev = self.getFirst()
+            return toDict(ev)
+        except UnicodeError:
+            print("GetFirst Unicode error", ev)
         
     def next(self):
-        return toDict(self.getNext())
+        ev = None
+        try:
+            ev = self.getNext()
+            return toDict(ev)
+        except UnicodeError:
+            print("GetNext Unicode error", ev)
     
     def start(self, startDate):
         self.setStartDate(toDtStr(startDate))

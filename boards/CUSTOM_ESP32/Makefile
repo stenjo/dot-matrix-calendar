@@ -70,6 +70,9 @@ erase:
 reset:
 	echo -e "\r\nimport machine; machine.reset()\r\n" >$(PORT)
 
+removepy:
+	echo -e "\r\nos.remove('main.py');os.remove('boot.py')\r\n" >$(PORT)
+
 copy:
 	rshell -p /dev/cu.usbserial-0001 rsync ../../src /pyboard
 

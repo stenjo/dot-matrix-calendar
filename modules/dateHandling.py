@@ -13,24 +13,29 @@ def dayText(event, today=datetime.now(timezone.utc)):
 
     weekday = ["Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag"]
     text = ""
-    dt = datetime.fromisoformat(
-        event["start"].get("dateTime", event["start"].get("date"))
-    ).replace(tzinfo=timezone.utc)
-    tomorrow = today + timedelta(1)
-    delta = dt - today
+    try:
+        dt = datetime.fromisoformat(
+            event["start"].get("dateTime", event["start"].get("date"))
+        ).replace(tzinfo=timezone.utc)
 
-    if dt.date() == today.date():
-        text = text + "I dag: "
-    elif dt.date() == tomorrow.date():
-        text = text + "I morgen: "
-    elif delta.days > 6:
-        text = text + weekday[dt.weekday()] + " " + dt.strftime("%d/%m") + ": "
-    else:
-        text = text + weekday[dt.weekday()] + ": "
+        tomorrow = today + timedelta(1)
+        delta = dt - today
 
-    text = text + event["summary"]
+        if dt.date() == today.date():
+            text = text + "I dag: "
+        elif dt.date() == tomorrow.date():
+            text = text + "I morgen: "
+        elif delta.days > 6:
+            text = text + weekday[dt.weekday()] + " " + dt.strftime("%d/%m") + ": "
+        else:
+            text = text + weekday[dt.weekday()] + ": "
 
-    if dt.hour > 0:
-        text = text + dt.strftime(" kl. %H:%M")
+        text = text + event["summary"]
+
+        if dt.hour > 0:
+            text = text + dt.strftime(" kl. %H:%M")
+
+    except ValueError:
+        print(event)
 
     return text
