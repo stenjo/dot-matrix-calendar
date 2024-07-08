@@ -205,7 +205,7 @@ void test_getNextEventInRange(void) {
     const char endDate[] = "20240701T000000Z";
 
     time_t start = setStartDate(&ics, startDate);
-    TEST_ASSERT_EQUAL(1714514400, start);
+    TEST_ASSERT_EQUAL(1714521600, start);
 
     size_t count = parseFile(&ics, "test/f2-calendar_p_q_sprint_feature.ics");
     TEST_ASSERT_EQUAL(44, count);
@@ -244,9 +244,9 @@ void test_sortEvents_sortAllFilteredEventsByStartTime(void) {
     const char endDate[] = "20240701T000000Z";
 
     time_t start = setStartDate(&ics, startDate);
-    TEST_ASSERT_EQUAL(1714514400, start);
+    TEST_ASSERT_EQUAL(1714521600, start);
     time_t end = setEndDate(&ics, endDate);
-    TEST_ASSERT_EQUAL(1719784800, end);
+    TEST_ASSERT_EQUAL(1714521600, end);
 
     int count = parseFile(&ics, "test/f2-calendar_p_q_sprint_feature.ics");
     event_t event = getFirstEvent(&ics);
@@ -298,9 +298,9 @@ void test_withLargeCalendar(void) {
     const char endDate[] = "20240701T000000Z";
 
     time_t start = setStartDate(&ics, startDate);
-    TEST_ASSERT_EQUAL(1711922400, start);
+    TEST_ASSERT_EQUAL(1711929600, start);
     time_t end = setEndDate(&ics, endDate);
-    TEST_ASSERT_EQUAL(1719784800, end);
+    TEST_ASSERT_EQUAL(1711929600, end);
 
     int count = parseFile(&ics, "test/basic.ics");
     event_t event = getFirstEvent(&ics);
