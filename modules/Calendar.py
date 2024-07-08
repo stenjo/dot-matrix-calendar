@@ -1,6 +1,7 @@
 from ics_parser import ICS
-from datetime import datetime, timezone, timedelta
-import mrequests, re, time
+from datetime import datetime, timedelta
+from mrequests import mrequests
+import re, time
 
 def dtStrToIso(dtstart):
     # Assuming the format of dtstart is '20230412T165722Z'
@@ -8,6 +9,7 @@ def dtStrToIso(dtstart):
     dtstart = dtstart.rstrip('Z')
     time_iso = None
     date_part = dtstart[:8]
+    
     # Insert hyphens and colons to match ISO 8601 format
     date_iso = "{}-{}-{}".format(date_part[:4], date_part[4:6], date_part[6:])
     if len(dtstart) > 10:
