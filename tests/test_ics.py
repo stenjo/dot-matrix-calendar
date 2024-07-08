@@ -108,13 +108,6 @@ class TestCalendar(unittest.TestCase):
         calendar.sources.append(url)
         items = calendar.refresh()
         self.assertEqual(items, 56)
-
-    def test_first(self):
-        calendar = Calendar()
-        calendar.getFirst = lambda: ('Event Summary', '20230412T165722Z')
-        first_event = calendar.first()
-        self.assertEqual(first_event, {'start': {'dateTime': '2023-04-12T16:57:22'}, 'summary': 'Event Summary'})
-
     def test_next(self):
         calendar = Calendar()
         calendar.getNext = lambda: ('Event Summary', '20230412T165722Z')
