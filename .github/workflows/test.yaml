@@ -1,4 +1,4 @@
-name: Python tests
+name: Tests
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  unix:
+  python:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v4
@@ -50,3 +50,16 @@ jobs:
       run: |
         MICROPYPATH=../../modules ./build/micropython ../../tests/test_ics.py
     
+  cmodules:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install tools
+      run: |
+        gem install ceedling
+
+    - name: Run IcsParser tests
+      working-directory: cmodules/IcsParser
+      run: |
+        ceedling
