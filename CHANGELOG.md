@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.4.1](https://github.com/stenjo/dot-matrix-calendar/compare/v0.4.0...v0.4.1) (2024-07-08)
+
+
+### Bug Fixes
+
+* **ci:** missing mrequests ([093e696](https://github.com/stenjo/dot-matrix-calendar/commit/093e6965f4f0f65f9da3606255a008c17f580465))
+* **main.py:** clean up and move code into modules ([46775f7](https://github.com/stenjo/dot-matrix-calendar/commit/46775f7d754da02ea41764254a54dca7b7bb8a79))
+* **parsing:** trying to handle unicode errors ([18ac88b](https://github.com/stenjo/dot-matrix-calendar/commit/18ac88bc20ff97414dbc6a32dc8ab0e183da161d))
+
 ## [0.4.0](https://github.com/stenjo/dot-matrix-calendar/compare/v0.3.5...v0.4.0) (2024-07-08)
 
 
