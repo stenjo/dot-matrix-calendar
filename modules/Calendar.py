@@ -1,6 +1,7 @@
 from ics_parser import ICS
-from datetime import datetime, timezone, timedelta
-import mrequests, re, time
+from datetime import datetime, timedelta
+from mrequests import mrequests
+import re, time
 
 def dtStrToIso(dtstart):
     # Assuming the format of dtstart is '20230412T165722Z'
