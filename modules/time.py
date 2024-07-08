@@ -104,11 +104,13 @@ def localtime(secs: int | None = None) -> tuple[int, int, int, int, int, int, in
         seconds = mktime((year, month + 1, 0, hour, minute, 0, None, None))
 
         # Calculate the offset to the last sunday of the month
-        (year, month, mday, hour, minute, second, weekday, yearday) = gmtime(seconds)
-        offset = (weekday + 1) % 7
+        # (year, month, mday, hour, minute, second, weekday, yearday) = gmtime(seconds)
+        # offset = (weekday + 1) % 7
+        tpl = gmtime(seconds)
+        offset = (tpl[6] + 1) % 7
 
         # Return the time of the last sunday of the month
-        return mktime((year, month, mday - offset, hour, minute, second, None, None))
+        return mktime((year, month, tpl[2] - offset, hour, minute, tpl[5], None, None))
 
     utc = gmtime(secs)
 

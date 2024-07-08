@@ -84,3 +84,9 @@ reset:
 clean:
 	idf.py fullclean
 	rm -rf build
+
+copy:
+	rshell rsync ../../src /pyboard
+
+mon:
+	picocom $(REPL) --b 115200

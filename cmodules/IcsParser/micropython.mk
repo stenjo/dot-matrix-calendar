@@ -1,0 +1,9 @@
+ICSPARSER_MOD_DIR := $(USERMOD_DIR)
+
+# Add all C files to SRC_USERMOD.
+SRC_USERMOD += $(ICSPARSER_MOD_DIR)/mp_ics.c
+SRC_USERMOD += $(ICSPARSER_MOD_DIR)/src/ics_parser.c
+SRC_USERMOD += $(ICSPARSER_MOD_DIR)/src/ics_event.c
+SRC_USERMOD += $(ICSPARSER_MOD_DIR)/src/ics_utils.c
+
+CFLAGS_USERMOD += -I$(ICSPARSER_MOD_DIR)
