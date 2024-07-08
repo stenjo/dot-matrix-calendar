@@ -9,6 +9,7 @@ def dtStrToIso(dtstart):
     dtstart = dtstart.rstrip('Z')
     time_iso = None
     date_part = dtstart[:8]
+    
     # Insert hyphens and colons to match ISO 8601 format
     date_iso = "{}-{}-{}".format(date_part[:4], date_part[4:6], date_part[6:])
     if len(dtstart) > 10:
