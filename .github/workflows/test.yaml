@@ -50,7 +50,8 @@ jobs:
       working-directory: boards/UNIX
       run: |
         MICROPYPATH=../../modules ./build/micropython ../../tests/test_ics.py
-    
+        MICROPYPATH=../../modules ./build/micropython ../../tests/test_Clock.py
+
   cmodules:
     runs-on: macos-latest
     steps:
