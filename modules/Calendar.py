@@ -109,17 +109,25 @@ class Calendar(ICS):
         print(f"Fetching URL in chunks: {url}")
         try:
             response = mrequests.get(url, headers={b"accept": b"text/html"}, response_class=ResponseWithProgress)
-        except:
-            pass
+        except Exception as e:
+            print(f"Exception occurred during request: {e}")
+            return 0
         finally:
             if response.status_code == 200:
                 count = 0
-                while True:
-                    chunk = response.read(chunkSize)
-                    if not chunk:
-                        break
-                    count = self.parseIcs(chunk.decode('utf-8'))
-                response.close()
+                try:
+                    encoding = response.encoding if response.encoding else 'utf-8'
+                    while True:
+                        chunk = response.read(chunkSize)
+                        if not chunk:
+                            break
+                        try:
+                            decoded_chunk = chunk.decode(encoding)
+                            count = self.parseIcs(decoded_chunk)
+                        except UnicodeError as e:
+                            print(f"UnicodeDecodeError occurred: {e}")
+                finally:
+                    response.close()
                 print(f"Parsed {count} items from URL in chunks")
                 return count
             else:
