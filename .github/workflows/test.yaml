@@ -48,6 +48,5 @@ jobs:
     - name: Run test
       working-directory: boards/UNIX
       run: |
-        chmod a+x run_tests.sh
-        ./run_tests.sh
+        MICROPYPATH=../../modules ./build/micropython ../../tests/test_ics.py
     
