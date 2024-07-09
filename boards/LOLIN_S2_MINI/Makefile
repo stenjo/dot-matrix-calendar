@@ -77,6 +77,7 @@ deploy-merged:
 erase:
 	$(ECHO) "Erase flash"
 	$(Q)esptool.py --after no_reset --port $(PORT) --baud $(BAUD) erase_flash
+	sleep 1
 
 reset:
 	echo -e "\r\nimport machine; machine.reset()\r\n" >$(REPL)
@@ -87,6 +88,7 @@ clean:
 
 copy:
 	rshell rsync ../../src /pyboard
+	sleep 1
 
 mon:
 	picocom $(REPL) --b 115200
