@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.2](https://github.com/stenjo/dot-matrix-calendar/compare/v0.4.1...v0.4.2) (2024-07-09)
+
+
+### Bug Fixes
+
+* **calendar.py:** missing exception handling ([f046e9a](https://github.com/stenjo/dot-matrix-calendar/commit/f046e9adbc3aaedb005bd15f74302457c8f4f646))
+
 ## [0.4.1](https://github.com/stenjo/dot-matrix-calendar/compare/v0.4.0...v0.4.1) (2024-07-08)
 
 
