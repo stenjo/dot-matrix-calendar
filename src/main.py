@@ -11,7 +11,7 @@ gc.collect()
 print("Free mem: ",gc.mem_free())
 
 # (8x8 blocks, spi host, clock speed, CS pin)
-m = Matrix8x8(8,20,1)
+m = Matrix8x8(4,20,1)
 m.clear()
 m.init()
 
@@ -22,7 +22,7 @@ utils.show_ip_and_version(m)
 c=Calendar(daysAhead=14)
 c.parseURL('webcal://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics')
 c.parseURL('webcal://files-f3.motorsportcalendars.com/no/f3-calendar_p_q_sprint_feature.ics')
-c.parseURL('https://calendar.google.com/calendar/ical/ht3jlfaac5lfd6263ulfh4tql8%40group.calendar.google.com/public/basic.ics')
+c.parseURL('https://calendar.google.com/calendar/ical/parterapeutene.no_e1or90m2lp6p523ma7u15v2pc0%40group.calendar.google.com/public/basic.ics')
 
 scrollDone = False
 clock = Clock(15)
