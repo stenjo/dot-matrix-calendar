@@ -107,13 +107,14 @@ class Calendar(ICS):
 
     def _parseChunks(self, url, chunkSize=1024):
         print(f"Fetching URL in chunks: {url}")
+        response = None
         try:
             response = mrequests.get(url, headers={b"accept": b"text/html"}, response_class=ResponseWithProgress)
         except Exception as e:
             print(f"Exception occurred during request: {e}")
             return 0
         finally:
-            if response.status_code == 200:
+            if response and response.status_code == 200:
                 count = 0
                 try:
                     encoding = response.encoding if response.encoding else 'utf-8'
@@ -131,8 +132,10 @@ class Calendar(ICS):
                 print(f"Parsed {count} items from URL in chunks")
                 return count
             else:
-                response.close()
-                print(f"Failed to fetch calendar data in chunks, status code: {response.status_code}")
+                print(response)
+                if response is not None:
+                    response.close()
+                    print(f"Failed to fetch calendar data in chunks, status code: {response.status_code}")
 
     def refresh(self, start_date=None, end_date=None):
         print("Refreshing calendar")
