@@ -30,6 +30,7 @@ print("Free mem: ",gc.mem_free())
 
 try:
     event = c.first()
+    if event: m.marquee(dayText(event))
     while True:
         if scrollDone is False: scrollDone = m.scroll(False)
         if scrollDone is True: clockDone = clock.display(m)
