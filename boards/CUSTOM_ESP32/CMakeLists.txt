@@ -23,6 +23,10 @@ foreach(SDKCONFIG_DEFAULT ${SDKCONFIG_DEFAULTS})
     file(READ ${SDKCONFIG_DEFAULT} CONTENTS)
     file(APPEND ${CMAKE_BINARY_DIR}/sdkconfig.combined.in "${CONTENTS}")
 endforeach()
+
+file(READ sdkconfig.board CONTENTS)
+file(APPEND ${CMAKE_BINARY_DIR}/sdkconfig.combined.in "${CONTENTS}")
+
 configure_file(${CMAKE_BINARY_DIR}/sdkconfig.combined.in ${CMAKE_BINARY_DIR}/sdkconfig.combined COPYONLY)
 set(SDKCONFIG_DEFAULTS ${CMAKE_BINARY_DIR}/sdkconfig.combined)
 
