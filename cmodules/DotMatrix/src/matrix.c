@@ -508,7 +508,13 @@ void drawBlock(max7219_t *dev, uint8_t pos, const void *image)
     for (uint8_t i = pos, offs = 0; i < dev->cascade_size*8 && offs < 8; i++, offs++)
         display_set_segment(dev, i, *((uint8_t *)image + offs));
 }
-void clear(max7219_t *dev) {memset(dev->frameBuffer, 0, 8*dev->cascade_size);}
+void clear(max7219_t *dev) {
+  if (dev == NULL) {
+      ESP_LOGE("ERROR", "Pointer to dev is null, cannot proceed!");
+      return;
+  }
+  memset(dev->frameBuffer, 0, 8*dev->cascade_size);
+}
 
 /**
  * @brief Shift text displayed one pixel left if scroll delay is passed.

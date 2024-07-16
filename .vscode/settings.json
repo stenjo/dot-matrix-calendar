@@ -50,7 +50,14 @@
         "setjmp.h": "c",
         "ics_parser.h": "c",
         "__locale": "c",
-        "max7219_priv.h": "c"
+        "max7219_priv.h": "c",
+        "gpio.h": "c",
+        "esp_log.h": "c",
+        "spi_master.h": "c",
+        "spi_common.h": "c",
+        "spi_types.h": "c",
+        "esp_attr.h": "c",
+        "locale": "c"
     },
     "cmake.configureOnOpen": false,
     "idf.port": "/dev/cu.usbmodem1234561",

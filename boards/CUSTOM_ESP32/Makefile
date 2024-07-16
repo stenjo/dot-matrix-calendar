@@ -33,6 +33,7 @@ deploy:
 	0x1000  $(BUILD)/bootloader/bootloader.bin \
 	0x8000  $(BUILD)/partition_table/partition-table.bin \
 	0x10000 $(MPBIN)
+	sleep 2
 
 merge:
 	$(ECHO) "Merge binary with src/ folder files"
@@ -75,6 +76,7 @@ removepy:
 
 copy:
 	rshell -p /dev/cu.usbserial-0001 rsync ../../src /pyboard
+	sleep 2
 
 mon:
 	picocom /dev/tty.usbserial-0001 --b 115200
