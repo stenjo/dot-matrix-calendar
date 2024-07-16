@@ -171,3 +171,4 @@ log
 **/unity-app
 **/frozen_*
 src/credentials
+**/dependencies.lock
