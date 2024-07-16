@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/stenjo/dot-matrix-calendar/compare/v0.4.2...v0.5.0) (2024-07-16)
+
+
+### Features
+
+* **esp32s3:** add support for Lolin esp32s3 min ([#42](https://github.com/stenjo/dot-matrix-calendar/issues/42)) ([b69f2fb](https://github.com/stenjo/dot-matrix-calendar/commit/b69f2fbd104ff6b0b986a4be3b8819875c034374))
+
 ## [0.4.2](https://github.com/stenjo/dot-matrix-calendar/compare/v0.4.1...v0.4.2) (2024-07-09)
 
 
