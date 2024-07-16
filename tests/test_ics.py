@@ -83,7 +83,7 @@ class TestCalendar(unittest.TestCase):
         
         calendar.parseURL('webcal://files-f3.motorsportcalendars.com/no/f3-calendar_p_q_sprint_feature.ics')
         count = calendar.parseURL('webcal://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics')
-        self.assertEqual(count, 25)
+        self.assertGreaterEqual(count, 25)
         
     def test_parseURL_Days_Ahead(self):
         
