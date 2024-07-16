@@ -66,30 +66,36 @@ void set_decode_mode(max7219_t *dev)
 
 // Public functions
 
-void init_descriptor(max7219_t* dev, spi_host_device_t host, uint32_t clock_speed_hz, gpio_num_t cs_pin)
-{
-    memset(&dev->spi_cfg, 0, sizeof(dev->spi_cfg));
-    dev->spi_cfg.spics_io_num = cs_pin;
-    dev->spi_cfg.clock_speed_hz = clock_speed_hz;
-    dev->spi_cfg.mode = 0;
-    dev->spi_cfg.queue_size = 1;
-    dev->spi_cfg.flags = SPI_DEVICE_NO_DUMMY;
+// void init_descriptor(max7219_t* dev, spi_host_device_t host, uint32_t clock_speed_hz, gpio_num_t cs_pin)
+// {
+//     memset(&dev->spi_cfg, 0, sizeof(dev->spi_cfg));
+//     dev->spi_cfg.spics_io_num = cs_pin;
+//     dev->spi_cfg.clock_speed_hz = clock_speed_hz;
+//     dev->spi_cfg.mode = 0;
+//     dev->spi_cfg.queue_size = 1;
+//     dev->spi_cfg.flags = SPI_DEVICE_NO_DUMMY;
 
-    spi_bus_add_device(host, &dev->spi_cfg, &dev->spi_dev);
-}
+//     spi_bus_add_device(host, &dev->spi_cfg, &dev->spi_dev);
+// }
 
 void init_display(max7219_t* dev)
 {
+    ESP_LOGI("DEBUG", "Entering init_display");
+
+    if (dev == NULL) {
+        ESP_LOGE("ERROR", "Pointer to device is null, cannot proceed!");
+        return;
+    }
     if (!dev->cascade_size || dev->cascade_size > MAX7219_MAX_CASCADE_SIZE)
     {
-        printf("Invalid cascade size %d", dev->cascade_size);
+        ESP_LOGE("ERROR", "Invalid cascade size %d", dev->cascade_size);
         return;
     }
 
     uint8_t max_digits = dev->cascade_size * ALL_DIGITS;
     if (dev->digits > max_digits)
     {
-        printf("Invalid digits count %d, max %d", dev->digits, max_digits);
+        ESP_LOGE("ERROR", "Invalid digits count %d, max %d", dev->digits, max_digits);
         return;
     }
     if (!dev->digits)

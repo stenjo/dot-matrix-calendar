@@ -16,6 +16,7 @@
 #else
 #include <driver/spi_master.h>
 #include <driver/gpio.h> // add by nopnop2002
+#include "soc/spi_pins.h"
 #endif
 
 
@@ -24,8 +25,9 @@
 #define MAX7219_MAX_CASCADE_SIZE 16
 #define MAX7219_MAX_BRIGHTNESS   15
 
-#define DEFAULT_SCROLL_DELAY 30
-#define DEFAULT_CASCADE_SIZE 8
+#define DEFAULT_SCROLL_DELAY    20
+#define DEFAULT_CASCADE_SIZE    8
+#define DEFAULT_BAUDRATE        500000
 #define DEFAULT_SPI_HOST        MICROPY_HW_SPI_HOST
 #define DEFAULT_PIN_NUM_MOSI    MICROPY_HW_SPI1_MOSI //19
 #define DEFAULT_PIN_NUM_CLK     MICROPY_HW_SPI1_SCK //18
@@ -43,8 +45,26 @@
  */
 typedef struct
 {
+    /* SPI Controls*/
     spi_device_interface_config_t spi_cfg;
+    spi_host_device_t host;
+    uint32_t baudrate;
+    uint8_t polarity;
+    uint8_t phase;
+    uint8_t bits;
+    uint8_t firstbit;
+    int8_t sck;
+    int8_t mosi;
+    int8_t miso;
+    int8_t cs;
     spi_device_handle_t spi_dev;
+    enum {
+        MAX7219_SPI_STATE_NONE,
+        MAX7219_SPI_STATE_INIT,
+        MAX7219_SPI_STATE_DEINIT
+    } state;
+
+    /* MAX7219 controls */    
     uint8_t digits;              //!< Accessible digits in 7seg. Up to cascade_size * 8
     uint8_t cascade_size;        //!< Up to `MAX7219_MAX_CASCADE_SIZE` MAX721xx cascaded
     uint8_t flags;
@@ -61,7 +81,6 @@ typedef struct
     uint64_t mrqTmstmp;
     uint8_t frameBuffer[MAX7219_MAX_CASCADE_SIZE*8];
 } max7219_t;
-
 
 
 void init_descriptor(max7219_t *dev, spi_host_device_t host, uint32_t clock_speed_hz, gpio_num_t cs_pin);
