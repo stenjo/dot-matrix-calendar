@@ -123,9 +123,9 @@ static void spi_deinit(max7219_t *spi_dev) {
             return;
     }
 
-    int8_t pins[3] = {spi_dev->miso, spi_dev->mosi, spi_dev->sck};
+    int8_t pins[4] = {spi_dev->miso, spi_dev->mosi, spi_dev->sck, spi_dev->cs};
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 4; i++) {
         if (pins[i] != -1) {
             esp_rom_gpio_pad_select_gpio(pins[i]);
             esp_rom_gpio_connect_out_signal(pins[i], SIG_GPIO_OUT_IDX, false, false);
@@ -146,7 +146,7 @@ static void spi_deinit(max7219_t *spi_dev) {
 static void mp_dotmatrix_spi_argcheck(mp_arg_val_t args[], const mp_dotmatrix_spi_default_pins_t *default_pins) {
 // A non-NULL default_pins argument will trigger the "use default" behavior.
     // Replace pin args with default/current values for new vs init call, respectively
-    for (int i = ARG_sck; i <= ARG_miso; i++) {
+    for (int i = ARG_sck; i <= ARG_cs; i++) {
         if (args[i].u_obj == MP_OBJ_NULL) {
             args[i].u_int = default_pins ? default_pins->array[i - ARG_sck] : -2;
         } else if (args[i].u_obj == mp_const_none) {
