@@ -10,10 +10,12 @@ import utils
 gc.collect()
 print("Free mem: ",gc.mem_free())
 
-# (8x8 blocks, spi host, clock speed, CS pin)
-m = Matrix8x8(4,20,1)
+
+# # (8x8 blocks, spi host, clock speed, CS pin)
+# m = Matrix8x8(4,20,1)
+
 m.clear()
-m.init()
+# m.init()
 
 
 # Get version
@@ -30,6 +32,7 @@ print("Free mem: ",gc.mem_free())
 
 try:
     event = c.first()
+    if event: m.marquee(dayText(event))
     while True:
         if scrollDone is False: scrollDone = m.scroll(False)
         if scrollDone is True: clockDone = clock.display(m)

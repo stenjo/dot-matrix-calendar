@@ -2,7 +2,6 @@
 # Nothing in here needs to be customised, it will work for any board.
 
 cmake_minimum_required(VERSION 3.12)
-add_definitions(-DESP32)
 
 # Set the location of MicroPython, the esp32 port, and the board directory.
 get_filename_component(PROJECT_DIR "../.." ABSOLUTE)
@@ -23,10 +22,6 @@ foreach(SDKCONFIG_DEFAULT ${SDKCONFIG_DEFAULTS})
     file(READ ${SDKCONFIG_DEFAULT} CONTENTS)
     file(APPEND ${CMAKE_BINARY_DIR}/sdkconfig.combined.in "${CONTENTS}")
 endforeach()
-
-file(READ sdkconfig.board CONTENTS)
-file(APPEND ${CMAKE_BINARY_DIR}/sdkconfig.combined.in "${CONTENTS}")
-
 configure_file(${CMAKE_BINARY_DIR}/sdkconfig.combined.in ${CMAKE_BINARY_DIR}/sdkconfig.combined COPYONLY)
 set(SDKCONFIG_DEFAULTS ${CMAKE_BINARY_DIR}/sdkconfig.combined)
 
