@@ -3,6 +3,53 @@ from datetime import datetime, timedelta
 from mrequests import mrequests
 import re, time
 
+def contains_non_unicode_bytes(s):
+    try:
+        s.encode('utf-8')
+    except UnicodeEncodeError:
+        return True
+    return False
+
+import sys
+
+def log_error(tag, message):
+    print("[ERROR] [{}] {}".format(tag, message), file=sys.stderr)
+
+def log_info(tag, message):
+    print("[INFO] [{}] {}".format(tag, message))
+
+def is_continuation_byte(byte):
+    return (byte & 0xC0) == 0x80
+
+def is_valid_utf8(byte_string):
+    bytes = bytearray(byte_string)
+    i = 0
+    while i < len(bytes):
+        byte = bytes[i]
+        if byte <= 0x7F:
+            i += 1
+        elif (byte & 0xE0) == 0xC0:
+            if i + 1 >= len(bytes) or not is_continuation_byte(bytes[i + 1]):
+                log_error("UTF8_CHECK", "Invalid 2-byte sequence at index {}".format(i))
+                return False
+            i += 2
+        elif (byte & 0xF0) == 0xE0:
+            if i + 2 >= len(bytes) or not is_continuation_byte(bytes[i + 1]) or not is_continuation_byte(bytes[i + 2]):
+                log_error("UTF8_CHECK", "Invalid 3-byte sequence at index {}".format(i))
+                return False
+            i += 3
+        elif (byte & 0xF8) == 0xF0:
+            if i + 3 >= len(bytes) or not is_continuation_byte(bytes[i + 1]) or not is_continuation_byte(bytes[i + 2]) or not is_continuation_byte(bytes[i + 3]):
+                log_error("UTF8_CHECK", "Invalid 4-byte sequence at index {}".format(i))
+                return False
+            i += 4
+        else:
+            log_error("UTF8_CHECK", "Invalid UTF-8 start byte at index {}".format(i))
+            return False
+    log_info("UTF8_CHECK", "Valid UTF-8 string")
+    return True
+
+
 def dtStrToIso(dtstart):
     # Assuming the format of dtstart is '20230412T165722Z'
     # We remove the 'Z' as it indicates UTC and 'fromisoformat' does not support 'Z'
@@ -123,10 +170,13 @@ class Calendar(ICS):
                         if not chunk:
                             break
                         try:
-                            decoded_chunk = chunk.decode(encoding)
-                            count = self.parseIcs(decoded_chunk)
+                            # decoded_chunk = chunk.decode(encoding)
+                            # if contains_non_unicode_bytes(decoded_chunk):
+                            #     print("Non-Unicode bytes detected, skipping chunk")
+                            count = self.parseIcs(chunk)
                         except UnicodeError as e:
                             print(f"UnicodeDecodeError occurred: {e}")
+                            is_valid_utf8(chunk)
                 finally:
                     response.close()
                 print(f"Parsed {count} items from URL in chunks")

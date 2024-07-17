@@ -50,3 +50,7 @@ prepare:
 
 deploy:
 	$(PYTHON) $(MICROPY_TOP)/tools/pydfu.py -u $(BUILD)/firmware.dfu
+
+test: firmware
+	MICROPYPATH=../../modules ./build/micropython ../../tests/test_ics.py
+
