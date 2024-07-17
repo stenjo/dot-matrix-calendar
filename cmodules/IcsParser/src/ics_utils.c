@@ -2,6 +2,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 
 bool parse_date_string(const char *date_str, struct tm *tm) {
     if (date_str == NULL) {
