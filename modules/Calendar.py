@@ -154,6 +154,8 @@ class Calendar(ICS):
 
     def _parseChunks(self, url, chunkSize=1024):
         print(f"Fetching URL in chunks: {url}")
+        start = time.ticks_ms()
+        timeout = 20000
         response = None
         try:
             response = mrequests.get(url, headers={b"accept": b"text/html"}, response_class=ResponseWithProgress)
@@ -164,23 +166,28 @@ class Calendar(ICS):
             if response and response.status_code == 200:
                 count = 0
                 try:
-                    encoding = response.encoding if response.encoding else 'utf-8'
-                    while True:
+                    while time.ticks_diff(time.ticks_ms(), start) < timeout:
                         chunk = response.read(chunkSize)
-                        if not chunk:
+                        if not chunk or len(chunk) == 0:
                             break
                         try:
                             # decoded_chunk = chunk.decode(encoding)
                             # if contains_non_unicode_bytes(decoded_chunk):
                             #     print("Non-Unicode bytes detected, skipping chunk")
                             count = self.parseIcs(chunk)
+                            start = time.ticks_ms()
                         except UnicodeError as e:
                             print(f"UnicodeDecodeError occurred: {e}")
                             is_valid_utf8(chunk)
+                    if time.ticks_diff(time.ticks_ms(), start) > timeout:
+                        print(f"Timeout reading  {url}")
+                        
                 finally:
                     response.close()
+                    
                 print(f"Parsed {count} items from URL in chunks")
                 return count
+            
             else:
                 print(response)
                 if response is not None:
