@@ -3,17 +3,17 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "ics_parser.h"
+#include "ics_utils.h"
 
 const event_t nullEvent = {NULL, NULL, NULL, NULL, 0,0};
 static char *data_buffer = NULL;
 
 void updateBuffer(const char *new_data) {
+
     if (data_buffer == NULL) {
         // Allocate initial buffer if data_buffer is NULL
-        // printf("\nAllocate %u bytes for buffer\n", strlen(new_data) + 1);
-
         data_buffer = malloc(strlen(new_data) + 1);
-        memset(data_buffer, 0, strlen(new_data) + 1);
+        memset(data_buffer, 0xFF, strlen(new_data) + 1);
         if (data_buffer == NULL) {
             printf("\nMemory allocation failed, trying to allocate %zu bytes\n", (size_t)(strlen(new_data) + 1));
             return;
@@ -24,9 +24,7 @@ void updateBuffer(const char *new_data) {
         // Reallocate buffer if data_buffer is not NULL
         size_t new_data_len = strlen(new_data);
         size_t buffer_len = strlen(data_buffer);
-        // printf("\nReallocate %u bytes for buffer", buffer_len + new_data_len + 1);
         char *new_buffer = realloc(data_buffer, buffer_len + new_data_len + 1);
-        // printf(" - Buffer length: %u", strlen(data_buffer));
         if (!new_buffer) {
             printf("Memory reallocation failed, trying to reallocate %zu bytes with additional %zu bytes\n", buffer_len, new_data_len);
             return;
@@ -34,6 +32,7 @@ void updateBuffer(const char *new_data) {
         data_buffer = new_buffer;
         memset(data_buffer+buffer_len, 0, new_data_len + 1);
         strcat(data_buffer, new_data);
+    
     }
 
 }
@@ -59,13 +58,9 @@ event_t getEvent(void) {
     if (!vevent_end) {
         return event;
     }
-    // char part[100] = "";
-    // strncpy(part, vevent_start, (vevent_end - vevent_start));
-    // printf(" - buffer event: %s\n", part);
 
     event.summary = extract_property(vevent_start, "SUMMARY:", vevent_end);
-    // printf(" - event summary: %s\n", event.summary);
-    
+
     event.uid = extract_property(vevent_start, "UID:", vevent_end);
     event.dtstart = extract_property(vevent_start, "DTSTART;VALUE=DATE:", vevent_end);
     if (!event.dtstart) {
@@ -87,9 +82,8 @@ event_t getEvent(void) {
         data_buffer = NULL;
     } else {
         size_t buffer_length = strlen(data_buffer) - offset;
-        memmove(data_buffer, data_buffer + offset, buffer_length+2);
-        char *new_buffer = realloc(data_buffer,buffer_length);
-        // printf(" - Buffer length: %u", strlen(data_buffer));
+        memmove(data_buffer, data_buffer + offset, buffer_length + 1);
+        char *new_buffer = realloc(data_buffer, buffer_length + 1);
         if (!new_buffer) {
             printf("Memory reallocation failed, trying to reallocate %zu bytes\n", buffer_length);
             return event;
@@ -101,7 +95,6 @@ event_t getEvent(void) {
 }
 
 char *extract_property(const char *data, const char *property, const char *end) {
-    // char * src = strndup(data, end - data);
     const char *start = strnstr(data, property, end - data);
     if (!start) {
         return NULL;
@@ -111,13 +104,9 @@ char *extract_property(const char *data, const char *property, const char *end) 
 
     // Find the end of the property value (handle both \r\n and \n)
     const char *terminator = strstr(start, "\r\n");
-    if (!terminator) {
-        terminator = strstr(start, "\n");
-    }
 
-    if (!terminator) {
-        return NULL;
-    }
+    if (!terminator) terminator = strstr(start, "\n");
+    if (!terminator) return NULL;
 
     size_t len = terminator - start;
     char *value = malloc(len + 1);
@@ -130,44 +119,29 @@ char *extract_property(const char *data, const char *property, const char *end) 
 
 event_t getFirstEvent(ics_t *ics)
 {
-    if (ics == NULL || ics->count == 0) {
-
-        return nullEvent; 
-    }
-
+    if (ics == NULL || ics->count == 0) return nullEvent; 
     ics->current = 0;
-
     return getCurrentEvent(ics);
 
 }
 
 event_t getNextEvent(ics_t *ics)
 {
-    if (atEnd(ics))
-    {
-        return nullEvent; 
-    }
-
+    if (atEnd(ics)) return nullEvent; 
     ics->current++;
     return getCurrentEvent(ics);
 }
 
 event_t getLastEvent(ics_t *ics)
 {
-    if (ics == NULL || ics->count == 0) {
-        return nullEvent; 
-    }
+    if (ics == NULL || ics->count == 0) return nullEvent; 
     ics->current = ics->count - 1;
     return getCurrentEvent(ics);
 }
 
 event_t getCurrentEvent(ics_t *ics)
 {
-    if (ics == NULL || ics->count == 0) {
-        return nullEvent; 
-    }
-    // printf("Event: %s %s\n", ics->events[ics->current].summary, ics->events[ics->current].dtstart);
-
+    if (ics == NULL || ics->count == 0) return nullEvent; 
     return ics->events[ics->current];
 }
 
@@ -183,11 +157,9 @@ int setCurrentEvent(ics_t *ics, size_t index)
 
 event_t getEventAt(ics_t *ics, size_t index) 
 {
-    if (ics == NULL || ics->count == 0) {
-        return nullEvent; 
-    }
-    size_t saved_index = ics->current;
+    if (ics == NULL || ics->count == 0) return nullEvent; 
 
+    size_t saved_index = ics->current;
     int current = setCurrentEvent(ics, index);
     if (current == -1) {
         return nullEvent;
