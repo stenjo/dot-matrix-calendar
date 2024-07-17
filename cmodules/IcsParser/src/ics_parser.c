@@ -9,22 +9,8 @@
 #include "ics_event.h"
 #include "ics_parser.h"
 
-
-// Helper function to find the end of the line ('\r\n')
-// static char *find_eol(char *s) {
-//     if (s == NULL) return NULL;
-//     while (*s != '\0' && !(s[0] == '\r' || s[0] == '\n')) {
-//         s++;
-//     }
-
-//     if (*s == '\0') {
-//         return NULL;  // Return NULL if we're at the end of the string
-//     } else {
-//         return s;
-//     }
-// }
-
 #define CHUNK_SIZE 1024
+
 
 size_t parseFile(ics_t *ics, const char *file_path) {
     resetGetEvent(); // Start off with clear buffer
@@ -63,14 +49,11 @@ size_t parseFile(ics_t *ics, const char *file_path) {
 }
 
 size_t parseIcs(ics_t *ics, const char *ics_data) {
-    // printf("Updating buffer: %lu\n", strlen(ics_data));
     updateBuffer(ics_data);
     event_t event;
     while ((event = getEvent()).dtstart != NULL) {
-        // printf("Found event: %s\n", event.summary);
 
         struct tm tm_event_start = {0};
-        // struct tm tm_event_end;
         if (parse_date_string(event.dtstart, &tm_event_start)) {
             time_t event_time = mktime(&tm_event_start);
             event.tstart = event_time;
@@ -82,9 +65,6 @@ size_t parseIcs(ics_t *ics, const char *ics_data) {
                 (ics->startTime == 0 || afterStartFilter >= 0) &&
                 (ics->endTime == 0 || beforeEndFilter >= 0)
             ) {
-                // parse_date_string(event.dtstart, &tm_event_start);
-                // time_t event_time_end = mktime(&tm_event_end);
-                // event.tend = event_time;
                 if (ics->count >= ics->capacity) {
                     size_t new_capacity = ics->capacity + 20;
                     event_t *new_events = realloc(ics->events, new_capacity * sizeof(event_t));
@@ -96,12 +76,7 @@ size_t parseIcs(ics_t *ics, const char *ics_data) {
                         break;
                     }
                 }
-                // ics->events[ics->count] = event;
-                // printf("Event: %s %s\n", event.summary, event.dtstart);
-                // printf("Copy event to list: dest %lu, source %lu, size %lu\n",  (unsigned long)&(ics->events[ics->count]), (unsigned long)&event, sizeof(event));
                 memcpy(&(ics->events[ics->count]), &event, sizeof(event));
-                // printf("Event copied to list: %s\n", ics->events[ics->count].summary);
-                // printf("Event: %s %s - copied\n", ics->events[ics->count].summary, ics->events[ics->count].dtstart);
                 ics->count++;
             } else {
                 freeEvent(event);
@@ -111,7 +86,6 @@ size_t parseIcs(ics_t *ics, const char *ics_data) {
         }
     }
 
-    // printf("Parsed %zu events\n", ics->count);
     return ics->count;
 }
 
