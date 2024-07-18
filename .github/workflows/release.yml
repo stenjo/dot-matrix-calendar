@@ -22,10 +22,17 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
-      - name: Fetch tags
-        run: git fetch --tags
-
-
+      - name: Fetch all history and tags
+        run: |
+            git fetch --all
+            git fetch --tags
+            git pull
+  
+      - name: Clean up repository state
+        run: |
+            git reset --hard
+            git clean -fdx
+  
       - uses: googleapis/release-please-action@v4
         id: release
         with:
