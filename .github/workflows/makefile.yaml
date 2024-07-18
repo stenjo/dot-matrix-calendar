@@ -82,7 +82,7 @@ jobs:
         
     - name: Initialize submodules and create frozen modules
       run: |
-        source ../../../../esp-idf/export.sh
+        source esp-idf/export.sh
         git submodule update --init lib/micropython
         make prepare
         
