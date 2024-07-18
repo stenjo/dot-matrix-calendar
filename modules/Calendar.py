@@ -130,7 +130,7 @@ class Calendar(ICS):
             self.end(end)
         
         if daysAhead is not None:
-            self.startTime = datetime.now().timetuple()
+            self.startTime = (datetime.now() - timedelta(1)).timetuple()
             self.start(self.startTime)
             self.endTime = (datetime.now() + timedelta(daysAhead)).timetuple()
             self.end(self.endTime)

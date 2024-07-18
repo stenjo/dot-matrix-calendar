@@ -32,6 +32,18 @@ void test_parse_date_string_invalid_format(void) {
     TEST_ASSERT_FALSE(result);
 }
 
+void test_parse_date_string_both_format(void) {
+    const char *time_string = "20230615T000000Z";
+    const char *date_string = "20230615";
+    struct tm tm_time = {0};
+    struct tm tm_date = {0};
+    bool result = parse_date_string(date_string, &tm_date);
+    TEST_ASSERT_TRUE(result);
+    result = parse_date_string(time_string, &tm_time);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL_INT(mktime(&tm_time), mktime(&tm_date));
+}
+
 void test_parse_date_string_valid_format(void) {
     const char *date_string = "20240420";
     struct tm tm_result = {0};
