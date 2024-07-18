@@ -30,9 +30,11 @@ jobs:
 
       - name: Show git history for debugging
         run: |
-          git log -n 10
-          git tag
-      
+            echo "Recent commits:"
+            git log -n 20
+            echo "Tags:"
+            git tag -l
+    
       - name: Clean up repository state
         run: |
             git reset --hard
