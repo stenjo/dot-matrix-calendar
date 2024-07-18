@@ -80,3 +80,8 @@ copy:
 
 mon:
 	picocom /dev/tty.usbserial-0001 --b 115200
+
+latest:
+	rm -rf build
+	$(Q)wget https://github.com/stenjo/dot-matrix-calendar/actions/runs/9990018864/artifacts/1714625733
+	mv esp32.zip.1 esp32.zip
