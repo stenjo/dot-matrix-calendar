@@ -74,41 +74,23 @@ jobs:
 
     - name: Install tools
       run: |
-        git clone -b v5.1.2 --recursive https://github.com/espressif/esp-idf.git
+        git clone -b v5.2.2 --recursive https://github.com/espressif/esp-idf.git
         cd esp-idf
         ./install.sh
         source export.sh
-        pip install esptool freezefs
+        pip install esptool freezefs vfs-merge
         
-    - name: Update repos
-      run: |
-        git submodule update --init lib/micropython
-        git submodule update --init modules/micropython-wifi-setup
-        make -C lib/micropython/mpy-cross
-        
-    - name: Make submodules    
-      working-directory: lib/micropython/ports/esp32
+    - name: Initialize submodules and create frozen modules
       run: |
         source ../../../../esp-idf/export.sh
-        make submodules
-        make
-      
-    - name: Make frozen extractable files    
-      working-directory: modules
-      run: |
-        pip install freezefs
-        git submodule update --init micropython-wifi-setup
-        git submodule update --init mrequests
-        python -m freezefs micropython-wifi-setup/lib/wifi_setup frozen_wifi_setup.py -ov always
-        python -m freezefs micropython-wifi-setup/lib/micro_web_srv_2 frozen_micro_web_srv_2.py -ov always
-
+        git submodule update --init lib/micropython
+        make prepare
         
     - name: Compile firmware
       working-directory: boards/CUSTOM_ESP32
       run: |
         source ../../esp-idf/export.sh
-        idf.py build
-        zip -r esp32.zip build -x build/CMakeFiles/**/*.bin -x build/bootloader/CMakeFiles/**/*.bin  -i *.bin -i *.elf
+        make
       
     - name: Merge with src files
       run: |
