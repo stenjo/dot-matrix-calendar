@@ -42,24 +42,19 @@ jobs:
             zip -r ${{ inputs.board }}.zip build -x build/CMakeFiles/**/*.bin -x build/bootloader/CMakeFiles/**/*.bin  -i *.bin -i *.elf
           
         - name: Merge with src files
+          continue-on-error: true
           run: |
             mkdir build
-            vfsmerge --port esp32 --firmware ./boards/${{ inputs.path }}/build/micropython.bin
+            vfsmerge --port ${{ inputs.board }} --firmware ./boards/${{ inputs.path }}/build/micropython.bin
           
-        - name: Check output
-          working-directory: boards/${{ inputs.path }}
-          run: ls -al build/*
-    
         - name: Save binary
           uses: actions/upload-artifact@v4
           with:
             name: ${{ inputs.board }}-binary
             path: boards/${{ inputs.path }}/${{ inputs.board }}.zip
-            
-        - name: Check output
-          run: ls -al build/
       
         - name: Save binary
+          continue-on-error: true
           uses: actions/upload-artifact@v4
           with:
             name: ${{ inputs.board }}-binary-src

@@ -92,3 +92,13 @@ copy:
 
 mon:
 	picocom $(REPL) --b 115200
+
+latest:
+	rm -rf build
+	$(Q)wget https://github.com/stenjo/dot-matrix-calendar/releases/latest/download/esp32s3.zip
+	mv esp32s2.zip.1 esp32s2.zip
+
+latest-src:
+	rm -rf build
+    wget https://github.com/stenjo/dot-matrix-calendar/releases/latest/download/esp32s3.zip
+	mv esp32s3.zip.1 esp32s3.zip
