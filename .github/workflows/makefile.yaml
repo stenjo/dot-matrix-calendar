@@ -77,12 +77,14 @@ jobs:
     - name: idf
       working-directory: esp-idf
       run: |
+        git submodule  update --init --recursive
         ./install.sh
         
     - name: Initialize submodules and create frozen modules
       run: |
         source esp-idf/export.sh
         git submodule update --init lib/micropython
+        pip install freezefs
         make prepare
         
     - name: Compile firmware
