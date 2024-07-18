@@ -27,7 +27,12 @@ jobs:
             git fetch --all
             git fetch --tags
             git pull
-  
+
+      - name: Show git history for debugging
+        run: |
+          git log -n 10
+          git tag
+      
       - name: Clean up repository state
         run: |
             git reset --hard
