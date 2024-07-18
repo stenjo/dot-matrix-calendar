@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release-please:
+    uses: ./.github/workflows/release-please.yaml
+    secrets: inherit
+
+  esp32:
+    needs: release-please
+    uses: ./.github/workflows/make_esp32.yaml
+    with:
+      board: esp32
+      path: CUSTOM_ESP32
+
+  esp32s2:
+    needs: release-please
+    uses: ./.github/workflows/make_esp32.yaml
+    with:
+      board: esp32s2
+      path: LOLIN_S2_MINI
+
+  esp32s3:
+    needs: release-please
+    uses: ./.github/workflows/make_esp32.yaml
+    with:
+      board: esp32s3
+      path: LOLIN_S2_MINI
+
+  upload-esp32s2:
+    if: ${{ needs.release-please.outputs.release_created }}
+    needs: esp32s2
+    uses: ./.github/workflows/upload-release.yaml
+    secrets: inherit
+    with:
+      board: esp32s2
+      path: LOLIN_S2_MINI
+      tag: ${{ needs.release-please.outputs.tag_name }}
+
+  upload-esp32s3:
+    if: ${{ needs.release-please.outputs.release_created }}
+    needs: esp32s3
+    uses: ./.github/workflows/upload-release.yaml
+    secrets: inherit
+    with:
+      board: esp32s3
+      path: LOLIN_S3_MINI
+      tag: ${{ needs.release-please.outputs.tag_name }}
+
