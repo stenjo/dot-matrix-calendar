@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.5.1](https://github.com/stenjo/dot-matrix-calendar/compare/v0.5.0...v0.5.1) (2024-07-18)
+
+
+### Bug Fixes
+
+* **ics:** fetching of calendar stream sometimes hangs ([#50](https://github.com/stenjo/dot-matrix-calendar/issues/50)) ([b89d570](https://github.com/stenjo/dot-matrix-calendar/commit/b89d5707bb18c6ede49b55bf7c23029fdac6e8e8))
+* **ics:** unicode error occurring frequently ([#46](https://github.com/stenjo/dot-matrix-calendar/issues/46)) ([0a21751](https://github.com/stenjo/dot-matrix-calendar/commit/0a2175177164c115fbd8f455ee992df68ed92260))
+* **start time:** all day events are not listed as today ([#54](https://github.com/stenjo/dot-matrix-calendar/issues/54)) ([9419b03](https://github.com/stenjo/dot-matrix-calendar/commit/9419b03e478b68e5625f3e6800b4117fe5acc305))
+
 ## [0.5.0](https://github.com/stenjo/dot-matrix-calendar/compare/v0.4.2...v0.5.0) (2024-07-16)
 
 
