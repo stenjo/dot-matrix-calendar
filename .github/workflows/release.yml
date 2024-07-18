@@ -3,7 +3,6 @@ name: Release
 on:
   push:
     branches: [main]
-    paths: ["!**/version.txt"]
 
 jobs:
   release-please:
