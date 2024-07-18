@@ -69,16 +69,15 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Exporting xtensa gcc path
-      run: echo "ESP_ESPRESSIF_ROOT=/usr/lib/espressif" >> $GITHUB_ENV
-
     - name: Install tools
       run: |
-        git clone -b v5.2.2 --recursive https://github.com/espressif/esp-idf.git
-        cd esp-idf
-        ./install.sh
-        source export.sh
         pip install esptool freezefs vfs-merge
+        git clone -b v5.2.2 --recursive https://github.com/espressif/esp-idf.git
+
+    - name: idf
+      working-directory: esp-idf
+      run: |
+        ./install.sh
         
     - name: Initialize submodules and create frozen modules
       run: |
