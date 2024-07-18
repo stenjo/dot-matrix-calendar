@@ -1,0 +1,24 @@
+name: Reusable upload release
+
+on:
+  workflow_call:
+    inputs:
+      board:
+        type: string
+        required: true
+      path:
+        type: string
+        required: true
+      tag:
+        type: string
+        required: true
+
+jobs:
+
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upload Release Artifact
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        run: gh release upload ${{ inputs.tag }} ./boards/${{ inputs.path}}/${{inputs.board}}.zip
