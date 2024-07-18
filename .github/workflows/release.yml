@@ -31,23 +31,33 @@ jobs:
       board: esp32s3
       path: LOLIN_S2_MINI
 
+  upload-esp32:
+    if: ${{ needs.release-please.outputs.release }}
+    needs: [release-please, esp32]
+    uses: ./.github/workflows/upload-release.yaml
+    secrets: inherit
+    with:
+      board: esp32
+      path: CUSTOM_ESP32
+      tag: ${{ needs.release-please.outputs.tag }}
+
   upload-esp32s2:
-    if: ${{ needs.release-please.outputs.release_created }}
-    needs: esp32s2
+    if: ${{ needs.release-please.outputs.release }}
+    needs: [release-please, esp32s2]
     uses: ./.github/workflows/upload-release.yaml
     secrets: inherit
     with:
       board: esp32s2
       path: LOLIN_S2_MINI
-      tag: ${{ needs.release-please.outputs.tag_name }}
+      tag: ${{ needs.release-please.outputs.tag }}
 
   upload-esp32s3:
-    if: ${{ needs.release-please.outputs.release_created }}
-    needs: esp32s3
+    if: ${{ needs.release-please.outputs.release }}
+    needs: [release-please, esp32s3]
     uses: ./.github/workflows/upload-release.yaml
     secrets: inherit
     with:
       board: esp32s3
       path: LOLIN_S3_MINI
-      tag: ${{ needs.release-please.outputs.tag_name }}
+      tag: ${{ needs.release-please.outputs.tag }}
 
