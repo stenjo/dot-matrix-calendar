@@ -91,7 +91,7 @@ size_t parseIcs(ics_t *ics, const char *ics_data) {
 
 time_t setStartDate(ics_t *ics, const char *start)
 {
-    struct tm tm_event_start = { 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    struct tm tm_event_start = { 0};
     if (parse_date_string(start, &tm_event_start)) {
         time_t event_time = mktime(&tm_event_start);
 
@@ -105,7 +105,7 @@ time_t setStartDate(ics_t *ics, const char *start)
 
 time_t setEndDate(ics_t *ics, const char *end)
 {
-    struct tm tm_event_end = { 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    struct tm tm_event_end = { 0 };
     if (parse_date_string(end, &tm_event_end)) {
         time_t event_time = mktime(&tm_event_end);
 
