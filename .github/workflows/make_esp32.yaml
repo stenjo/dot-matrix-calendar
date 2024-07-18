@@ -44,7 +44,7 @@ jobs:
         - name: Merge with src files
           run: |
             mkdir build
-            vfsmerge --port ${{ inputs.board }} --firmware ./boards/${{ inputs.path }}/build/micropython.bin
+            vfsmerge --port esp32 --firmware ./boards/${{ inputs.path }}/build/micropython.bin
           
         - name: Check output
           working-directory: boards/${{ inputs.path }}
