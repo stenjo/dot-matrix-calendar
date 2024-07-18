@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.2](https://github.com/stenjo/dot-matrix-calendar/compare/v0.5.1...v0.5.2) (2024-07-18)
+
+
+### Bug Fixes
+
+* **ci:** no upload when releasing ([ca3a398](https://github.com/stenjo/dot-matrix-calendar/commit/ca3a398bfa939212c0784cc4e210acdddbeccb7b))
+
 ## [0.5.1](https://github.com/stenjo/dot-matrix-calendar/compare/v0.5.0...v0.5.1) (2024-07-18)
 
 
