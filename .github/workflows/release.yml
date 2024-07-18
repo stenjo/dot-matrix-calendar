@@ -1,8 +1,10 @@
+name: Release
+
 on:
   push:
     branches:
       - main
-name: release-please
+
 jobs:
   release-please:
     uses: ./.github/workflows/release-please.yaml
