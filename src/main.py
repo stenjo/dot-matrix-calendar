@@ -21,7 +21,7 @@ m.clear()
 # Get version
 utils.show_ip_and_version(m)
 
-c=Calendar(daysAhead=14)
+c=Calendar(daysAhead=7)
 c.parseURL('webcal://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics')
 c.parseURL('webcal://files-f3.motorsportcalendars.com/no/f3-calendar_p_q_sprint_feature.ics')
 c.parseURL('https://calendar.google.com/calendar/ical/parterapeutene.no_e1or90m2lp6p523ma7u15v2pc0%40group.calendar.google.com/public/basic.ics')
