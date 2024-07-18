@@ -91,10 +91,10 @@ jobs:
       run: |
         source ../../esp-idf/export.sh
         make
+        zip -r esp32.zip build -x build/CMakeFiles/**/*.bin -x build/bootloader/CMakeFiles/**/*.bin  -i *.bin -i *.elf
       
     - name: Merge with src files
       run: |
-        pip install vfs_merge
         mkdir build
         vfsmerge --port esp32 --firmware ./boards/CUSTOM_ESP32/build/micropython.bin
       
@@ -122,7 +122,7 @@ jobs:
       working-directory: boards/LOLIN_S2_MINI
       run: |
         source ../../esp-idf/export.sh
-        idf.py build
+        make
         zip -r esp32s2.zip build -x build/CMakeFiles/**/*.bin -x build/bootloader/CMakeFiles/**/*.bin  -i *.bin -i *.elf
       
     - name: Check output
@@ -153,7 +153,7 @@ jobs:
       working-directory: boards/LOLIN_S3_MINI
       run: |
         source ../../esp-idf/export.sh
-        idf.py build
+        make
         zip -r esp32s3.zip build -x build/CMakeFiles/**/*.bin -x build/bootloader/CMakeFiles/**/*.bin  -i *.bin -i *.elf
       
     - name: Check output
