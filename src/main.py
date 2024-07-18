@@ -1,4 +1,3 @@
-import time
 from datetime import datetime, timezone, timedelta
 from dateHandling import dayText
 from DotMatrix import Matrix8x8
@@ -11,12 +10,7 @@ gc.collect()
 print("Free mem: ",gc.mem_free())
 
 
-# # (8x8 blocks, spi host, clock speed, CS pin)
-# m = Matrix8x8(4,20,1)
-
 m.clear()
-# m.init()
-
 
 # Get version
 utils.show_ip_and_version(m)
