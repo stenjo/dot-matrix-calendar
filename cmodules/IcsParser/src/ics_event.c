@@ -72,6 +72,9 @@ event_t getEvent(void) {
         event.dtend = extract_property(vevent_start, "DTEND:", vevent_end);
     }
 
+    event.rrule = extract_property(vevent_start, "RRULE:FREQ=", vevent_end);
+    event.interval = extract_property(vevent_start, "INTERVAL=", vevent_end);
+
     size_t offset = (vevent_end - data_buffer) + strlen("END:VEVENT");
     char * next_vevent_start = strstr(data_buffer + offset, "BEGIN:VEVENT");
     if (next_vevent_start) {

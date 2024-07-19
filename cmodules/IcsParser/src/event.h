@@ -9,6 +9,8 @@ typedef struct {
     char *dtstart;
     char *dtend;
     char *uid;
+    char *rrule;
+    char *interval;
     time_t tstart;
     time_t tend;
 } event_t;
