@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/stenjo/dot-matrix-calendar/compare/v1.0.1...v1.0.2) (2024-07-19)
+
+
+### Bug Fixes
+
+* **upload:** missing git repo on asset upload ([903248f](https://github.com/stenjo/dot-matrix-calendar/commit/903248f74f5e2885b9a048f9ea7c8cd6a3204257))
+
 ## [1.0.1](https://github.com/stenjo/dot-matrix-calendar/compare/v1.0.0...v1.0.1) (2024-07-19)
 
 
