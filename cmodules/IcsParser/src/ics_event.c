@@ -5,7 +5,7 @@
 #include "ics_parser.h"
 #include "ics_utils.h"
 
-const event_t nullEvent = {NULL, NULL, NULL, NULL, 0,0};
+const event_t nullEvent = {NULL, NULL, NULL, NULL, NULL, NULL, 0,0};
 static char *data_buffer = NULL;
 
 void updateBuffer(const char *new_data) {

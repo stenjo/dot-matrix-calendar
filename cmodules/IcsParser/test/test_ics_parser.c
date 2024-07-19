@@ -24,6 +24,32 @@ const char *ics_all_day = "BEGIN:VCALENDAR\r\n"
                       "END:VEVENT\r\n"
                       "END:VCALENDAR";
 
+const char *ics_repeated_4weekly = "BEGIN:VCALENDAR\r\n"
+                      "VERSION:2.0\r\n"
+                      "BEGIN:VEVENT\r\n"
+                      "DTSTART;VALUE=DATE:20240116\r\n"
+                      "DTEND;VALUE=DATE:20240117\r\n"
+                      "RRULE:FREQ=WEEKLY;INTERVAL=4\r\n"
+                      "DTSTAMP:20240424T062905Z\r\n"
+                      "UID:bug3i5ig6j8v71399cqi8ascco@google.com\r\n"
+                      "CREATED:20240101T133755Z\r\n"
+                      "LAST-MODIFIED:20240408T100539Z\r\n"
+                      "SEQUENCE:0\r\n"
+                      "STATUS:CONFIRMED\r\n"
+                      "SUMMARY:Restavfall\r\n"
+                      "TRANSP:TRANSPARENT\r\n"
+                      "X-APPLE-TRAVEL-ADVISORY-BEHAVIOR:AUTOMATIC\r\n"
+                      "BEGIN:VALARM\r\n"
+                      "ACTION:AUDIO\r\n"
+                      "TRIGGER:-PT15H\r\n"
+                      "X-WR-ALARMUID:239590F8-F791-4A22-994D-6FB9571B8038\r\n"
+                      "UID:239590F8-F791-4A22-994D-6FB9571B8038V\r\n"
+                      "ATTACH;VALUE=URI:Chord\r\n"
+                      "X-APPLE-DEFAULT-ALARM:TRUE\r\n"
+                      "ACKNOWLEDGED:20240408T100536Z\r\n"
+                      "END:VALARM\r\n"
+                      "END:VEVENT";
+
 const char *ics_data3 = "BEGIN:VCALENDAR\r\n"
                       "VERSION:2.0\r\n"
                       "BEGIN:VEVENT\r\n"
@@ -66,7 +92,7 @@ void tearDown(void) {
 
 void test_parseAllDayEventToday(void) {
 
-    char * event =  "BEGIN:VCALENDAR\r\n"
+    const char * event =  "BEGIN:VCALENDAR\r\n"
                     "VERSION:2.0\r\n"
                     "BEGIN:VEVENT\r\n"
                     "DTSTART;VALUE=DATE:20240427\r\n"
@@ -582,6 +608,27 @@ void test_parse_with_start_and_end_dates(void) {
 
     const char *data = "BEGIN:VEVENT\r\nSUMMARY:Event 1\r\nDTSTART:20230615T090000Z\r\nDTEND:20230615T100000Z\r\nEND:VEVENT\r\nBEGIN:VEVENT\r\nSUMMARY:Event 2\r\nDTSTART:20230617T090000Z\r\nDTEND:20230617T100000Z\r\nEND:VEVENT\r\n";
     size_t count = parseIcs(&ics, data);
+
+    TEST_ASSERT_EQUAL(1, count);
+    TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0].summary);
+    TEST_ASSERT_EQUAL_STRING("20230615T090000Z", ics.events[0].dtstart);
+    TEST_ASSERT_EQUAL_STRING("20230615T100000Z", ics.events[0].dtend);
+
+    freeIcs(&ics);
+}
+
+void test_parse_with_start_and_end_dates_repeat(void) {
+    ics_t ics;
+    initIcs(&ics);
+    initIcsDates(&ics);
+
+    const char *startDate = "20230615T000000Z";
+    const char *endDate = "20230616T235959Z";
+    ics.startTime = setStartDate(&ics, startDate);
+    ics.endTime = setEndDate(&ics, endDate);
+
+    const char *data = "BEGIN:VEVENT\r\nSUMMARY:Event 1\r\nDTSTART:20230615T090000Z\r\nDTEND:20230615T100000Z\r\nEND:VEVENT\r\nBEGIN:VEVENT\r\nSUMMARY:Event 2\r\nDTSTART:20230617T090000Z\r\nDTEND:20230617T100000Z\r\nEND:VEVENT\r\n";
+    size_t count = parseIcs(&ics, ics_repeated_4weekly);
 
     TEST_ASSERT_EQUAL(1, count);
     TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0].summary);

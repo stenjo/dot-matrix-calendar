@@ -24,5 +24,6 @@
     "mesonbuild.selectRootDir": false,
     "gcovViewer.buildDirectories": [
         "/Users/sten.johnsen/git/dot-matrix-calendar/cmodules/IcsParser/build"
-    ]
+    ],
+    "sonarlint.pathToCompileCommands": "${workspaceFolder}/build/artifacts/compile_commands.json"
 }
