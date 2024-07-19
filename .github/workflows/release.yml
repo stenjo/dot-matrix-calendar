@@ -8,8 +8,6 @@ on:
   push:
     branches: [main]
     paths-ignore: ['**/version.txt']
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -25,25 +23,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-
-      - name: Fetch all history and tags
-        run: |
-            git fetch --all
-            git fetch --tags
-            git pull
-
-      - name: Show git history for debugging
-        run: |
-            echo "Recent commits:"
-            git log -n 20
-            echo "Tags:"
-            git tag -l
-    
-      - name: Clean up repository state
-        run: |
-            git reset --hard
-            git clean -fdx
-  
+ 
       - uses: googleapis/release-please-action@v4
         id: release
         with:
