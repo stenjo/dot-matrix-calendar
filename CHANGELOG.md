@@ -1,5 +1,58 @@
 # Changelog
 
+## [1.0.0](https://github.com/stenjo/dot-matrix-calendar/compare/v0.0.1...v1.0.0) (2024-07-19)
+
+
+### Features
+
+* **calendar:** parse ical feed ([#12](https://github.com/stenjo/dot-matrix-calendar/issues/12)) ([91c343a](https://github.com/stenjo/dot-matrix-calendar/commit/91c343ab50ce214af8828c6e43c4dbc15c865e8b))
+* **doc:** add documentation ([#16](https://github.com/stenjo/dot-matrix-calendar/issues/16)) ([f9ba820](https://github.com/stenjo/dot-matrix-calendar/commit/f9ba820879263502cacef28243b7ba138f62cd42))
+* **esp32s3:** add support for Lolin esp32s3 min ([#42](https://github.com/stenjo/dot-matrix-calendar/issues/42)) ([dc09997](https://github.com/stenjo/dot-matrix-calendar/commit/dc099978cbda1c2fb1a196d029af78c6dc779f07))
+* **ical:** handle large ics files ([#35](https://github.com/stenjo/dot-matrix-calendar/issues/35)) ([9ccaf0c](https://github.com/stenjo/dot-matrix-calendar/commit/9ccaf0c9e22460cc858cc9f72cb4d3a01b3becbf))
+* **main:** cleanup ([8d9506f](https://github.com/stenjo/dot-matrix-calendar/commit/8d9506fd29736ba2796d2e9d8ac42983fa670e9e))
+* **scroller:** improve speed on display ([fb0dc98](https://github.com/stenjo/dot-matrix-calendar/commit/fb0dc98448769e2232de2bd5261908e3e5d1a5d5))
+
+
+### Bug Fixes
+
+* **artifact:** upload artifact on release ([462248f](https://github.com/stenjo/dot-matrix-calendar/commit/462248fbbfc87d3ecb3c4fe2fb211a11136f5f2e))
+* **binaries:** binaries upload ([7a6e972](https://github.com/stenjo/dot-matrix-calendar/commit/7a6e972131ac921724d067e072ea53069adf3897))
+* **binaries:** include bootloadere.bin and partition_table.bin too ([9f687de](https://github.com/stenjo/dot-matrix-calendar/commit/9f687defc93effb2be327fca0f3094d1898b8831))
+* **binaries:** upload zipped binaries on release ([9e54a36](https://github.com/stenjo/dot-matrix-calendar/commit/9e54a3600aa176c89f7e4adbb86e68950dc47528))
+* **calendar.py:** missing exception handling ([e7790c4](https://github.com/stenjo/dot-matrix-calendar/commit/e7790c459fab49b9ef60cb7f5b51e5adc332a020))
+* **calendar:** crashes when refetch fails ([#15](https://github.com/stenjo/dot-matrix-calendar/issues/15)) ([a6b5741](https://github.com/stenjo/dot-matrix-calendar/commit/a6b5741ae331071a9e175ed6370db730e573ed23))
+* **ci:** error on push release ([fd71370](https://github.com/stenjo/dot-matrix-calendar/commit/fd71370ed0bffa85d54af66e7be020cbf6dbced5))
+* **ci:** ignore updatees to version.txt ([e14bb66](https://github.com/stenjo/dot-matrix-calendar/commit/e14bb66fac1c7f9c8391c668914be7a6175e2725))
+* **ci:** make releaseplease work again ([#56](https://github.com/stenjo/dot-matrix-calendar/issues/56)) ([ca89f67](https://github.com/stenjo/dot-matrix-calendar/commit/ca89f6706b50f0f7b30dd1be506de977041e1c0b))
+* **ci:** missing mrequests ([3e20618](https://github.com/stenjo/dot-matrix-calendar/commit/3e20618200117059f715cf6af7050b991a8e25de))
+* **ci:** no upload when releasing ([c23c188](https://github.com/stenjo/dot-matrix-calendar/commit/c23c188a924d991df4290a52e492c1ac9d8076cc))
+* **ci:** releasing ([#60](https://github.com/stenjo/dot-matrix-calendar/issues/60)) ([f25d62a](https://github.com/stenjo/dot-matrix-calendar/commit/f25d62aee364fac73f26d60bcdc97c0fb39e5aca))
+* **ci:** releasing ([#61](https://github.com/stenjo/dot-matrix-calendar/issues/61)) ([94526ba](https://github.com/stenjo/dot-matrix-calendar/commit/94526ba93ac51a071d676df84d1986ebcd6aa761))
+* **docs:** added missing step on cloning repo ([6e18fdc](https://github.com/stenjo/dot-matrix-calendar/commit/6e18fdc6a2ffe59927610b0648cfc0432c0501ab))
+* **docs:** docs and upload ([944106f](https://github.com/stenjo/dot-matrix-calendar/commit/944106fd9dc690eb1777b6408222a1b1ad2ce716))
+* **docs:** update README.md with easy programming instructions ([58787e3](https://github.com/stenjo/dot-matrix-calendar/commit/58787e31aea902043655e1c79e716d9ae4b820c8))
+* **ics:** fetching of calendar stream sometimes hangs ([#50](https://github.com/stenjo/dot-matrix-calendar/issues/50)) ([38d1f03](https://github.com/stenjo/dot-matrix-calendar/commit/38d1f03972b89e8c520ffde0e8d6c614d0bcf08a))
+* **ics:** unicode error occurring frequently ([#46](https://github.com/stenjo/dot-matrix-calendar/issues/46)) ([b398ed5](https://github.com/stenjo/dot-matrix-calendar/commit/b398ed5ae1b5ca4792a4fb1e47f6f9e949a1fc86))
+* **main.py:** clean up and move code into modules ([8cd37e7](https://github.com/stenjo/dot-matrix-calendar/commit/8cd37e7b4c26c8de03887e3c1d952a55bb8cf0d1))
+* **main.py:** updated Calendar.py to handle days ahead param ([#37](https://github.com/stenjo/dot-matrix-calendar/issues/37)) ([8fa592e](https://github.com/stenjo/dot-matrix-calendar/commit/8fa592ead3707e0ff5a83f528792cbc0b6264e0d))
+* **network:** add urequests ([d4a129b](https://github.com/stenjo/dot-matrix-calendar/commit/d4a129b35fe13d8de70ae49aae752ccb2d8b6ad4))
+* **network:** reconnect when disconnected ([a5629eb](https://github.com/stenjo/dot-matrix-calendar/commit/a5629ebe4b1009bb931f65473df61a3e2f56e96a))
+* **parsing:** trying to handle unicode errors ([c52eb68](https://github.com/stenjo/dot-matrix-calendar/commit/c52eb6855240a894f372bca3cae52fcb9c44e5ac))
+* **release:** make release process work ([f34d472](https://github.com/stenjo/dot-matrix-calendar/commit/f34d4728038edade2540a95b086e42324398afa0))
+* **release:** missing platform esp32 on installing tools ([cbbef09](https://github.com/stenjo/dot-matrix-calendar/commit/cbbef09576f31a484f42bb74d3eff34e509f473b))
+* **release:** release-please failling ([8a0702c](https://github.com/stenjo/dot-matrix-calendar/commit/8a0702cfae6306e215139ed5a802ae10caa4ba0a))
+* **release:** release-please refuses to create a release ([#62](https://github.com/stenjo/dot-matrix-calendar/issues/62)) ([c3b1947](https://github.com/stenjo/dot-matrix-calendar/commit/c3b194730518626cc4bd795330303e5329a4541c))
+* **release:** update release flow to include binary ([#17](https://github.com/stenjo/dot-matrix-calendar/issues/17)) ([91bbd9a](https://github.com/stenjo/dot-matrix-calendar/commit/91bbd9a9b5ad7168ee9ac44583801eefe7606efc))
+* **release:** use uploaded binary ([214261c](https://github.com/stenjo/dot-matrix-calendar/commit/214261c0ddca130b429f7cbe842a65b9ab898cb2))
+* **release:** wrong path ([8e78d96](https://github.com/stenjo/dot-matrix-calendar/commit/8e78d966adbd1fc5b9e7a75fbf153130833355b6))
+* **start time:** all day events are not listed as today ([#54](https://github.com/stenjo/dot-matrix-calendar/issues/54)) ([71557d3](https://github.com/stenjo/dot-matrix-calendar/commit/71557d364527d236925d52fdf71584a150f181aa))
+* **upload:** upload artifact ([0d8b4c2](https://github.com/stenjo/dot-matrix-calendar/commit/0d8b4c278d24ab6ae454bb02667561473f0cb9bd))
+
+
+### Miscellaneous Chores
+
+* release 1.0.0 ([6bbbddb](https://github.com/stenjo/dot-matrix-calendar/commit/6bbbddb5c7f09649f85ee0cf66d15b001dfcb23b))
+
 ## [0.5.2](https://github.com/stenjo/dot-matrix-calendar/compare/v0.5.1...v0.5.2) (2024-07-18)
 
 
