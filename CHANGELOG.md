@@ -5,7 +5,7 @@
 
 ### Bug Fixes
 
-* **relerase:** missing assets from release ([d698924](https://github.com/stenjo/dot-matrix-calendar/commit/d69892432b0e0313e4cf2608bef21841a3dbde77))
+* **release:** missing assets from release ([d698924](https://github.com/stenjo/dot-matrix-calendar/commit/d69892432b0e0313e4cf2608bef21841a3dbde77))
 
 ## [1.0.0](https://github.com/stenjo/dot-matrix-calendar/compare/v0.0.1...v1.0.0) (2024-07-19)
 
