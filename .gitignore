@@ -172,3 +172,4 @@ log
 **/frozen_*
 src/credentials
 **/dependencies.lock
+locate_untagged.sh
