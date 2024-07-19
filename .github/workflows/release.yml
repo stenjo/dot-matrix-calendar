@@ -17,18 +17,19 @@ jobs:
         release: ${{ steps.release.outputs.release_created }}
         tag: ${{ steps.release.outputs.tag_name }}
     steps:
-
-      - name: Checkout repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
  
       - uses: googleapis/release-please-action@v4
         id: release
         with:
           release-type: simple
           token: ${{secrets.PERSONAL_ACCESS_TOKEN}}
+
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       - name: Update version.txt
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
