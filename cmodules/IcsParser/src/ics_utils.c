@@ -52,7 +52,7 @@ void updateDateStr(char * str, time_t time) {
     if (strlen(str) == 8) {
         strftime(buff, 20, "%Y%m%d", localtime_r(&time, &tm_event));
         strncpy(str, buff, 8);
-    } else if (strlen(str) == 18) {
+    } else if (strlen(str) >= 15) {
         strftime(buff, 20, "%Y%m%dT%H%M%SZ", localtime_r(&time, &tm_event));
         strncpy(str, buff, 18);
     }

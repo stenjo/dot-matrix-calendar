@@ -94,8 +94,6 @@ void handleRRule(event_t *event, time_t filter_time) {
         return; // TODO: handle no filtertime
     }
     if (event->rrule && strstr(event->rrule, "WEEKLY")) {
-        char buffer[20] = "12345678";
-        updateDateStr(buffer, filter_time);
         time_t interval = atoi(event->interval) * 7 * 3600 * 24; // seconds
         time_t event_age = filter_time - event->tstart; // timestamp
         time_t repeats = event_age / interval +1;

@@ -137,10 +137,10 @@ void test_parse_with_start_and_end_times_repeat(void) {
 
     TEST_ASSERT_EQUAL(1, count);
     TEST_ASSERT_EQUAL_STRING("Matavfall", ics.events[0].summary);
-    TEST_ASSERT_EQUAL_STRING("20240730", ics.events[0].dtstart);
-    TEST_ASSERT_EQUAL_STRING("20240731", ics.events[0].dtend);
+    TEST_ASSERT_EQUAL_STRING("20240723T221509Z", ics.events[0].dtstart);
+    TEST_ASSERT_EQUAL_STRING("20240723T231509Z", ics.events[0].dtend);
     TEST_ASSERT_EQUAL_STRING("WEEKLY", ics.events[0].rrule);
-    TEST_ASSERT_EQUAL_STRING("4", ics.events[0].interval);
+    TEST_ASSERT_EQUAL_STRING("2", ics.events[0].interval);
 
     freeIcs(&ics);
 }
