@@ -73,10 +73,22 @@ event_t getEvent(void) {
     }
 
     event.rrule = extract_property(vevent_start, "RRULE:FREQ=", vevent_end);
+    if (event.rrule) {
+        char const * semi = strstr(event.rrule, ";");
+        if (semi) {
+            size_t rrule_length = semi - event.rrule + 1;
+            event.rrule = realloc(event.rrule, semi - event.rrule + 1);
+            if (!event.rrule) {
+                printf("Memory reallocation failed, trying to reallocate %zu bytes\n", rrule_length);
+                return event;
+            }
+            event.rrule[semi - event.rrule] = '\0';
+        }
+    }
     event.interval = extract_property(vevent_start, "INTERVAL=", vevent_end);
 
     size_t offset = (vevent_end - data_buffer) + strlen("END:VEVENT");
-    char * next_vevent_start = strstr(data_buffer + offset, "BEGIN:VEVENT");
+    char const * next_vevent_start = strstr(data_buffer + offset, "BEGIN:VEVENT");
     if (next_vevent_start) {
         offset = next_vevent_start - data_buffer;
     }
@@ -93,6 +105,11 @@ event_t getEvent(void) {
         }
         data_buffer = new_buffer;
     }
+
+    // Update tstart and tend
+    event.tstart = getTimeStamp(event.dtstart);
+    event.tend = getTimeStamp(event.dtend);
+
     return event;
 
 }

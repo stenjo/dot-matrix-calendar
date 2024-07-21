@@ -37,4 +37,23 @@ bool parse_date_string(const char *date_str, struct tm *tm) {
     }
 }
 
+time_t getTimeStamp(const char *date_str) {
+    struct tm tm_event = {0};
+    if (parse_date_string(date_str, &tm_event)) {
+        time_t event_time = mktime(&tm_event);
+        return event_time;
+    }
+    return -1; // Failed to parse
+}
 
+void updateDateStr(char * str, time_t time) {
+        struct tm tm_event = {0};
+        char buff[20];
+    if (strlen(str) == 8) {
+        strftime(buff, 20, "%Y%m%d", localtime_r(&time, &tm_event));
+        strncpy(str, buff, 8);
+    } else if (strlen(str) == 18) {
+        strftime(buff, 20, "%Y%m%dT%H%M%SZ", localtime_r(&time, &tm_event));
+        strncpy(str, buff, 18);
+    }
+}

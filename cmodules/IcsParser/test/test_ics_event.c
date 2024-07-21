@@ -2,6 +2,7 @@
 
 #include "unity.h"
 #include <stdlib.h>
+#include "ics_utils.h"
 #include "ics_event.h"
 
 void setUp(void) {
@@ -102,7 +103,7 @@ void test_getEvent_repeating_event(void) {
     TEST_ASSERT_EQUAL_STRING("Restavfall", event.summary);
     TEST_ASSERT_EQUAL_STRING("20240116", event.dtstart);
     TEST_ASSERT_EQUAL_STRING("20240117", event.dtend);
-    TEST_ASSERT_EQUAL_STRING("WEEKLY;INTERVAL=4", event.rrule);
+    TEST_ASSERT_EQUAL_STRING("WEEKLY", event.rrule);
     TEST_ASSERT_EQUAL_STRING("4", event.interval);
 }
 

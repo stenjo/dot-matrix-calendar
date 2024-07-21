@@ -53,13 +53,13 @@ size_t parseIcs(ics_t *ics, const char *ics_data) {
     event_t event;
     while ((event = getEvent()).dtstart != NULL) {
 
-        struct tm tm_event_start = {0};
-        if (parse_date_string(event.dtstart, &tm_event_start)) {
-            time_t event_time = mktime(&tm_event_start);
-            event.tstart = event_time;
+        if (event.tstart >= 0) {
 
-            double afterStartFilter = difftime(event_time, ics->startTime);
-            double beforeEndFilter = difftime(ics->endTime, event_time);
+            // Handle RRule
+            handleRRule(&event, ics->startTime);
+
+            double afterStartFilter = difftime(event.tstart, ics->startTime);
+            double beforeEndFilter = difftime(ics->endTime, event.tstart);
 
             if (
                 (ics->startTime == 0 || afterStartFilter >= 0) &&
@@ -87,6 +87,25 @@ size_t parseIcs(ics_t *ics, const char *ics_data) {
     }
 
     return ics->count;
+}
+
+void handleRRule(event_t *event, time_t filter_time) {
+    if (filter_time == 0) {
+        return; // TODO: handle no filtertime
+    }
+    if (event->rrule && strstr(event->rrule, "WEEKLY")) {
+        char buffer[20] = "12345678";
+        updateDateStr(buffer, filter_time);
+        time_t interval = atoi(event->interval) * 7 * 3600 * 24; // seconds
+        time_t event_age = filter_time - event->tstart; // timestamp
+        time_t repeats = event_age / interval +1;
+        time_t delta = interval * repeats;
+        event->tstart = event->tstart + delta;
+        event->tend = event->tend + delta;
+        updateDateStr(event->dtstart, event->tstart);
+        updateDateStr(event->dtend, event->tend);
+    }
+
 }
 
 time_t setStartDate(ics_t *ics, const char *start)

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "unity.h"
+#include "ics_utils.h"
 
 #include "ics_event.h"
 
@@ -25,7 +26,7 @@ void test_extract_property_normal_case(void) {
 void test_extract_property_not_found(void) {
     const char *data = "DTSTART:20230615T090000\r\n";
     const char *end = data + strlen(data);
-    char *result = extract_property(data, "SUMMARY:", end);
+    char const *result = extract_property(data, "SUMMARY:", end);
     TEST_ASSERT_NULL(result);
 }
 
