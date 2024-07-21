@@ -76,13 +76,13 @@ event_t getEvent(void) {
     if (event.rrule) {
         char const * semi = strstr(event.rrule, ";");
         if (semi) {
-            size_t rrule_length = semi - event.rrule + 1;
-            event.rrule = realloc(event.rrule, semi - event.rrule + 1);
+            size_t rrule_length = semi - event.rrule;
+            event.rrule = realloc(event.rrule, rrule_length);
             if (!event.rrule) {
                 printf("Memory reallocation failed, trying to reallocate %zu bytes\n", rrule_length);
                 return event;
             }
-            event.rrule[semi - event.rrule] = '\0';
+            event.rrule[rrule_length] = '\0';
         }
     }
     event.interval = extract_property(vevent_start, "INTERVAL=", vevent_end);
