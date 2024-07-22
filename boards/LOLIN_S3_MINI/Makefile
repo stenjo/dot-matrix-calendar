@@ -43,6 +43,17 @@ deploy:
 	0x8000 $(BUILD)/partition_table/partition-table.bin \
 	0x10000 $(MPBIN)
 
+merge:
+	$(ECHO) "Merge binary with src/ folder files"
+	$(Q)vfsmerge  --port esp32 --firmware $(MPBIN)
+	$(Q)esptool.py --chip esp32s3 merge_bin -o $(FWSRC) \
+	--flash_mode=$(FLASH_MODE) \
+	--flash_size=$(FLASH_SIZE) \
+	--flash_freq 80m \
+	0x1000 $(BUILD)/bootloader/bootloader.bin \
+	0x8000 $(BUILD)/partition_table/partition-table.bin \
+	0x10000 $(MPBIN) \
+	0x00200000 $(LFS)
 
 erase:
 	$(Q)esptool.py --after no_reset --port $(PORT) --baud $(BAUD) erase_flash
