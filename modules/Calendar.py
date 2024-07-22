@@ -118,6 +118,7 @@ class Calendar(ICS):
     
     startTime = None
     endTime = None
+    daysAhead = None
     sources = []
     def __init__(self, filename=None, start=None, end=None, daysAhead=None, url=None):
         super().__init__()
@@ -130,10 +131,11 @@ class Calendar(ICS):
             self.end(end)
         
         if daysAhead is not None:
-            self.startTime = (datetime.now() - timedelta(1)).timetuple()
+            self.startTime = datetime.now().timetuple()
             self.start(self.startTime)
-            self.endTime = (datetime.now() + timedelta(daysAhead)).timetuple()
+            self.endTime = (datetime.now() + timedelta(days=daysAhead)).timetuple()
             self.end(self.endTime)
+            self.daysAhead = daysAhead
 
         if filename is not None:
             self.parseFile(filename)
@@ -207,6 +209,12 @@ class Calendar(ICS):
         if end_date is not None:
             self.end(end_date)
         elif self.endTime is not None:
+            self.end(self.endTime)
+
+        if self.daysAhead is not None:
+            self.startTime = datetime.now().timetuple()
+            self.start(self.startTime)
+            self.endTime = (datetime.now() + timedelta(days=self.daysAhead)).timetuple()
             self.end(self.endTime)
 
         for url in self.sources:
