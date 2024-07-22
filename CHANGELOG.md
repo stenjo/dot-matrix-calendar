@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/stenjo/dot-matrix-calendar/compare/v1.1.0...v1.1.1) (2024-07-22)
+
+
+### Bug Fixes
+
+* **ics:** commas in summary causes back slash rendered( ',' -&gt; '\,') ([#73](https://github.com/stenjo/dot-matrix-calendar/issues/73)) ([1bd8b89](https://github.com/stenjo/dot-matrix-calendar/commit/1bd8b89d55f45ea0633dd9e5adf163582cdb2252))
+
 ## [1.1.0](https://github.com/stenjo/dot-matrix-calendar/compare/v1.0.2...v1.1.0) (2024-07-22)
 
 
