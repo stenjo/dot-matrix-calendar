@@ -57,7 +57,8 @@
         "spi_common.h": "c",
         "spi_types.h": "c",
         "esp_attr.h": "c",
-        "locale": "c"
+        "locale": "c",
+        "ctime": "c"
     },
     "cmake.configureOnOpen": false,
     "idf.port": "/dev/cu.usbmodem1234561",
