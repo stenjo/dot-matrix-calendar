@@ -110,8 +110,12 @@ size_t parseIcs(ics_t *ics, const char *ics_data) {
         // Handle RRule
         time_t interval_seconds = handleRRule(event, ics->startTime);
 
-        double afterStartFilter = difftime(event->tstart, ics->endTime);
+
+        double afterStartFilter = difftime(event->tstart, ics->startTime);
         double beforeEndFilter = difftime(ics->endTime, event->tstart);
+        if (event->tend > event->tstart) {
+            beforeEndFilter = difftime(ics->endTime, event->tend);
+        }
 
         if ((ics->startTime != 0 && afterStartFilter < 0) || (ics->endTime != 0 && beforeEndFilter < 0)) { 
             freeEvent(event); 
