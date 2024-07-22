@@ -89,7 +89,7 @@ class TestCalendar(unittest.TestCase):
         
         calendar = Calendar(daysAhead=30)
         count = calendar.parseURL('https://calendar.google.com/calendar/ical/ht3jlfaac5lfd6263ulfh4tql8%40group.calendar.google.com/public/basic.ics')
-        self.assertEqual(count, 5)
+        self.assertEqual(count, 4)
         
         print(dayText(calendar.first()))
         print(dayText(calendar.next()))
@@ -98,7 +98,7 @@ class TestCalendar(unittest.TestCase):
         
         
         count = calendar.refresh()
-        self.assertEqual(count, 5)
+        self.assertEqual(count, 4)
         
         
 

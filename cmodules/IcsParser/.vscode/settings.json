@@ -9,7 +9,8 @@
         "ios": "c",
         "string": "c",
         "stdbool.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "typeinfo": "c"
     },
     "cSpell.words": [
         "dotmatrix",

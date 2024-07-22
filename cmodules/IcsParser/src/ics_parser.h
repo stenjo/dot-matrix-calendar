@@ -6,7 +6,6 @@
 
 size_t parseFile(ics_t * ics, const char *file_path);
 size_t parseIcs(ics_t * ics, const char *ics_data);
-void handleRRule(event_t *event, time_t filter_time);
 
 time_t setStartDate(ics_t *ics, const char *start);
 time_t setEndDate(ics_t *ics, const char *end);

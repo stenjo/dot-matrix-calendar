@@ -115,8 +115,8 @@ void test_parseAllDayEventToday(void) {
     setStartDate(&ics, "20240427");
     setEndDate(&ics, "20240429");
     parseIcs(&ics, event);
-    TEST_ASSERT_EQUAL_STRING("All day event", ics.events[0].summary);
-    TEST_ASSERT_EQUAL_STRING("20240427", ics.events[0].dtstart);
+    TEST_ASSERT_EQUAL_STRING("All day event", ics.events[0]->summary);
+    TEST_ASSERT_EQUAL_STRING("20240427", ics.events[0]->dtstart);
     TEST_ASSERT_EQUAL(1, ics.count);
     freeIcs(&ics);
 
@@ -124,10 +124,10 @@ void test_parseAllDayEventToday(void) {
 
 void test_ics_parse_ShouldReturnEventSummaryAndStart(void) {
     updateBuffer(ics_data);
-    event_t event = getEvent();
-    TEST_ASSERT_EQUAL_STRING("Meeting with John", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20230412T160000Z", event.dtstart);
-    TEST_ASSERT_EQUAL(17, strlen(event.summary));
+    const event_t *event = getEvent();
+    TEST_ASSERT_EQUAL_STRING("Meeting with John", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20230412T160000Z", event->dtstart);
+    TEST_ASSERT_EQUAL(17, strlen(event->summary));
 }
 
 void test_parse_ShouldReturnEventList(void) {
@@ -135,8 +135,8 @@ void test_parse_ShouldReturnEventList(void) {
     initIcs(&ics);
     initIcsDates(&ics);
     parseIcs(&ics, ics_data);
-    TEST_ASSERT_EQUAL_STRING("Meeting with John", ics.events[0].summary);
-    TEST_ASSERT_EQUAL_STRING("20230412T160000Z", ics.events[0].dtstart);
+    TEST_ASSERT_EQUAL_STRING("Meeting with John", ics.events[0]->summary);
+    TEST_ASSERT_EQUAL_STRING("20230412T160000Z", ics.events[0]->dtstart);
     TEST_ASSERT_EQUAL(1, ics.count);
     freeIcs(&ics);
 }
@@ -146,11 +146,11 @@ void test_parse_ShouldReturnEventListIterationOneEvent(void) {
     initIcs(&ics);
     initIcsDates(&ics);
     size_t count = parseIcs(&ics, ics_data);
-    event_t event = getFirstEvent(&ics);
+    event_t const *event = getFirstEvent(&ics);
     TEST_ASSERT_EQUAL(1, count);
 
-    TEST_ASSERT_EQUAL_STRING("Meeting with John", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20230412T160000Z", event.dtstart);
+    TEST_ASSERT_EQUAL_STRING("Meeting with John", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20230412T160000Z", event->dtstart);
 
     freeIcs(&ics);
 }
@@ -160,25 +160,25 @@ void test_parse_ShouldReturnEventListIterationThreeEvents(void) {
     initIcs(&ics);
     initIcsDates(&ics);
     size_t count = parseIcs(&ics, ics_data3);
-    event_t event = getFirstEvent(&ics);
+    event_t const *event = getFirstEvent(&ics);
 
     TEST_ASSERT_EQUAL(3, count);
     TEST_ASSERT_EQUAL(3, ics.count);
 
-    TEST_ASSERT_EQUAL_STRING("Meeting with John", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20230412T160000Z", event.dtstart);
+    TEST_ASSERT_EQUAL_STRING("Meeting with John", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20230412T160000Z", event->dtstart);
 
     event = getNextEvent(&ics);
-    TEST_ASSERT_EQUAL_STRING("F2: Kvalifisering (Emilia Romagna)", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20240517T140000Z", event.dtstart);
+    TEST_ASSERT_EQUAL_STRING("F2: Kvalifisering (Emilia Romagna)", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20240517T140000Z", event->dtstart);
 
     event = getNextEvent(&ics);
-    TEST_ASSERT_EQUAL_STRING("F2: Feature (Monaco)", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20240526T084000Z", event.dtstart);
+    TEST_ASSERT_EQUAL_STRING("F2: Feature (Monaco)", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20240526T084000Z", event->dtstart);
 
     event = getFirstEvent(&ics);
-    TEST_ASSERT_EQUAL_STRING("Meeting with John", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20230412T160000Z", event.dtstart);
+    TEST_ASSERT_EQUAL_STRING("Meeting with John", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20230412T160000Z", event->dtstart);
 
     freeIcs(&ics);
 }
@@ -194,9 +194,9 @@ void test_setCurrentEvent_verifyIndexWithinBounds(void) {
     size_t index = setCurrentEvent(&ics, 2);
     TEST_ASSERT_EQUAL(2, index);
 
-    event_t event = getCurrentEvent(&ics);
-    TEST_ASSERT_EQUAL_STRING("F2: Feature (Monaco)", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20240526T084000Z", event.dtstart);
+    event_t *event = getCurrentEvent(&ics);
+    TEST_ASSERT_EQUAL_STRING("F2: Feature (Monaco)", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20240526T084000Z", event->dtstart);
 
     index = setCurrentEvent(&ics, 3);
     TEST_ASSERT_EQUAL(-1, index);
@@ -215,9 +215,9 @@ void test_getEventAt_verifyGettingEventAtGivenIndex(void) {
 
     TEST_ASSERT_EQUAL(3, count);
 
-    event_t event = getEventAt(&ics, 1);
-    TEST_ASSERT_EQUAL_STRING("F2: Kvalifisering (Emilia Romagna)", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20240517T140000Z", event.dtstart);
+    event_t *event = getEventAt(&ics, 1);
+    TEST_ASSERT_EQUAL_STRING("F2: Kvalifisering (Emilia Romagna)", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20240517T140000Z", event->dtstart);
     freeIcs(&ics);
 }
 
@@ -228,11 +228,11 @@ void test_parse_ics_from_file(void) {
     size_t count = parseFile(&ics, "test/test_event.ics");
     TEST_ASSERT_EQUAL(1, count);
 
-    TEST_ASSERT_NOT_NULL(ics.events[0].summary);
-    TEST_ASSERT_NOT_NULL(ics.events[0].dtstart);
+    TEST_ASSERT_NOT_NULL(ics.events[0]->summary);
+    TEST_ASSERT_NOT_NULL(ics.events[0]->dtstart);
 
-    if (ics.events[0].summary) TEST_ASSERT_EQUAL_STRING("Test Event", ics.events[0].summary);
-    if (ics.events[0].dtstart) TEST_ASSERT_EQUAL_STRING("20230412T160000Z", ics.events[0].dtstart);
+    if (ics.events[0]->summary) TEST_ASSERT_EQUAL_STRING("Test Event", ics.events[0]->summary);
+    if (ics.events[0]->dtstart) TEST_ASSERT_EQUAL_STRING("20230412T160000Z", ics.events[0]->dtstart);
 
     freeIcs(&ics);
 }
@@ -244,11 +244,11 @@ void test_parse_ics_from_f2_file(void) {
     size_t count = parseFile(&ics, "test/f2-calendar_p_q_sprint_feature.ics");
     TEST_ASSERT_EQUAL(56, count);
 
-    TEST_ASSERT_NOT_NULL(ics.events[0].summary);
-    TEST_ASSERT_NOT_NULL(ics.events[0].dtstart);
+    TEST_ASSERT_NOT_NULL(ics.events[0]->summary);
+    TEST_ASSERT_NOT_NULL(ics.events[0]->dtstart);
 
-    TEST_ASSERT_EQUAL_STRING("F2: Practice (Bahrain)", ics.events[0].summary);
-    TEST_ASSERT_EQUAL_STRING("20240229T090500Z", ics.events[0].dtstart);
+    TEST_ASSERT_EQUAL_STRING("F2: Practice (Bahrain)", ics.events[0]->summary);
+    TEST_ASSERT_EQUAL_STRING("20240229T090500Z", ics.events[0]->dtstart);
     TEST_ASSERT_EQUAL(56, ics.count);
 
     freeIcs(&ics);
@@ -267,10 +267,10 @@ void test_getNextEventInRange(void) {
     size_t count = parseFile(&ics, "test/f2-calendar_p_q_sprint_feature.ics");
     TEST_ASSERT_EQUAL(44, count);
 
-    event_t event = getFirstEvent(&ics);
+    event_t *event = getFirstEvent(&ics);
 
-    TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20240517T090500Z", event.dtstart);
+    TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20240517T090500Z", event->dtstart);
     TEST_ASSERT_EQUAL(44, ics.count);
     resetGetEvent();
     initIcs(&ics);
@@ -281,13 +281,13 @@ void test_getNextEventInRange(void) {
 
     event = getFirstEvent(&ics);
 
-    TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20240517T090500Z", event.dtstart);
+    TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20240517T090500Z", event->dtstart);
 
     event = getLastEvent(&ics);
 
-    TEST_ASSERT_EQUAL_STRING("F2: Feature (Austrian)", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20240630T094000Z", event.dtstart);
+    TEST_ASSERT_EQUAL_STRING("F2: Feature (Austrian)", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20240630T094000Z", event->dtstart);
     freeIcs(&ics);
 }
 
@@ -303,11 +303,11 @@ void test_sortEvents_sortAllFilteredEventsByStartTime(void) {
     time_t end = setEndDate(&ics, endDate);
 
     int count = parseFile(&ics, "test/f2-calendar_p_q_sprint_feature.ics");
-    event_t event = getFirstEvent(&ics);
+    event_t *event = getFirstEvent(&ics);
     TEST_ASSERT_EQUAL(16, count);
 
-    TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20240517T090500Z", event.dtstart);
+    TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20240517T090500Z", event->dtstart);
     TEST_ASSERT_EQUAL(16, ics.count);
 
     sortEventsByStart(&ics);
@@ -315,8 +315,8 @@ void test_sortEvents_sortAllFilteredEventsByStartTime(void) {
     event = getFirstEvent(&ics);
     TEST_ASSERT_EQUAL(16, ics.count);
 
-    TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20240517T090500Z", event.dtstart);
+    TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20240517T090500Z", event->dtstart);
     TEST_ASSERT_EQUAL(16, ics.count);
     freeIcs(&ics);
 }
@@ -333,11 +333,11 @@ void test_endDate_verifyEndDateAvailableOnEvents(void) {
     time_t end = setEndDate(&ics, endDate);
 
     int count = parseFile(&ics, "test/f2-calendar_p_q_sprint_feature.ics");
-    event_t event = getFirstEvent(&ics);
+    event_t *event = getFirstEvent(&ics);
     TEST_ASSERT_EQUAL(16, count);
 
-    TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20240517T095000Z", event.dtend);
+    TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20240517T095000Z", event->dtend);
     freeIcs(&ics);
 }
 
@@ -353,16 +353,22 @@ void test_withLargeCalendar(void) {
     time_t end = setEndDate(&ics, endDate);
 
     int count = parseFile(&ics, "test/basic.ics");
-    event_t event = getFirstEvent(&ics);
+    sortEventsByStart(&ics);
 
-    TEST_ASSERT_EQUAL_STRING("Service på bilen", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20240418T053000Z", event.dtstart);
+    event_t *event = getEventAt(&ics, 5);
+
+    TEST_ASSERT_EQUAL_STRING("Service på bilen", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20240418T053000Z", event->dtstart);
+
+    setCurrentEvent(&ics, 0);
+
     while (!atEnd(&ics))  {
         event = getNextEvent(&ics);
-        TEST_ASSERT_NOT_NULL(event.summary);
-        TEST_ASSERT_NOT_NULL(event.dtstart);
+        printf("%s %s %s\n", event->dtstart, event->dtend, event->summary);
+        TEST_ASSERT_NOT_NULL(event->summary);
+        TEST_ASSERT_NOT_NULL(event->dtstart);
     }
-    TEST_ASSERT_EQUAL(13, count);
+    TEST_ASSERT_EQUAL(23, count);
     freeIcs(&ics);
 }
 
@@ -380,9 +386,9 @@ void test_withMultipleCalendars(void) {
     int count = parseFile(&ics, "test/f2-calendar_p_q_sprint_feature.ics");
     TEST_ASSERT_EQUAL(39, count);
 
-    event_t event = getFirstEvent(&ics);
-    TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20240517T090500Z", event.dtstart);
+    event_t *event = getFirstEvent(&ics);
+    TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20240517T090500Z", event->dtstart);
 
     count = parseFile(&ics, "test/f3-calendar_p_q_sprint_feature.ics");
     TEST_ASSERT_EQUAL(70, count);
@@ -390,12 +396,12 @@ void test_withMultipleCalendars(void) {
     sortEventsByStart(&ics);
 
     event = getFirstEvent(&ics);
-    TEST_ASSERT_EQUAL_STRING("F3: Practice (Emilia Romagna)", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20240517T075500Z", event.dtstart);
+    TEST_ASSERT_EQUAL_STRING("F3: Practice (Emilia Romagna)", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20240517T075500Z", event->dtstart);
 
     event = getNextEvent(&ics);
-    TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20240517T090500Z", event.dtstart);
+    TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20240517T090500Z", event->dtstart);
 
      count = parseFile(&ics, "test/basic.ics");
     sortEventsByStart(&ics);
@@ -403,8 +409,8 @@ void test_withMultipleCalendars(void) {
     getFirstEvent(&ics);
     getNextEvent(&ics);
     event = getNextEvent(&ics);
-    TEST_ASSERT_EQUAL_STRING("Rød curry med torsk", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20240416", event.dtstart);
+    TEST_ASSERT_EQUAL_STRING("Rød curry med torsk", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20240416", event->dtstart);
 
 
     freeIcs(&ics);
@@ -426,15 +432,15 @@ void test_withGoogleCalendars(void) {
     int count = parseFile(&ics, "test/moon.ics");
     TEST_ASSERT_EQUAL(148, count);
 
-    event_t event = getFirstEvent(&ics);
-    TEST_ASSERT_EQUAL_STRING("Full moon 11:08pm", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20230106", event.dtstart);
+    event_t *event = getFirstEvent(&ics);
+    TEST_ASSERT_EQUAL_STRING("Full moon 11:08pm", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20230106", event->dtstart);
 
     sortEventsByStart(&ics);
 
     event = getFirstEvent(&ics);
-    TEST_ASSERT_EQUAL_STRING("Full moon 11:08pm", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20230106", event.dtstart);
+    TEST_ASSERT_EQUAL_STRING("Full moon 11:08pm", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20230106", event->dtstart);
 
 
     freeIcs(&ics);
@@ -448,13 +454,13 @@ void test_parse_allDayEvents(void) {
     int count = parseFile(&ics, "test/allday.ics");
     TEST_ASSERT_EQUAL(2, count);
 
-    event_t event = getFirstEvent(&ics);
-    TEST_ASSERT_EQUAL_STRING("Første eventet", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20240425T070000Z", event.dtstart);
+    event_t *event = getFirstEvent(&ics);
+    TEST_ASSERT_EQUAL_STRING("Første eventet", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20240425T070000Z", event->dtstart);
     event = getNextEvent(&ics);
-    // TEST_ASSERT_EQUAL_STRING("I Åsane har vi både færøymål, låglønnsnæring og skjærgårdsøl!", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20240427", event.dtstart);
-    TEST_ASSERT_EQUAL_STRING("20240428", event.dtend);
+    // TEST_ASSERT_EQUAL_STRING("I Åsane har vi både færøymål, låglønnsnæring og skjærgårdsøl!", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20240427", event->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20240428", event->dtend);
     freeIcs(&ics);
 }
 
@@ -477,19 +483,19 @@ void test_parse_with_chunks(void) {
     // Verify that the events were parsed correctly
     TEST_ASSERT_EQUAL(2, ics.count);
 
-    TEST_ASSERT_NOT_NULL(ics.events[0].summary);
-    TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0].summary);
-    TEST_ASSERT_NOT_NULL(ics.events[0].dtstart);
-    TEST_ASSERT_EQUAL_STRING("20230615T090000", ics.events[0].dtstart);
-    TEST_ASSERT_NOT_NULL(ics.events[0].dtend);
-    TEST_ASSERT_EQUAL_STRING("20230615T100000", ics.events[0].dtend);
+    TEST_ASSERT_NOT_NULL(ics.events[0]->summary);
+    TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0]->summary);
+    TEST_ASSERT_NOT_NULL(ics.events[0]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20230615T090000", ics.events[0]->dtstart);
+    TEST_ASSERT_NOT_NULL(ics.events[0]->dtend);
+    TEST_ASSERT_EQUAL_STRING("20230615T100000", ics.events[0]->dtend);
 
-    TEST_ASSERT_NOT_NULL(ics.events[1].summary);
-    TEST_ASSERT_EQUAL_STRING("Event 2", ics.events[1].summary);
-    TEST_ASSERT_NOT_NULL(ics.events[1].dtstart);
-    TEST_ASSERT_EQUAL_STRING("20230616T090000", ics.events[1].dtstart);
-    TEST_ASSERT_NOT_NULL(ics.events[1].dtend);
-    TEST_ASSERT_EQUAL_STRING("20230616T100000", ics.events[1].dtend);
+    TEST_ASSERT_NOT_NULL(ics.events[1]->summary);
+    TEST_ASSERT_EQUAL_STRING("Event 2", ics.events[1]->summary);
+    TEST_ASSERT_NOT_NULL(ics.events[1]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20230616T090000", ics.events[1]->dtstart);
+    TEST_ASSERT_NOT_NULL(ics.events[1]->dtend);
+    TEST_ASSERT_EQUAL_STRING("20230616T100000", ics.events[1]->dtend);
 
     // Clean up
     freeIcs(&ics);
@@ -503,9 +509,9 @@ void test_parse_single_event(void) {
     size_t count = parseIcs(&ics, data);
 
     TEST_ASSERT_EQUAL(1, count);
-    TEST_ASSERT_EQUAL_STRING("Meeting with John", ics.events[0].summary);
-    TEST_ASSERT_EQUAL_STRING("20230615T090000", ics.events[0].dtstart);
-    TEST_ASSERT_EQUAL_STRING("20230615T100000", ics.events[0].dtend);
+    TEST_ASSERT_EQUAL_STRING("Meeting with John", ics.events[0]->summary);
+    TEST_ASSERT_EQUAL_STRING("20230615T090000", ics.events[0]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20230615T100000", ics.events[0]->dtend);
 
     freeIcs(&ics);
 }
@@ -518,12 +524,12 @@ void test_parse_multiple_events(void) {
     size_t count = parseIcs(&ics, data);
 
     TEST_ASSERT_EQUAL(2, count);
-    TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0].summary);
-    TEST_ASSERT_EQUAL_STRING("20230615T090000", ics.events[0].dtstart);
-    TEST_ASSERT_EQUAL_STRING("20230615T100000", ics.events[0].dtend);
-    TEST_ASSERT_EQUAL_STRING("Event 2", ics.events[1].summary);
-    TEST_ASSERT_EQUAL_STRING("20230616T090000", ics.events[1].dtstart);
-    TEST_ASSERT_EQUAL_STRING("20230616T100000", ics.events[1].dtend);
+    TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0]->summary);
+    TEST_ASSERT_EQUAL_STRING("20230615T090000", ics.events[0]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20230615T100000", ics.events[0]->dtend);
+    TEST_ASSERT_EQUAL_STRING("Event 2", ics.events[1]->summary);
+    TEST_ASSERT_EQUAL_STRING("20230616T090000", ics.events[1]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20230616T100000", ics.events[1]->dtend);
 
     freeIcs(&ics);
 }
@@ -558,9 +564,9 @@ void test_parse_all_day_event(void) {
     size_t count = parseIcs(&ics, data);
 
     TEST_ASSERT_EQUAL(1, count);
-    TEST_ASSERT_EQUAL_STRING("Holiday", ics.events[0].summary);
-    TEST_ASSERT_EQUAL_STRING("20230615", ics.events[0].dtstart);
-    TEST_ASSERT_EQUAL_STRING("20230616", ics.events[0].dtend);
+    TEST_ASSERT_EQUAL_STRING("Holiday", ics.events[0]->summary);
+    TEST_ASSERT_EQUAL_STRING("20230615", ics.events[0]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20230616", ics.events[0]->dtend);
 
     freeIcs(&ics);
 }
@@ -573,12 +579,12 @@ void test_parse_mixed_events(void) {
     size_t count = parseIcs(&ics, data);
 
     TEST_ASSERT_EQUAL(2, count);
-    TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0].summary);
-    TEST_ASSERT_EQUAL_STRING("20230615T090000", ics.events[0].dtstart);
-    TEST_ASSERT_EQUAL_STRING("20230615T100000", ics.events[0].dtend);
-    TEST_ASSERT_EQUAL_STRING("Holiday", ics.events[1].summary);
-    TEST_ASSERT_EQUAL_STRING("20230615", ics.events[1].dtstart);
-    TEST_ASSERT_EQUAL_STRING("20230616", ics.events[1].dtend);
+    TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0]->summary);
+    TEST_ASSERT_EQUAL_STRING("20230615T090000", ics.events[0]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20230615T100000", ics.events[0]->dtend);
+    TEST_ASSERT_EQUAL_STRING("Holiday", ics.events[1]->summary);
+    TEST_ASSERT_EQUAL_STRING("20230615", ics.events[1]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20230616", ics.events[1]->dtend);
 
     freeIcs(&ics);
 }
@@ -612,9 +618,9 @@ void test_parse_with_start_and_end_dates(void) {
     size_t count = parseIcs(&ics, data);
 
     TEST_ASSERT_EQUAL(1, count);
-    TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0].summary);
-    TEST_ASSERT_EQUAL_STRING("20230615T090000Z", ics.events[0].dtstart);
-    TEST_ASSERT_EQUAL_STRING("20230615T100000Z", ics.events[0].dtend);
+    TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0]->summary);
+    TEST_ASSERT_EQUAL_STRING("20230615T090000Z", ics.events[0]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20230615T100000Z", ics.events[0]->dtend);
 
     freeIcs(&ics);
 }
@@ -633,12 +639,12 @@ void test_parse_with_chunks2(void) {
     parseIcs(&ics, chunk3);
 
     TEST_ASSERT_EQUAL(2, ics.count);
-    TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0].summary);
-    TEST_ASSERT_EQUAL_STRING("20230615T090000Z", ics.events[0].dtstart);
-    TEST_ASSERT_EQUAL_STRING("20230615T100000Z", ics.events[0].dtend);
-    TEST_ASSERT_EQUAL_STRING("Event 2", ics.events[1].summary);
-    TEST_ASSERT_EQUAL_STRING("20230616T090000Z", ics.events[1].dtstart);
-    TEST_ASSERT_EQUAL_STRING("20230616T100000Z", ics.events[1].dtend);
+    TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0]->summary);
+    TEST_ASSERT_EQUAL_STRING("20230615T090000Z", ics.events[0]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20230615T100000Z", ics.events[0]->dtend);
+    TEST_ASSERT_EQUAL_STRING("Event 2", ics.events[1]->summary);
+    TEST_ASSERT_EQUAL_STRING("20230616T090000Z", ics.events[1]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20230616T100000Z", ics.events[1]->dtend);
 
     freeIcs(&ics);
 }

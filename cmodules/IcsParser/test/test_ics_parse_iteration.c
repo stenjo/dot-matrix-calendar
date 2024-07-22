@@ -55,25 +55,25 @@ void test_parse_ShouldReturnEventListIterationThreeEvents(void) {
     initIcs(&ics);
     initIcsDates(&ics);
     size_t count = parseIcs(&ics, ics_data3);
-    event_t event = getFirstEvent(&ics);
+    event_t *event = getFirstEvent(&ics);
 
     TEST_ASSERT_EQUAL(3, count);
     TEST_ASSERT_EQUAL(3, ics.count);
 
-    TEST_ASSERT_EQUAL_STRING("Meeting with John", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20230412T160000Z", event.dtstart);
+    TEST_ASSERT_EQUAL_STRING("Meeting with John", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20230412T160000Z", event->dtstart);
 
     event = getNextEvent(&ics);
-    TEST_ASSERT_EQUAL_STRING("F2: Kvalifisering (Emilia Romagna)", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20240517T140000Z", event.dtstart);
+    TEST_ASSERT_EQUAL_STRING("F2: Kvalifisering (Emilia Romagna)", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20240517T140000Z", event->dtstart);
 
     event = getNextEvent(&ics);
-    TEST_ASSERT_EQUAL_STRING("F2: Feature (Monaco)", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20240526T084000Z", event.dtstart);
+    TEST_ASSERT_EQUAL_STRING("F2: Feature (Monaco)", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20240526T084000Z", event->dtstart);
 
     event = getFirstEvent(&ics);
-    TEST_ASSERT_EQUAL_STRING("Meeting with John", event.summary);
-    TEST_ASSERT_EQUAL_STRING("20230412T160000Z", event.dtstart);
+    TEST_ASSERT_EQUAL_STRING("Meeting with John", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20230412T160000Z", event->dtstart);
 
     freeIcs(&ics);
 }

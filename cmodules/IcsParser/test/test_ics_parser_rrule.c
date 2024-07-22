@@ -112,13 +112,18 @@ void test_parse_with_start_and_end_dates_repeat(void) {
     ics.endTime = setEndDate(&ics, endDate);
 
     size_t count = parseIcs(&ics, ics_repeated_4weekly);
+    event_t * event;
+    while (!atEnd(&ics))  {
+        event = getNextEvent(&ics);
+        printf("%s %s %s\n", event->dtstart, event->dtend, event->summary);
+    }
 
     TEST_ASSERT_EQUAL(1, count);
-    TEST_ASSERT_EQUAL_STRING("Restavfall", ics.events[0].summary);
-    TEST_ASSERT_EQUAL_STRING("20240730", ics.events[0].dtstart);
-    TEST_ASSERT_EQUAL_STRING("20240731", ics.events[0].dtend);
-    TEST_ASSERT_EQUAL_STRING("WEEKLY", ics.events[0].rrule);
-    TEST_ASSERT_EQUAL_STRING("4", ics.events[0].interval);
+    TEST_ASSERT_EQUAL_STRING("Restavfall", ics.events[0]->summary);
+    TEST_ASSERT_EQUAL_STRING("20240730", ics.events[0]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20240731", ics.events[0]->dtend);
+    TEST_ASSERT_EQUAL_STRING("WEEKLY", ics.events[0]->rrule);
+    TEST_ASSERT_EQUAL_STRING("4", ics.events[0]->interval);
 
     freeIcs(&ics);
 }
@@ -129,18 +134,24 @@ void test_parse_with_start_and_end_times_repeat(void) {
     initIcsDates(&ics);
 
     const char *startDate = "20240716T000000Z";
-    const char *endDate = "20240731T235959Z";
+    const char *endDate = "20240807T235959Z";
     ics.startTime = setStartDate(&ics, startDate);
     ics.endTime = setEndDate(&ics, endDate);
 
     size_t count = parseIcs(&ics, ics_repeated_2weekly_timeofday);
 
-    TEST_ASSERT_EQUAL(1, count);
-    TEST_ASSERT_EQUAL_STRING("Matavfall", ics.events[0].summary);
-    TEST_ASSERT_EQUAL_STRING("20240723T211509Z", ics.events[0].dtstart);
-    TEST_ASSERT_EQUAL_STRING("20240723T221509Z", ics.events[0].dtend);
-    TEST_ASSERT_EQUAL_STRING("WEEKLY", ics.events[0].rrule);
-    TEST_ASSERT_EQUAL_STRING("2", ics.events[0].interval);
+    event_t * event;
+    while (!atEnd(&ics))  {
+        event = getNextEvent(&ics);
+        printf("%s %s %s\n", event->dtstart, event->dtend, event->summary);
+    }
+
+    TEST_ASSERT_EQUAL(2, count);
+    TEST_ASSERT_EQUAL_STRING("Matavfall", ics.events[0]->summary);
+    TEST_ASSERT_EQUAL_STRING("20240723T211509Z", ics.events[0]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20240723T221509Z", ics.events[0]->dtend);
+    TEST_ASSERT_EQUAL_STRING("WEEKLY", ics.events[0]->rrule);
+    TEST_ASSERT_EQUAL_STRING("2", ics.events[0]->interval);
 
     freeIcs(&ics);
 }
