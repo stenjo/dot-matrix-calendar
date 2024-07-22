@@ -9,7 +9,8 @@
         "ios": "c",
         "string": "c",
         "stdbool.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "typeinfo": "c"
     },
     "cSpell.words": [
         "dotmatrix",
@@ -24,5 +25,6 @@
     "mesonbuild.selectRootDir": false,
     "gcovViewer.buildDirectories": [
         "/Users/sten.johnsen/git/dot-matrix-calendar/cmodules/IcsParser/build"
-    ]
+    ],
+    "sonarlint.pathToCompileCommands": "${workspaceFolder}/build/artifacts/compile_commands.json"
 }

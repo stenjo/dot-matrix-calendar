@@ -28,17 +28,17 @@ void test_parse_should_handle_single_event(void) {
 
     // Initialize buffer with data and then call getEvent
     updateBuffer_Expect(data);
-    getEvent_ExpectAndReturn(mock_event);
-    getEvent_ExpectAndReturn(((event_t){NULL, NULL, NULL, 0, 0}));
-    freeEvent_ExpectAnyArgs();
+    getEvent_ExpectAndReturn(&mock_event);
+    getEvent_ExpectAndReturn(NULL);
+    freeEvent_Ignore();
     resetGetEvent_Ignore();
 
     size_t count = parseIcs(&ics, data);
 
     TEST_ASSERT_EQUAL(1, count);
-    TEST_ASSERT_EQUAL_STRING("Meeting with John", ics.events[0].summary);
-    TEST_ASSERT_EQUAL_STRING("20230615T090000", ics.events[0].dtstart);
-    TEST_ASSERT_EQUAL_STRING("20230615T100000", ics.events[0].dtend);
+    TEST_ASSERT_EQUAL_STRING("Meeting with John", ics.events[0]->summary);
+    TEST_ASSERT_EQUAL_STRING("20230615T090000", ics.events[0]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20230615T100000", ics.events[0]->dtend);
 
     freeIcs(&ics);
 }
@@ -61,22 +61,22 @@ void test_parse_should_handle_multiple_events(void) {
 
     // Initialize buffer with data and then call getEvent
     updateBuffer_Expect(data);
-    getEvent_ExpectAndReturn(mock_event1);
-    getEvent_ExpectAndReturn(mock_event2);
-    getEvent_ExpectAndReturn(((event_t){NULL, NULL, NULL, 0, 0}));
-    freeEvent_ExpectAnyArgs();
-    freeEvent_ExpectAnyArgs();
+    getEvent_ExpectAndReturn(&mock_event1);
+    getEvent_ExpectAndReturn(&mock_event2);
+    getEvent_ExpectAndReturn(NULL);
+    freeEventMembers_Ignore();
+    freeEvent_Ignore();
     resetGetEvent_Ignore();
 
     size_t count = parseIcs(&ics, data);
 
     TEST_ASSERT_EQUAL(2, count);
-    TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0].summary);
-    TEST_ASSERT_EQUAL_STRING("20230615T090000", ics.events[0].dtstart);
-    TEST_ASSERT_EQUAL_STRING("20230615T100000", ics.events[0].dtend);
-    TEST_ASSERT_EQUAL_STRING("Event 2", ics.events[1].summary);
-    TEST_ASSERT_EQUAL_STRING("20230616T090000", ics.events[1].dtstart);
-    TEST_ASSERT_EQUAL_STRING("20230616T100000", ics.events[1].dtend);
+    TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0]->summary);
+    TEST_ASSERT_EQUAL_STRING("20230615T090000", ics.events[0]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20230615T100000", ics.events[0]->dtend);
+    TEST_ASSERT_EQUAL_STRING("Event 2", ics.events[1]->summary);
+    TEST_ASSERT_EQUAL_STRING("20230616T090000", ics.events[1]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20230616T100000", ics.events[1]->dtend);
 
     freeIcs(&ics);
 }
@@ -89,7 +89,7 @@ void test_parse_should_handle_no_events(void) {
 
     // Initialize buffer with data and then call getEvent
     updateBuffer_Expect(data);
-    getEvent_ExpectAndReturn(((event_t){NULL, NULL, NULL, 0, 0}));
+    getEvent_ExpectAndReturn(NULL);
     resetGetEvent_Ignore();
 
     size_t count = parseIcs(&ics, data);
@@ -106,7 +106,7 @@ void test_parse_should_handle_incomplete_event(void) {
 
     // Initialize buffer with data and then call getEvent
     updateBuffer_Expect(data);
-    getEvent_ExpectAndReturn(((event_t){NULL, NULL, NULL, 0, 0}));
+    getEvent_ExpectAndReturn(NULL);
     resetGetEvent_Ignore();
 
     size_t count = parseIcs(&ics, data);
@@ -134,27 +134,27 @@ void test_parse_should_handle_multiple_calls(void) {
 
     // Initialize buffer with data1 and call getEvent
     updateBuffer_Expect(data1);
-    getEvent_ExpectAndReturn(mock_event1);
-    getEvent_ExpectAndReturn(((event_t){NULL, NULL, NULL, 0, 0}));
+    getEvent_ExpectAndReturn(&mock_event1);
+    getEvent_ExpectAndReturn(NULL);
 
     // Initialize buffer with data2 and call getEvent
     updateBuffer_Expect(data2);
-    getEvent_ExpectAndReturn(mock_event2);
-    getEvent_ExpectAndReturn(((event_t){NULL, NULL, NULL, 0, 0}));
-    freeEvent_ExpectAnyArgs();
-    freeEvent_ExpectAnyArgs();
+    getEvent_ExpectAndReturn(&mock_event2);
+    getEvent_ExpectAndReturn(NULL);
+    freeEvent_Ignore();
+    freeEventMembers_Ignore();
     resetGetEvent_Ignore();
 
-    size_t count = parseIcs(&ics, data1);
-    count = parseIcs(&ics, data2);
+    parseIcs(&ics, data1);
+    size_t count = parseIcs(&ics, data2);
 
     TEST_ASSERT_EQUAL(2, count);
-    TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0].summary);
-    TEST_ASSERT_EQUAL_STRING("20230615T090000", ics.events[0].dtstart);
-    TEST_ASSERT_EQUAL_STRING("20230615T100000", ics.events[0].dtend);
-    TEST_ASSERT_EQUAL_STRING("Event 2", ics.events[1].summary);
-    TEST_ASSERT_EQUAL_STRING("20230616T090000", ics.events[1].dtstart);
-    TEST_ASSERT_EQUAL_STRING("20230616T100000", ics.events[1].dtend);
+    TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0]->summary);
+    TEST_ASSERT_EQUAL_STRING("20230615T090000", ics.events[0]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20230615T100000", ics.events[0]->dtend);
+    TEST_ASSERT_EQUAL_STRING("Event 2", ics.events[1]->summary);
+    TEST_ASSERT_EQUAL_STRING("20230616T090000", ics.events[1]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20230616T100000", ics.events[1]->dtend);
 
     freeIcs(&ics);
 }
@@ -177,27 +177,27 @@ void test_parse_should_handle_multiple_calls_split_at_timestamp(void) {
 
     // Initialize buffer with data1 and call getEvent
     updateBuffer_Expect(data1);
-    getEvent_ExpectAndReturn(mock_event1);
-    getEvent_ExpectAndReturn(((event_t){NULL, NULL, NULL, 0, 0}));
+    getEvent_ExpectAndReturn(&mock_event1);
+    getEvent_ExpectAndReturn(NULL);
 
     // Initialize buffer with data2 and call getEvent
     updateBuffer_Expect(data2);
-    getEvent_ExpectAndReturn(mock_event2);
-    getEvent_ExpectAndReturn(((event_t){NULL, NULL, NULL, 0, 0}));
-    freeEvent_ExpectAnyArgs();
-    freeEvent_ExpectAnyArgs();
+    getEvent_ExpectAndReturn(&mock_event2);
+    getEvent_ExpectAndReturn(NULL);
+    freeEvent_Ignore();
+    freeEventMembers_Ignore();
     resetGetEvent_Ignore();
 
-    size_t count = parseIcs(&ics, data1);
-    count = parseIcs(&ics, data2);
+    parseIcs(&ics, data1);
+    size_t count = parseIcs(&ics, data2);
 
     TEST_ASSERT_EQUAL(2, count);
-    TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0].summary);
-    TEST_ASSERT_EQUAL_STRING("20230615T090000", ics.events[0].dtstart);
-    TEST_ASSERT_EQUAL_STRING("20230615T100000", ics.events[0].dtend);
-    TEST_ASSERT_EQUAL_STRING("Event 2", ics.events[1].summary);
-    TEST_ASSERT_EQUAL_STRING("20230616T090000", ics.events[1].dtstart);
-    TEST_ASSERT_EQUAL_STRING("20230616T100000", ics.events[1].dtend);
+    TEST_ASSERT_EQUAL_STRING("Event 1", ics.events[0]->summary);
+    TEST_ASSERT_EQUAL_STRING("20230615T090000", ics.events[0]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20230615T100000", ics.events[0]->dtend);
+    TEST_ASSERT_EQUAL_STRING("Event 2", ics.events[1]->summary);
+    TEST_ASSERT_EQUAL_STRING("20230616T090000", ics.events[1]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20230616T100000", ics.events[1]->dtend);
 
     freeIcs(&ics);
 }

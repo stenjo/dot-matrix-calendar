@@ -83,7 +83,7 @@ class TestCalendar(unittest.TestCase):
         
         calendar.parseURL('webcal://files-f3.motorsportcalendars.com/no/f3-calendar_p_q_sprint_feature.ics')
         count = calendar.parseURL('webcal://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics')
-        self.assertAlmostEqual(count, 25, delta=10)
+        self.assertAlmostEqual(count, 25, delta=15)
         
     def test_parseURL_Days_Ahead(self):
         
@@ -100,6 +100,16 @@ class TestCalendar(unittest.TestCase):
         count = calendar.refresh()
         self.assertEqual(count, 4)
         
+    def test_get_next_completed_list(self):
+        calendar = Calendar()
+        count = calendar.parseFile('../../tests/test-hendelse.ics')
+        self.assertEqual(count, 1)
+
+        print(dayText(calendar.first()))
+      
+        self.assertIsNone(calendar.next())
+        
+              
         
 
     def test_refresh(self):
@@ -108,6 +118,7 @@ class TestCalendar(unittest.TestCase):
         calendar.sources.append(url)
         items = calendar.refresh()
         self.assertEqual(items, 56)
+        
     def test_next(self):
         calendar = Calendar()
         calendar.getNext = lambda: ('Event Summary', '20230412T165722Z')

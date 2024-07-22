@@ -31,11 +31,11 @@ void test_parse_ics_from_file(void) {
     size_t count = parseFile(&ics, "test/moon.ics");
     TEST_ASSERT_EQUAL(9, count);
 
-    TEST_ASSERT_NOT_NULL(ics.events[0].summary);
-    TEST_ASSERT_NOT_NULL(ics.events[0].dtstart);
+    TEST_ASSERT_NOT_NULL(ics.events[0]->summary);
+    TEST_ASSERT_NOT_NULL(ics.events[0]->dtstart);
 
-    if (ics.events[0].summary) TEST_ASSERT_EQUAL_STRING("Last quarter 11:27am", ics.events[0].summary);
-    if (ics.events[0].dtstart) TEST_ASSERT_EQUAL_STRING("20240501", ics.events[0].dtstart);
+    if (ics.events[0]->summary) TEST_ASSERT_EQUAL_STRING("Last quarter 11:27am", ics.events[0]->summary);
+    if (ics.events[0]->dtstart) TEST_ASSERT_EQUAL_STRING("20240501", ics.events[0]->dtstart);
 
     freeIcs(&ics);
 }
