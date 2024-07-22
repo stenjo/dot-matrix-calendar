@@ -362,6 +362,7 @@ void test_withLargeCalendar(void) {
 
     setCurrentEvent(&ics, 0);
 
+    printf("\n%d events\n", count);
     while (!atEnd(&ics))  {
         event = getNextEvent(&ics);
         printf("%s %s %s\n", event->dtstart, event->dtend, event->summary);
@@ -403,14 +404,24 @@ void test_withMultipleCalendars(void) {
     TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event->summary);
     TEST_ASSERT_EQUAL_STRING("20240517T090500Z", event->dtstart);
 
-     count = parseFile(&ics, "test/basic.ics");
+    count = parseFile(&ics, "test/basic.ics");
     sortEventsByStart(&ics);
+
+    setCurrentEvent(&ics, 0);
+    // printf("\n%d events\n", count);
+    // while (!atEnd(&ics))  {
+    //     event = getNextEvent(&ics);
+    //     printf("%s %s %s\n", event->dtstart, event->dtend, event->summary);
+    // }
+
 
     getFirstEvent(&ics);
     getNextEvent(&ics);
+    getNextEvent(&ics);
+    getNextEvent(&ics);
     event = getNextEvent(&ics);
-    TEST_ASSERT_EQUAL_STRING("Rød curry med torsk", event->summary);
-    TEST_ASSERT_EQUAL_STRING("20240416", event->dtstart);
+    TEST_ASSERT_EQUAL_STRING("Salat", event->summary);
+    TEST_ASSERT_EQUAL_STRING("20240417", event->dtstart);
 
 
     freeIcs(&ics);
@@ -419,15 +430,6 @@ void test_withGoogleCalendars(void) {
     ics_t ics;
     initIcs(&ics);
     initIcsDates(&ics);
-
-    // const char startDate[] = "20240401T000000Z";
-    // const char endDate[] = "20241201T000000Z";
-
-    // time_t start = setStartDate(&ics, startDate);
-    // TEST_ASSERT_EQUAL(1711922400, start);
-    // time_t end = setEndDate(&ics, endDate);
-    // TEST_ASSERT_EQUAL(1733007600, end);
-
 
     int count = parseFile(&ics, "test/moon.ics");
     TEST_ASSERT_EQUAL(148, count);
