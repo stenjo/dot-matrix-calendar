@@ -652,5 +652,31 @@ void test_parse_with_chunks2(void) {
     freeIcs(&ics);
 }
 
+void test_parse_should_handle_commas_in_summary(void) {
+    ics_t ics;
+    initIcs(&ics);
+
+    const char *data =  "BEGIN:VEVENT\r\n"
+                        "DTSTART;VALUE=DATE:20190422\r\n"
+                        "DTEND;VALUE=DATE:20190423\r\n"
+                        "DTSTAMP:20240424T062905Z\r\n"
+                        "UID:6qchqqlee209carvhfo3ino68g@google.com\r\n"
+                        "CREATED:20190420T092806Z\r\n"
+                        "LAST-MODIFIED:20190420T093123Z\r\n"
+                        "SEQUENCE:2\r\n"
+                        "STATUS:CONFIRMED\r\n"
+                        "SUMMARY:Laks\\, stappe og brokkoli med hollandaise saus\r\n"
+                        "TRANSP:TRANSPARENT\r\n"
+                        "END:VEVENT\r\n";
+
+    // Initialize buffer with data and then call getEvent
+
+    size_t count = parseIcs(&ics, data);
+
+    TEST_ASSERT_EQUAL(1, count);
+    TEST_ASSERT_EQUAL_STRING("Laks, stappe og brokkoli med hollandaise saus", ics.events[0]->summary);
+
+    freeIcs(&ics);
+}
 
 #endif // TEST
