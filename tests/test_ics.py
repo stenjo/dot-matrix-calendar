@@ -100,23 +100,16 @@ class TestCalendar(unittest.TestCase):
         count = calendar.refresh()
         self.assertEqual(count, 4)
         
-    def test_refresh_after_completed_list(self):
-        calendar = Calendar(daysAhead=30)
-        count = calendar.parseURL('https://calendar.google.com/calendar/ical/ht3jlfaac5lfd6263ulfh4tql8%40group.calendar.google.com/public/basic.ics')
-        self.assertEqual(count, 4)
-        
+    def test_get_next_completed_list(self):
+        calendar = Calendar()
+        count = calendar.parseFile('../../tests/test-hendelse.ics')
+        self.assertEqual(count, 1)
+
         print(dayText(calendar.first()))
-        print(dayText(calendar.next()))
-        print(dayText(calendar.next()))
-        print(dayText(calendar.next()))
+      
+        self.assertIsNone(calendar.next())
         
-        count = calendar.refresh()
-        self.assertEqual(count, 4)
-        print(dayText(calendar.first()))
-        print(dayText(calendar.next()))
-        print(dayText(calendar.next()))
-        print(dayText(calendar.next()))
-                
+              
         
 
     def test_refresh(self):
