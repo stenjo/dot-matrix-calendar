@@ -4,6 +4,7 @@ MICROPY_TOP ?= $(abspath ../../lib/micropython)
 MICROPY_DIRECTORY ?= $(abspath ../../lib/micropython)
 BOARD = ESP32_GENERIC_S3
 # lib/micropython/ports/esp32/boards/ESP32_GENERIC_S3
+BOARD_VARIANT = esp32s3
 PORT_DIR = $(MICROPY_TOP)/ports/esp32/
 BOARD_DIR = $(PORT_DIR)/boards/$(BOARD)/
 BUILD = $(abspath build)
@@ -32,7 +33,7 @@ firmware:
 
 deploy:
 	$(ECHO) "Writing $< to the board"
-	$(Q)esptool.py --chip esp32s3 -p $(PORT) -b $(BAUD) \
+	$(Q)esptool.py --chip $(BOARD_VARIANT) -p $(PORT) -b $(BAUD) \
 	--before default_reset \
 	--after no_reset \
 	write_flash \
@@ -65,10 +66,12 @@ mon:
 
 latest:
 	rm -rf build
-	$(Q)wget https://github.com/stenjo/dot-matrix-calendar/releases/latest/download/esp32s3.zip
-	mv esp32s3.zip.1 esp32s3.zip
+	rm -rf *.zip
+	$(Q)wget https://github.com/stenjo/dot-matrix-calendar/releases/latest/download/$(BOARD_VARIANT).zip
+	unzip $(BOARD_VARIANT).zip
 
 latest-src:
 	rm -rf build
-    wget https://github.com/stenjo/dot-matrix-calendar/releases/latest/download/esp32s3.zip
-	mv esp32s3.zip.1 esp32s3.zip
+	rm -rf *.zip
+    wget https://github.com/stenjo/dot-matrix-calendar/releases/latest/download/$(BOARD_VARIANT).zip
+	unzip $(BOARD_VARIANT).zip

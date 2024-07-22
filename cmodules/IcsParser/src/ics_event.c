@@ -135,6 +135,7 @@ char *extract_property(const char *data, const char *property, const char *end) 
         strncpy(value, start, len);
         value[len] = '\0';
     }
+    nukechar(value, '\\');
     return value;
 }
 
