@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/stenjo/dot-matrix-calendar/compare/v1.0.2...v1.1.0) (2024-07-22)
+
+
+### Features
+
+* **ics:** handle weekly repeating events ([#67](https://github.com/stenjo/dot-matrix-calendar/issues/67)) ([f0cdfea](https://github.com/stenjo/dot-matrix-calendar/commit/f0cdfea273f51a26ee26a104b4cde087fa0d8e88))
+
+
+### Bug Fixes
+
+* **ics:** today time does not update ([#72](https://github.com/stenjo/dot-matrix-calendar/issues/72)) ([5b120da](https://github.com/stenjo/dot-matrix-calendar/commit/5b120da72c46fd6dee1a9c5a951ec7965a191f5e))
+
 ## [1.0.2](https://github.com/stenjo/dot-matrix-calendar/compare/v1.0.1...v1.0.2) (2024-07-19)
 
 
