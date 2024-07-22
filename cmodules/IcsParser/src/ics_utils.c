@@ -76,3 +76,15 @@ void remove_all_chars(char* str, char c) {
     }
     *pw = '\0';
 }
+
+void nukechar(char s[], char c)
+{
+    size_t j = 0;
+    for (size_t i = 0; s[i] != '\0'; ++i) {
+        if (s[i] != c) {
+            s[j] = s[i];
+            ++j;
+        }
+    }
+    s[j] = '\0';
+}
