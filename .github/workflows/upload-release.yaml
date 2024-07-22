@@ -25,7 +25,7 @@ jobs:
         id: reports
         uses: actions/download-artifact@v4
         with:
-          pattern:  ${{ inputs.board }}-binary
+          pattern:  ${{ inputs.board }}-binary*
           merge-multiple: true
           path: ./boards/${{ inputs.path}}
           github-token: ${{ secrets.API_TOKEN_GITHUB }}
@@ -34,3 +34,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: gh release upload ${{ inputs.tag }} ./boards/${{ inputs.path }}/${{ inputs.board }}.zip
+
+      - name: Upload Source merged artifact
+        if: exists('./boards/${{ inputs.path }}/${{ inputs.board }}_src.zip')
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        run: gh release upload ${{ inputs.tag }} ./boards/${{ inputs.path }}/${{ inputs.board }}src.zip
+
+

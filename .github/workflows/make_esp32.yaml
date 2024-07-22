@@ -40,23 +40,28 @@ jobs:
             source ../../esp-idf/export.sh
             make
             zip -r ${{ inputs.board }}.zip build -x build/CMakeFiles/**/*.bin -x build/bootloader/CMakeFiles/**/*.bin  -i *.bin -i *.elf
-          
-        - name: Merge with src files
-          continue-on-error: true
-          run: |
-            mkdir build
-            vfsmerge --port ${{ inputs.board }} --firmware ./boards/${{ inputs.path }}/build/micropython.bin
-          
+            
         - name: Save binary
           uses: actions/upload-artifact@v4
           with:
             name: ${{ inputs.board }}-binary
             path: boards/${{ inputs.path }}/${{ inputs.board }}.zip
-      
+          
+        - name: Merge with src files
+          if: ${{ inputs.board }} == 'esp32'
+          working-directory: boards/${{ inputs.path }}
+          continue-on-error: true
+          run: |
+            source ../../esp-idf/export.sh
+            mkdir build
+            vfsmerge --port ${{ inputs.board }} -f build -s ../../src -b build
+            zip -r ${{ inputs.board }}_src.zip build -x build/CMakeFiles/**/*.bin -x build/bootloader/CMakeFiles/**/*.bin  -i *.bin -i *.elf
+
         - name: Save binary
+          if: ${{ inputs.board }} == 'esp32'
           continue-on-error: true
           uses: actions/upload-artifact@v4
           with:
             name: ${{ inputs.board }}-binary-src
-            path: build/firmware_lfs.bin
+            path: boards/${{ inputs.path }}/${{ inputs.board }}_src.zip
     

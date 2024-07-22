@@ -1,13 +1,15 @@
 # Makefile for custom MicroPython esp32 board.
 
 MICROPY_TOP ?= $(abspath ../../lib/micropython)
+CHIPVARIANT ?= esp32
+ARCHIVENAME ?= $(CHIPVARIANT).zip
 BUILD = $(abspath build)
 FWBIN = $(BUILD)/firmware.bin
 MPBIN = $(BUILD)/micropython.bin
 FWSRC = $(BUILD)/firmware_lfs.bin
 PARTBIN = $(BUILD)/partition-table.bin
 LFS = $(BUILD)/littlefs.img
-PORT ?= /dev/tty.usbserial-0001
+PORT ?= /dev/cu.usbserial-0001
 BAUD ?= 460800
 FLASH_MODE ?= dio
 FLASH_SIZE ?= 4MB #detect
@@ -23,7 +25,7 @@ firmware:
 
 deploy:
 	$(ECHO) "Writing $< to the board"
-	$(Q)esptool.py --chip esp32 -p $(PORT) -b $(BAUD) \
+	$(Q)esptool.py --chip $(CHIPVARIANT) -p $(PORT) -b $(BAUD) \
 	--before default_reset \
 	--after hard_reset \
 	write_flash \
@@ -37,8 +39,8 @@ deploy:
 
 merge:
 	$(ECHO) "Merge binary with src/ folder files"
-	$(Q)vfsmerge  --port esp32 --firmware $(FWBIN)
-	$(Q)esptool.py --chip esp32 merge_bin -o $(FWSRC) \
+	$(Q)vfsmerge  --port $(CHIPVARIANT) --firmware $(FWBIN)
+	$(Q)esptool.py --chip $(CHIPVARIANT) merge_bin -o $(FWSRC) \
 	--flash_mode=$(FLASH_MODE) \
 	--flash_size=$(FLASH_SIZE) \
 	--flash_freq 40m \
@@ -49,7 +51,7 @@ merge:
 
 deploy-merged:
 	$(ECHO) "Writing $< to the board"
-	$(Q)esptool.py --chip esp32 -p $(PORT) -b $(BAUD) \
+	$(Q)esptool.py --chip $(CHIPVARIANT) -p $(PORT) -b $(BAUD) \
 	--before default_reset \
 	--after hard_reset \
 	write_flash \
@@ -83,5 +85,12 @@ mon:
 
 latest:
 	rm -rf build
-	$(Q)wget https://github.com/stenjo/dot-matrix-calendar/actions/runs/9990018864/artifacts/1714625733
-	mv esp32.zip.1 esp32.zip
+	rm -rf $(ARCHIVENAME)
+	$(Q)wget https://github.com/stenjo/dot-matrix-calendar/releases/latest/download/$(ARCHIVENAME)
+	unzip $(ARCHIVENAME)
+
+latest-src:
+	rm -rf build
+	rm -rf $(ARCHIVENAME)
+    $(Q)wget https://github.com/stenjo/dot-matrix-calendar/releases/latest/download/$(ARCHIVENAME)
+	unzip $(ARCHIVENAME)
