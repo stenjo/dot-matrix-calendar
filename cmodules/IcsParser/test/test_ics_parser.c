@@ -115,9 +115,10 @@ void test_parseAllDayEventToday(void) {
     setStartDate(&ics, "20240427");
     setEndDate(&ics, "20240429");
     parseIcs(&ics, event);
+
+    TEST_ASSERT_EQUAL(1, ics.count);
     TEST_ASSERT_EQUAL_STRING("All day event", ics.events[0]->summary);
     TEST_ASSERT_EQUAL_STRING("20240427", ics.events[0]->dtstart);
-    TEST_ASSERT_EQUAL(1, ics.count);
     freeIcs(&ics);
 
 }
@@ -125,9 +126,9 @@ void test_parseAllDayEventToday(void) {
 void test_ics_parse_ShouldReturnEventSummaryAndStart(void) {
     updateBuffer(ics_data);
     const event_t *event = getEvent();
+    TEST_ASSERT_EQUAL(17, strlen(event->summary));
     TEST_ASSERT_EQUAL_STRING("Meeting with John", event->summary);
     TEST_ASSERT_EQUAL_STRING("20230412T160000Z", event->dtstart);
-    TEST_ASSERT_EQUAL(17, strlen(event->summary));
 }
 
 void test_parse_ShouldReturnEventList(void) {
@@ -135,9 +136,9 @@ void test_parse_ShouldReturnEventList(void) {
     initIcs(&ics);
     initIcsDates(&ics);
     parseIcs(&ics, ics_data);
+    TEST_ASSERT_EQUAL(1, ics.count);
     TEST_ASSERT_EQUAL_STRING("Meeting with John", ics.events[0]->summary);
     TEST_ASSERT_EQUAL_STRING("20230412T160000Z", ics.events[0]->dtstart);
-    TEST_ASSERT_EQUAL(1, ics.count);
     freeIcs(&ics);
 }
 
@@ -147,8 +148,8 @@ void test_parse_ShouldReturnEventListIterationOneEvent(void) {
     initIcsDates(&ics);
     size_t count = parseIcs(&ics, ics_data);
     event_t const *event = getFirstEvent(&ics);
-    TEST_ASSERT_EQUAL(1, count);
 
+    TEST_ASSERT_EQUAL(1, count);
     TEST_ASSERT_EQUAL_STRING("Meeting with John", event->summary);
     TEST_ASSERT_EQUAL_STRING("20230412T160000Z", event->dtstart);
 
@@ -303,8 +304,8 @@ void test_sortEvents_sortAllFilteredEventsByStartTime(void) {
     time_t end = setEndDate(&ics, endDate);
 
     int count = parseFile(&ics, "test/f2-calendar_p_q_sprint_feature.ics");
-    event_t *event = getFirstEvent(&ics);
     TEST_ASSERT_EQUAL(16, count);
+    event_t *event = getFirstEvent(&ics);
 
     TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event->summary);
     TEST_ASSERT_EQUAL_STRING("20240517T090500Z", event->dtstart);
@@ -333,8 +334,8 @@ void test_endDate_verifyEndDateAvailableOnEvents(void) {
     time_t end = setEndDate(&ics, endDate);
 
     int count = parseFile(&ics, "test/f2-calendar_p_q_sprint_feature.ics");
-    event_t *event = getFirstEvent(&ics);
     TEST_ASSERT_EQUAL(16, count);
+    event_t *event = getFirstEvent(&ics);
 
     TEST_ASSERT_EQUAL_STRING("F2: Practice (Emilia Romagna)", event->summary);
     TEST_ASSERT_EQUAL_STRING("20240517T095000Z", event->dtend);
@@ -355,6 +356,7 @@ void test_withLargeCalendar(void) {
     int count = parseFile(&ics, "test/basic.ics");
     sortEventsByStart(&ics);
 
+    TEST_ASSERT_EQUAL(23, count);
     event_t *event = getEventAt(&ics, 5);
 
     TEST_ASSERT_EQUAL_STRING("Service på bilen", event->summary);
@@ -369,7 +371,6 @@ void test_withLargeCalendar(void) {
         TEST_ASSERT_NOT_NULL(event->summary);
         TEST_ASSERT_NOT_NULL(event->dtstart);
     }
-    TEST_ASSERT_EQUAL(23, count);
     freeIcs(&ics);
 }
 
