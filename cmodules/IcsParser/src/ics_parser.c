@@ -167,10 +167,15 @@ void initIcs(ics_t *ics) {
 }
 
 void freeIcs(ics_t *ics) {
+    if (ics->events == NULL) return;
     for (int i = 0; i < ics->count; i++) {
-        freeEvent(ics->events[i]);
+        if(ics->events[i] != NULL) {
+            freeEvent(ics->events[i]);
+            ics->events[i] = NULL;
+        }
     }
     free(ics->events);
+    ics->events = NULL;
     ics->count = 0;
     ics->events = NULL;
     resetGetEvent();

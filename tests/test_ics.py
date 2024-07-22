@@ -100,6 +100,23 @@ class TestCalendar(unittest.TestCase):
         count = calendar.refresh()
         self.assertEqual(count, 4)
         
+    def test_refresh_after_completed_list(self):
+        calendar = Calendar(daysAhead=30)
+        count = calendar.parseURL('https://calendar.google.com/calendar/ical/ht3jlfaac5lfd6263ulfh4tql8%40group.calendar.google.com/public/basic.ics')
+        self.assertEqual(count, 4)
+        
+        print(dayText(calendar.first()))
+        print(dayText(calendar.next()))
+        print(dayText(calendar.next()))
+        print(dayText(calendar.next()))
+        
+        count = calendar.refresh()
+        self.assertEqual(count, 4)
+        print(dayText(calendar.first()))
+        print(dayText(calendar.next()))
+        print(dayText(calendar.next()))
+        print(dayText(calendar.next()))
+                
         
 
     def test_refresh(self):
@@ -108,6 +125,7 @@ class TestCalendar(unittest.TestCase):
         calendar.sources.append(url)
         items = calendar.refresh()
         self.assertEqual(items, 56)
+        
     def test_next(self):
         calendar = Calendar()
         calendar.getNext = lambda: ('Event Summary', '20230412T165722Z')

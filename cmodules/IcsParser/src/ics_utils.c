@@ -49,11 +49,11 @@ time_t getTimeStamp(const char *date_str) {
 void updateDateStr(char * str, time_t time) {
         struct tm tm_event = {0};
         char buff[20];
-    if (strlen(str) == 9) {
-        strftime(buff, 10, "%Y%m%d", localtime_r(&time, &tm_event));
-        strcpy(str, buff);
-    } else if (strlen(str) >= 15) {
+    if (strlen(str) >= 15) {
         strftime(buff, 20, "%Y%m%dT%H%M%SZ", localtime_r(&time, &tm_event));
+        strcpy(str, buff);
+    } else if (strlen(str) >= 8) {
+        strftime(buff, 10, "%Y%m%d", localtime_r(&time, &tm_event));
         strcpy(str, buff);
     }
 }
