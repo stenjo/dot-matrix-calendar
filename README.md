@@ -19,49 +19,38 @@ For this project to work, you need the following:
 
 Connect the dot matrix module to the S2 mini:
 
-| S2 mini | Dot Matrix | signal      |
-|---------|------------|-------------|
-| 3V3     | VCC        | Power       |
-| GND     | GND        | Ground      |
-| GPIO 11 | DIN        | Data        |
-| GPIO 5  | CS         | Chip select |
-| GPIO 7  | CLK        | Clock       |
+| S2 mini | S3 mini | Dot Matrix | signal      |
+|---------|---------|------------|-------------|
+| 3V3     | 3V3     | VCC        | Power       |
+| GND     | GND     | GND        | Ground      |
+| GPIO 11 | GPIO 11 | DIN        | Data        |
+| GPIO 5  | GPIO 5  | CS         | Chip select |
+| GPIO 7  | GPIO 12 | CLK        | Clock       |
 
 ![Wiring](resources/wiring.png)
 ![Soldered](resources/soldered.jpg)
 
 ### Install tools for building and loading binary
 
+Install the basic tools for working with this repo:
+```bash
+brew install pipx picocom wget unzip
+pipx install esptool rshell freezefs vfs_merge 
+```
+
 To be able to build the firmware locally, the following tools are needed:
 
-Install version 5.0.4 of the Espressif toolchain.
+Install version 5.2 of the Espressif toolchain.
 
 ```bash
     pipx install pyelftools
     mkdir ~/esp
     cd ~/esp
     git clone https://github.com/espressif/esp-idf.git
-    git -C esp-idf checkout v5.0.2
+    git -C esp-idf checkout v5.2
     ./esp-idf/install.sh
 ```
 
-Install pipx for python tools:
-
-```bash
-brew install pipx picocom
-```
-
-For programming and erasing the flash, use esptools.py
-
-```bash
-    pipx install esptool
-```
-
-For loading python files and running repl
-
-```bash
-    pipx install rshell
-```
 
 ### Load binary
 
@@ -70,29 +59,16 @@ Clone and extract this repo and move into the esp32-S2 folder:
 
 ```bash
 git clone https://github.com/stenjo/dot-matrix-calendar.git
-cd dot-matrix-calendar/boards/LOLIN_S2_MINI
+cd dot-matrix-calendar
+git submodule update --init lib/micropython
+cd boards/LOLIN_S3_MINI
 ```
-
-Ready built binary can be downloaded from the latest build from github, [latest release](https://github.com/stenjo/dot-matrix-calendar/releases/latest). Click `esp32-S2-binary` and download the zipped binary to the `boards/LOLIN_S2_MINI` folder, or run the following commands:
-
-```bash
-wget https://github.com/stenjo/dot-matrix-calendar/releases/latest/download/esp32s2.zip
-mv esp32s2.zip.1 esp32s2.zip
-```
-
-Extract the files so that you have a `build` folder where all the binary files are located in the original folder structure.
-
-```bash
-unzip esp32s2.zip
-```
-
 Connect your esp32-S2 to your Mac via usb cable. Set the board into programming mode by holding button 0, pressing the reset button and releasing the button 0 when the board is connected.
 
-Run the following commands:
+Ready built binary can be downloaded from the latest build from github, [latest release](https://github.com/stenjo/dot-matrix-calendar/releases/latest). Click `esp32-S3-binary` and download the zipped binary to the `boards/LOLIN_S3_MINI` folder, or run the following commands:
 
 ```bash
-make erase
-make deploy
+make latest erase deploy
 ```
 
 You should see successful deploy.
@@ -100,8 +76,9 @@ Press the reset button on the board.
 Now deploy python files:
 
 ```bash
-rshell rsync ../../src /pyboard
+make copy
 ```
+
 Reset the board again and it should be running displaying `setup-` on the dot matrix if everything is connected OK. 
 
 ### Set up repo and build your own firmware

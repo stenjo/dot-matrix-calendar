@@ -135,6 +135,7 @@ char *extract_property(const char *data, const char *property, const char *end) 
         strncpy(value, start, len);
         value[len] = '\0';
     }
+    remove_all_chars(value, '\\');
     return value;
 }
 
