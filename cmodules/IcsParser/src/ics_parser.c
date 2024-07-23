@@ -112,6 +112,9 @@ size_t parseIcs(ics_t *ics, const char *ics_data) {
 
 
         double afterStartFilter = difftime(event->tstart, ics->startTime);
+        if (event->tend > event->tstart) {
+            afterStartFilter = difftime(event->tend, ics->startTime);
+        }
         double beforeEndFilter = difftime(ics->endTime, event->tstart);
 
         if ((ics->startTime != 0 && afterStartFilter < 0) || (ics->endTime != 0 && beforeEndFilter < 0)) { 

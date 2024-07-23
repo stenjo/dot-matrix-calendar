@@ -1,9 +1,10 @@
-import unittest, time
 from Calendar import Calendar, dtStrToIso, toDtStr, toDict
+import unittest, time
 from dateHandling import dayText
 
 class TestCalendar(unittest.TestCase):
 
+        
     def test_dtStrToIso(self):
         self.assertEqual(dtStrToIso('20230412T165722Z'), '2023-04-12T16:57:22')
         self.assertEqual(dtStrToIso('20230412'), '2023-04-12')
@@ -143,6 +144,16 @@ class TestCalendar(unittest.TestCase):
         calendar = Calendar()
         calendar.setEndDate = lambda x: self.assertEqual(x, '20230412')
         calendar.end('20230412')
+
+    def test_show_all_day_while_ongoing(self):
+        calendar = Calendar(start="20230106T090000Z", end="20230107")
+        # start= 20230106, end=20230107
+        count = calendar.parseFile('../../tests/all_day.ics')
+        self.assertEqual(count, 1)
+
+        print(dayText(calendar.first()))
+      
+        self.assertIsNone(calendar.next())
 
 if __name__ == "__main__":
     unittest.main()

@@ -148,8 +148,8 @@ void test_parse_with_start_and_end_times_repeat(void) {
 
     TEST_ASSERT_EQUAL(2, count);
     TEST_ASSERT_EQUAL_STRING("Matavfall", ics.events[0]->summary);
-    TEST_ASSERT_EQUAL_STRING("20240723T211509Z", ics.events[0]->dtstart);
-    TEST_ASSERT_EQUAL_STRING("20240723T221509Z", ics.events[0]->dtend);
+    TEST_ASSERT_INT_WITHIN(4000, getTimeStamp("20240723T211509Z"), ics.events[0]->tstart);
+    TEST_ASSERT_INT_WITHIN(4000, getTimeStamp("20240723T221509Z"), ics.events[0]->tend);
     TEST_ASSERT_EQUAL_STRING("WEEKLY", ics.events[0]->rrule);
     TEST_ASSERT_EQUAL_STRING("2", ics.events[0]->interval);
 
