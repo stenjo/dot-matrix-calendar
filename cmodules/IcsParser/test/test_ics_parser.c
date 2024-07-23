@@ -112,7 +112,7 @@ void test_parseAllDayEventToday(void) {
     ics_t ics;
     initIcs(&ics);
     initIcsDates(&ics);
-    setStartDate(&ics, "20240427");
+    setStartDate(&ics, "20240427T124520");
     setEndDate(&ics, "20240429");
     parseIcs(&ics, event);
 
