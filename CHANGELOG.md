@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/stenjo/dot-matrix-calendar/compare/v1.1.1...v1.1.2) (2024-07-23)
+
+
+### Bug Fixes
+
+* **ics:** todays all day events are not displayed ([#75](https://github.com/stenjo/dot-matrix-calendar/issues/75)) ([124cb36](https://github.com/stenjo/dot-matrix-calendar/commit/124cb36b7f4e9f7b9553aac1235075be554c77c5))
+
 ## [1.1.1](https://github.com/stenjo/dot-matrix-calendar/compare/v1.1.0...v1.1.1) (2024-07-22)
 
 
