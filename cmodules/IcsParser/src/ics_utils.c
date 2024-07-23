@@ -10,31 +10,15 @@ bool parse_date_string(const char *date_str, struct tm *tm) {
     }
 
     // Parse the date string.
-    if (sscanf(date_str, "%4d%2d%2dT%2d%2d%2dZ",
-               &tm->tm_year,
-               &tm->tm_mon,
-               &tm->tm_mday,
-               &tm->tm_hour,
-               &tm->tm_min,
-               &tm->tm_sec) == 6) {
+    if (sscanf(date_str, "%4d%2d%2dT%2d%2d%2dZ", &tm->tm_year, &tm->tm_mon, &tm->tm_mday, &tm->tm_hour, &tm->tm_min, &tm->tm_sec) == 6 
+    || sscanf(date_str, "%4d%2d%2d", &tm->tm_year, &tm->tm_mon, &tm->tm_mday) == 3){
         tm->tm_year -= 1900; // tm_year is years since 1900
         tm->tm_mon -= 1;     // tm_mon is 0-based
         tm->tm_isdst = -1;   // Daylight saving information is unknown
         return true; // Successfully parsed
-    } else if (sscanf(date_str, "%4d%2d%2d",
-               &tm->tm_year,
-               &tm->tm_mon,
-               &tm->tm_mday) == 3){
+    }
+    return false; // Failed to parse
 
-        tm->tm_year -= 1900; // tm_year is years since 1900
-        tm->tm_mon -= 1;     // tm_mon is 0-based
-        tm->tm_isdst = -1;   // Daylight saving information is unknown
-        return true; // Successfully parsed
-    }
-    else
-    {
-        return false; // Failed to parse
-    }
 }
 
 time_t getTimeStamp(const char *date_str) {
@@ -58,26 +42,7 @@ void updateDateStr(char * str, time_t time) {
     }
 }
 
-int replacechar(char *str, char orig, char rep) {
-    char *ix = str;
-    int n = 0;
-    while((ix = strchr(ix, orig)) != NULL) {
-        *ix++ = rep;
-        n++;
-    }
-    return n;
-}
-
-void remove_all_chars(char* str, char c) {
-    char *pr = str, *pw = str;
-    while (*pr) {
-        *pw = *pr++;
-        pw += (*pw != c);
-    }
-    *pw = '\0';
-}
-
-void nukechar(char s[], char c)
+void nukeChar(char s[], char c)
 {
     size_t j = 0;
     for (size_t i = 0; s[i] != '\0'; ++i) {

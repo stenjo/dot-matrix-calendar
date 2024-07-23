@@ -33,9 +33,7 @@ void test_getEvent_event_not_found(void) {
     updateBuffer(data);
     const event_t *event = getEvent();
 
-    TEST_ASSERT_NULL(event->summary);
-    TEST_ASSERT_NULL(event->dtstart);
-    TEST_ASSERT_NULL(event->dtend);
+    TEST_ASSERT_NULL(event);
 }
 
 void test_getEvent_incomplete_event(void) {
@@ -43,9 +41,7 @@ void test_getEvent_incomplete_event(void) {
     updateBuffer(data);
     const event_t *event = getEvent();
 
-    TEST_ASSERT_NULL(event->summary);
-    TEST_ASSERT_NULL(event->dtstart);
-    TEST_ASSERT_NULL(event->dtend);
+    TEST_ASSERT_NULL(event);
 }
 
 void test_getEvent_multiple_events(void) {

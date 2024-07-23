@@ -89,7 +89,7 @@ static mp_obj_t mp_getNext(mp_obj_t self_in) {
     if (event_p != NULL) {
         return getEventObj(event_p);
     }
-    mp_printf(&mp_plat_print, "mp_getNext called: %p\n", event_p);
+    // mp_printf(&mp_plat_print, "mp_getNext called: %p\n", event_p);
     return getEventObj(NULL);
 }
 static MP_DEFINE_CONST_FUN_OBJ_1(getNext_obj, mp_getNext);
@@ -149,9 +149,9 @@ static mp_obj_t mp_setStartDate(mp_obj_t self_in, mp_obj_t start_date_obj) {
     mp_check_self(mp_obj_is_str_or_bytes(start_date_obj));
 
     const char* startDate = mp_obj_str_get_str(start_date_obj);
-    // mp_printf(&mp_plat_print, "mp_setStartDate called: %s\n", startDate);
 
     size_t result = setStartDate(&(self->ics), startDate);
+    // mp_printf(&mp_plat_print, "mp_setStartDate called: %s\n", startDate);
 
     return mp_obj_new_int(result);
 }
@@ -167,6 +167,7 @@ static mp_obj_t mp_setEndDate(mp_obj_t self_in, mp_obj_t end_date_obj) {
     const char* endDate = mp_obj_str_get_str(end_date_obj);
 
     size_t result = setEndDate(&(self->ics), endDate);
+    // mp_printf(&mp_plat_print, "mp_setEndDate called: %s\n", endDate);
 
     return mp_obj_new_int(result);
 }
@@ -175,7 +176,9 @@ static MP_DEFINE_CONST_FUN_OBJ_2(setEndDate_obj, mp_setEndDate);
 static mp_obj_t mp_reset(mp_obj_t self_in) {
     mp_check_self(mp_obj_is_type(self_in, &ics_parser_type_ICS)); // Modify the type check accordingly
     ics_obj_t *self = MP_OBJ_TO_PTR(self_in);
+    mp_printf(&mp_plat_print, "mp_reset called. events: %d\n", self->ics.count);
     freeIcs(&(self->ics));
+    mp_printf(&mp_plat_print, "mp_reset called. remaining events: %d\n", self->ics.count);
     initIcs(&(self->ics));
     initIcsDates(&(self->ics));
     return mp_const_none;

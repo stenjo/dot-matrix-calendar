@@ -1,7 +1,14 @@
 # Makefile for custom MicroPython esp32 board.
 
 MICROPY_TOP ?= $(abspath ../../lib/micropython)
+MICROPY_DIRECTORY ?= $(abspath ../../lib/micropython)
+BOARD = ESP32_GENERIC
+# lib/micropython/ports/esp32/boards/ESP32_GENERIC_S3
+BOARD_VARIANT = esp32
+PORT_DIR = $(MICROPY_TOP)/ports/esp32/
+BOARD_DIR = $(PORT_DIR)/boards/$(BOARD)/
 BUILD = $(abspath build)
+
 FWBIN = $(BUILD)/firmware.bin
 MPBIN = $(BUILD)/micropython.bin
 FWSRC = $(BUILD)/firmware_lfs.bin
@@ -82,6 +89,12 @@ mon:
 	picocom /dev/tty.usbserial-0001 --b 115200
 
 latest:
+	rm -rf *.zip
+	$(Q)wget https://github.com/stenjo/dot-matrix-calendar/releases/latest/download/$(BOARD_VARIANT).zip
+	unzip $(BOARD_VARIANT).zip
+
+latest-src:
 	rm -rf build
-	$(Q)wget https://github.com/stenjo/dot-matrix-calendar/actions/runs/9990018864/artifacts/1714625733
-	mv esp32.zip.1 esp32.zip
+	rm -rf *.zip
+    wget https://github.com/stenjo/dot-matrix-calendar/releases/latest/download/$(BOARD_VARIANT)src.zip
+	unzip $(BOARD_VARIANT)src.zip

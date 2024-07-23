@@ -112,7 +112,7 @@ void test_parseAllDayEventToday(void) {
     ics_t ics;
     initIcs(&ics);
     initIcsDates(&ics);
-    setStartDate(&ics, "20240427");
+    setStartDate(&ics, "20240427T124520");
     setEndDate(&ics, "20240429");
     parseIcs(&ics, event);
 
@@ -356,18 +356,18 @@ void test_withLargeCalendar(void) {
     int count = parseFile(&ics, "test/basic.ics");
     sortEventsByStart(&ics);
 
-    TEST_ASSERT_EQUAL(23, count);
-    event_t *event = getEventAt(&ics, 5);
+    TEST_ASSERT_EQUAL(24, count);
+    event_t *event = getEventAt(&ics, 6);
 
     TEST_ASSERT_EQUAL_STRING("Service på bilen", event->summary);
     TEST_ASSERT_EQUAL_STRING("20240418T053000Z", event->dtstart);
 
     setCurrentEvent(&ics, 0);
 
-    printf("\n%d events\n", count);
+    // printf("\n%d events\n", count);
     while (!atEnd(&ics))  {
         event = getNextEvent(&ics);
-        printf("%s %s %s\n", event->dtstart, event->dtend, event->summary);
+        // printf("%s %s %s\n", event->dtstart, event->dtend, event->summary);
         TEST_ASSERT_NOT_NULL(event->summary);
         TEST_ASSERT_NOT_NULL(event->dtstart);
     }
@@ -420,6 +420,7 @@ void test_withMultipleCalendars(void) {
     getNextEvent(&ics);
     getNextEvent(&ics);
     getNextEvent(&ics);
+    getNextEvent(&ics);
     event = getNextEvent(&ics);
     TEST_ASSERT_EQUAL_STRING("Salat", event->summary);
     TEST_ASSERT_EQUAL_STRING("20240417", event->dtstart);
@@ -457,7 +458,7 @@ void test_parse_allDayEvents(void) {
     int count = parseFile(&ics, "test/allday.ics");
     TEST_ASSERT_EQUAL(2, count);
 
-    event_t *event = getFirstEvent(&ics);
+    event_t const *event = getFirstEvent(&ics);
     TEST_ASSERT_EQUAL_STRING("Første eventet", event->summary);
     TEST_ASSERT_EQUAL_STRING("20240425T070000Z", event->dtstart);
     event = getNextEvent(&ics);

@@ -13,6 +13,8 @@
 
 
 // Statics
+
+
 static event_t * createRepeatEvent(event_t * event, time_t interval) {
     event_t * revent = cloneEvent(event);
     
@@ -102,16 +104,23 @@ size_t parseFile(ics_t *ics, const char *file_path) {
 }
 
 size_t parseIcs(ics_t *ics, const char *ics_data) {
+
     updateBuffer(ics_data);
+
     event_t * event;
     while ((event = getEvent()) != NULL && event->dtstart != NULL) {
-        if (event->tstart < 0) { freeEvent(event); continue; }
+        if (event->tstart < 0) { 
+            freeEvent(event); 
+            continue; 
+        }
 
         // Handle RRule
         time_t interval_seconds = handleRRule(event, ics->startTime);
 
-
         double afterStartFilter = difftime(event->tstart, ics->startTime);
+        if (event->tend > event->tstart) {
+            afterStartFilter = difftime(event->tend, ics->startTime);
+        }
         double beforeEndFilter = difftime(ics->endTime, event->tstart);
 
         if ((ics->startTime != 0 && afterStartFilter < 0) || (ics->endTime != 0 && beforeEndFilter < 0)) { 
@@ -123,11 +132,9 @@ size_t parseIcs(ics_t *ics, const char *ics_data) {
 
         while (interval_seconds > 0 && ics->endTime > 0 && difftime(ics->endTime, event->tstart + interval_seconds) >= 0) {
             event = createRepeatEvent(event, interval_seconds);
-            if (event != NULL) addEvent(ics, event);
+            if (event != NULL) { addEvent(ics, event); }
         }
-
     }
-
     return ics->count;
 }
 
@@ -160,7 +167,7 @@ time_t setEndDate(ics_t *ics, const char *end)
 }
 
 void initIcs(ics_t *ics) {
-    ics->events = malloc(10 * sizeof(event_t *));
+    ics->events = calloc(10, sizeof(event_t *));
     ics->count = 0;
     ics->capacity = 10;
     ics->startTime = 0;
@@ -168,17 +175,14 @@ void initIcs(ics_t *ics) {
 }
 
 void freeIcs(ics_t *ics) {
-    if (ics->events == NULL) return;
     for (int i = 0; i < ics->count; i++) {
-        if(ics->events[i] != NULL) {
+        if (ics->events[i] != NULL) {
             freeEvent(ics->events[i]);
             ics->events[i] = NULL;
         }
     }
-    free(ics->events);
-    ics->events = NULL;
+    free(ics->events);  // Free the array of event pointers
     ics->count = 0;
-    ics->events = NULL;
     resetGetEvent();
 }
 

@@ -5,63 +5,69 @@
 #include "ics_parser.h"
 #include "ics_utils.h"
 
-const event_t nullEvent = {NULL, NULL, NULL, NULL, NULL, NULL, 0,0};
-static char *data_buffer = NULL;
+typedef struct {
+    size_t length;
+    char *buffer;
+} buffer_t;
+
+
+static buffer_t data={0,NULL};
 
 void updateBuffer(const char *new_data) {
 
-    if (data_buffer == NULL) {
+    size_t new_data_len = strlen(new_data);
+    if (data.buffer == NULL) {
         // Allocate initial buffer if data_buffer is NULL
-        data_buffer = malloc(strlen(new_data) + 1);
-        memset(data_buffer, 0xFF, strlen(new_data) + 1);
-        if (data_buffer == NULL) {
+        data.buffer = calloc(new_data_len + 1, sizeof(char));
+        if (data.buffer == NULL) {
             printf("\nMemory allocation failed, trying to allocate %zu bytes\n", (size_t)(strlen(new_data) + 1));
             return;
         }
-        strcpy(data_buffer, new_data);
-        data_buffer[strlen(new_data)] = '\0';
+        strcpy(data.buffer, new_data);
+        data.length = new_data_len + 1;
     } else {
         // Reallocate buffer if data_buffer is not NULL
-        size_t new_data_len = strlen(new_data);
-        size_t buffer_len = strlen(data_buffer);
-        char *new_buffer = realloc(data_buffer, buffer_len + new_data_len + 1);
+        size_t new_length = data.length + new_data_len;
+        // if (data.length != strlen(data.buffer)+1) { printf("%d: diff %zu %zu\n", __LINE__, data.length, strlen(data.buffer)+1);}
+        char *new_buffer = realloc(data.buffer, new_length);
         if (!new_buffer) {
-            printf("Memory reallocation failed, trying to reallocate %zu bytes with additional %zu bytes\n", buffer_len, new_data_len);
+            printf("Memory reallocation failed, trying to reallocate %zu bytes with additional %zu bytes\n", data.length, new_data_len);
             return;
         }
-        data_buffer = new_buffer;
-        memset(data_buffer+buffer_len, 0, new_data_len + 1);
-        strcat(data_buffer, new_data);
-    
+        data.buffer = new_buffer;
+        strcat(data.buffer, new_data);
+        data.length = new_length;
+        // if (data.length != strlen(data.buffer)+1) { printf("%d: diff %zu %zu\n", __LINE__, data.length, strlen(data.buffer)+1);}
     }
 
 }
 
 void resetGetEvent(void) {
-    free(data_buffer);
-    data_buffer = NULL;
+    free(data.buffer);
+    data.buffer = NULL;
+    data.length = 0;
 }
 
 event_t * getEvent(void) {
-    event_t * event = malloc(sizeof(event_t));
-    memcpy(event, &nullEvent, sizeof(event_t));
 
-    if (data_buffer == NULL || *data_buffer == '\0') {
-        return event;
+    if (data.buffer == NULL || *data.buffer == '\0') {
+        return NULL;
     }
 
-    const char *vevent_start = strstr(data_buffer, "BEGIN:VEVENT");
+    const char *vevent_start = strstr(data.buffer, "BEGIN:VEVENT");
     if (!vevent_start) {
-        return event;
+        return NULL;
     }
 
     const char *vevent_end = strstr(vevent_start, "END:VEVENT");
     if (!vevent_end) {
-        return event;
+        return NULL;
     }
 
-    event->summary = extract_property(vevent_start, "SUMMARY:", vevent_end);
+    // Allocate event in memory. Freed in parser
+    event_t * event = calloc(1,sizeof(event_t));
 
+    event->summary = extract_property(vevent_start, "SUMMARY:", vevent_end);
     event->uid = extract_property(vevent_start, "UID:", vevent_end);
     event->dtstart = extract_property(vevent_start, "DTSTART;VALUE=DATE:", vevent_end);
     if (!event->dtstart) {
@@ -88,23 +94,29 @@ event_t * getEvent(void) {
     }
     event->interval = extract_property(vevent_start, "INTERVAL=", vevent_end);
 
-    size_t offset = (vevent_end - data_buffer) + strlen("END:VEVENT");
-    char const * next_vevent_start = strstr(data_buffer + offset, "BEGIN:VEVENT");
+    size_t offset = (vevent_end - data.buffer) + strlen("END:VEVENT");
+    char const * next_vevent_start = strstr(data.buffer + offset, "BEGIN:VEVENT");
     if (next_vevent_start) {
-        offset = next_vevent_start - data_buffer;
+        offset = next_vevent_start - data.buffer;
     }
-    if (offset >= strlen(data_buffer)) {
-        free(data_buffer);
-        data_buffer = NULL;
+    if (data.length != strlen(data.buffer)+1) { printf("%d: diff %zu %zu\n", __LINE__, data.length, strlen(data.buffer)+1);}
+    if (offset >= strlen(data.buffer)) {
+        free(data.buffer);
+        data.buffer = NULL;
+        data.length = 0;
+        // printf("Buffer freed\n");
     } else {
-        size_t buffer_length = strlen(data_buffer) - offset;
-        memmove(data_buffer, data_buffer + offset, buffer_length + 1);
-        char *new_buffer = realloc(data_buffer, buffer_length + 1);
+        size_t buffer_length = data.length - offset;
+        memmove(data.buffer, data.buffer + offset, buffer_length);
+        char *new_buffer = realloc(data.buffer, buffer_length);
+        // printf("Buffer realloc, %zu bytes\n", buffer_length);
+
         if (!new_buffer) {
             printf("Memory reallocation failed, trying to reallocate %zu bytes\n", buffer_length);
             return event;
         }
-        data_buffer = new_buffer;
+        data.buffer = new_buffer;
+        data.length = buffer_length;
     }
 
     // Update tstart and tend
@@ -115,8 +127,8 @@ event_t * getEvent(void) {
 
 }
 
-char *extract_property(const char *data, const char *property, const char *end) {
-    const char *start = strnstr(data, property, end - data);
+char *extract_property(const char *source, const char *property, const char *end) {
+    const char *start = strnstr(source, property, end - source);
     if (!start) {
         return NULL;
     }
@@ -135,7 +147,7 @@ char *extract_property(const char *data, const char *property, const char *end) 
         strncpy(value, start, len);
         value[len] = '\0';
     }
-    nukechar(value, '\\');
+    nukeChar(value, '\\');
     return value;
 }
 
@@ -265,8 +277,7 @@ event_t *cloneEvent(event_t *existing) {
 
     if(existing == NULL) return NULL;
 
-    event_t *event = malloc(sizeof(event_t));
-    memset(event, 0, sizeof(event_t));
+    event_t *event = calloc(1, sizeof(event_t));
 
     event->summary = copyMember(existing->summary);
     event->dtstart = copyMember(existing->dtstart);
@@ -285,7 +296,7 @@ char *copyMember(const char *source) {
     if (source == NULL) { 
         return NULL;
     }
-    char *destination = malloc(strlen(source) + 1); // +1 for null terminator
+    char *destination = calloc(strlen(source) + 1, sizeof(char)); // +1 for null terminator
     strcpy(destination, source);
     return destination;
 }

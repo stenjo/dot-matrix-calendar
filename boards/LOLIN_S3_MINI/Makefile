@@ -59,6 +59,7 @@ clean:
 
 copy:
 	rshell rsync ../../src /pyboard
+	rshell "repl ~ import machine ~ machine.reset() ~"
 	sleep 1
 
 mon:

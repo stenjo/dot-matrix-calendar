@@ -42,6 +42,47 @@ void test_parse_should_handle_single_event(void) {
 
     freeIcs(&ics);
 }
+void test_parse_should_handle_all_day_ongoing_event_today(void) {
+
+    // Arrange
+    ics_t ics;
+    initIcs(&ics);
+
+    const char *data =  "BEGIN:VEVENT\r\n"
+                        "DTSTART;VALUE=DATE:20240427\r\n"
+                        "DTEND;VALUE=DATE:20240428\r\n"
+                        "DTSTAMP:20240425T055359Z\r\n"
+                        "SUMMARY:SUMMARY:Meeting with John\r\n"
+                        "END:VEVENT\r\n";
+
+    event_t mock_event;
+    mock_event.summary = strdup("Meeting with John");
+    mock_event.dtstart = strdup("20240427");
+    mock_event.dtend = strdup("20240428");
+    mock_event.tstart = getTimeStamp(mock_event.dtstart);
+    mock_event.tend = getTimeStamp(mock_event.dtend);
+
+    setStartDate(&ics, "20240427T090000");
+    setEndDate(&ics, "20240429T090000");
+
+    // Initialize buffer with data and then call getEvent
+    updateBuffer_Expect(data);
+    getEvent_ExpectAndReturn(&mock_event);
+    getEvent_ExpectAndReturn(NULL);
+    freeEvent_Ignore();
+    resetGetEvent_Ignore();
+
+    // Act
+    size_t count = parseIcs(&ics, data);
+
+    // Assert
+    TEST_ASSERT_EQUAL(1, count);
+    TEST_ASSERT_EQUAL_STRING("Meeting with John", ics.events[0]->summary);
+    TEST_ASSERT_EQUAL_STRING("20240427", ics.events[0]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20240428", ics.events[0]->dtend);
+
+    freeIcs(&ics);
+}
 
 void test_parse_should_handle_multiple_events(void) {
     ics_t ics;
