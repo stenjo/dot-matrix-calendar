@@ -23,6 +23,8 @@ c.parseURL('https://calendar.google.com/calendar/ical/parterapeutene.no_e1or90m2
 scrollDone = False
 clock = Clock(15)
 print("Free mem: ",gc.mem_free())
+c.reset()
+print("Free mem: ",gc.mem_free())
 
 try:
     event = c.first()
