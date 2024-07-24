@@ -156,4 +156,27 @@ void test_parse_with_start_and_end_times_repeat(void) {
     freeIcs(&ics);
 }
 
+
+void test_parse_yearly_repeat(void) {
+    ics_t ics;
+    initIcs(&ics);
+    initIcsDates(&ics);
+
+    const char startDate[] = "20250724T070000Z";
+    const char endDate[] = "20250725";
+
+    setStartDate(&ics, startDate);
+    setEndDate(&ics, endDate);
+
+    size_t count = parseFile(&ics, "test/repeat_yearly.ics");
+    TEST_ASSERT_EQUAL(1, count);
+    event_t const * ev = getFirstEvent(&ics);
+
+    TEST_ASSERT_NOT_NULL(ev->summary);
+    TEST_ASSERT_NOT_NULL(ev->dtstart);
+
+    freeIcs(&ics);
+}
+
+
 #endif // TEST
