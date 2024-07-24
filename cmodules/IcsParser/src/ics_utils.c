@@ -21,6 +21,13 @@ bool parse_date_string(const char *date_str, struct tm *tm) {
 
 }
 
+int getYearFromTime(time_t timestamp) {
+    if (timestamp == 0) timestamp = time(NULL);
+    struct tm tm = {0};
+    localtime_r(&timestamp, &tm);
+    return tm.tm_year + 1900;
+}
+
 time_t getTimeStamp(const char *date_str) {
     struct tm tm_event = {0};
     if (parse_date_string(date_str, &tm_event)) {

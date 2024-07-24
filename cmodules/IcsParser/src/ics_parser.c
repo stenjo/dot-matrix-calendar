@@ -47,11 +47,15 @@ static size_t addEvent(ics_t *ics, event_t *event) {
 }
 
 static time_t handleRRule(event_t *event, time_t filter_time) {
-    if (filter_time == 0) {
-        return 0; // TODO: handle no filtertime
-    }
-    if (event->rrule && strstr(event->rrule, "WEEKLY")) {
-        time_t interval_seconds = atoi(event->interval) * 7 * 3600 * 24; // seconds
+
+    if (filter_time == 0) return 0; // TODO: handle no filtertime
+    if (event->rrule == NULL || event->rrule[0] == '\0') return 0;
+
+    time_t interval = 1;
+    if (event->interval != NULL && event->interval[0] != '\0') interval = atoi(event->interval);
+
+    if (strstr(event->rrule, "WEEKLY")) {
+        time_t interval_seconds = interval * 7 * 3600 * 24; // seconds
         time_t event_age = filter_time - event->tstart; // timestamp
         time_t repeats = (event_age / interval_seconds) +1;
         time_t delta = interval_seconds * repeats;
@@ -60,6 +64,20 @@ static time_t handleRRule(event_t *event, time_t filter_time) {
         updateDateStr(event->dtstart, event->tstart);
         updateDateStr(event->dtend, event->tend);
 
+        return interval_seconds;
+    }
+    if (strstr(event->rrule, "YEARLY")) {
+        struct tm tm_event_start = { 0};
+        time_t duration = event->tend - event->tstart;
+        if (parse_date_string(event->dtstart, &tm_event_start)) {
+            tm_event_start.tm_year = getYearFromTime(filter_time) - 1900;
+            time_t event_start_time = mktime(&tm_event_start);
+            event->tstart = event_start_time;
+            event->tend = event_start_time + duration;
+            updateDateStr(event->dtstart, event->tstart);
+            updateDateStr(event->dtend, event->tend);
+        }
+        time_t interval_seconds = interval * 365 * 3600 * 24; // seconds
         return interval_seconds;
     }
     return 0;

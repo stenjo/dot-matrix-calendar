@@ -59,6 +59,8 @@ void test_parse_should_handle_all_day_ongoing_event_today(void) {
     mock_event.summary = strdup("Meeting with John");
     mock_event.dtstart = strdup("20240427");
     mock_event.dtend = strdup("20240428");
+    mock_event.rrule = NULL;
+    mock_event.interval = NULL;
     mock_event.tstart = getTimeStamp(mock_event.dtstart);
     mock_event.tend = getTimeStamp(mock_event.dtend);
 
