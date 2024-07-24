@@ -182,7 +182,7 @@ python -m freezefs modules/micropython-wifi-setup/lib modules/frozen_setup.py -o
 
 ```
 
-## Building for ESP8266
+## Building for ESP8266 (does not work at the moment)
 ```bash
 cd boards/ESP8266_GENERIC
 make
