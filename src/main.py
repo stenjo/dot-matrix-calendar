@@ -38,10 +38,13 @@ try:
                 event = c.first()
                 utils.reconnectIfNotConnected()
 
-                tf = esp32.raw_temperature()
-                tc = (tf-32.0)/1.8
-                print("T = {0:4d} deg F or {1:5.1f}  deg C".format(tf,tc))
-
+                if hasattr(esp32, 'raw_temperature'):
+                    tf = esp32.raw_temperature()
+                    tc = (tf-32.0)/1.8
+                    print("T = {0:4d} deg F or {1:5.1f}  deg C".format(tf,tc))
+                else:
+                    print("T = {0:4d} deg C".format(esp32.mcu_temperature()))
+                    
             if event:
                 m.marquee(dayText(event))
                 
