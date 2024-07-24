@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/stenjo/dot-matrix-calendar/compare/v1.2.0...v1.2.1) (2024-07-24)
+
+
+### Bug Fixes
+
+* **temperature:** temp check fails on S2 and S3 devices ([#83](https://github.com/stenjo/dot-matrix-calendar/issues/83)) ([9270a5d](https://github.com/stenjo/dot-matrix-calendar/commit/9270a5d615907e34c83714049143b5c1d6b1aac9))
+
 ## [1.2.0](https://github.com/stenjo/dot-matrix-calendar/compare/v1.1.2...v1.2.0) (2024-07-24)
 
 
