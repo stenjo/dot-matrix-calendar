@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0](https://github.com/stenjo/dot-matrix-calendar/compare/v1.1.2...v1.2.0) (2024-07-24)
+
+
+### Features
+
+* **ics:** add yearly repeat ([#79](https://github.com/stenjo/dot-matrix-calendar/issues/79)) ([6bcde9d](https://github.com/stenjo/dot-matrix-calendar/commit/6bcde9d1659b80773bf6c1680ba3ec39bef21e9f))
+* **temp:** display temp sensor reading ([#81](https://github.com/stenjo/dot-matrix-calendar/issues/81)) ([311895c](https://github.com/stenjo/dot-matrix-calendar/commit/311895cea79e1a1380788792c8540c149caea7c6))
+
 ## [1.1.2](https://github.com/stenjo/dot-matrix-calendar/compare/v1.1.1...v1.1.2) (2024-07-23)
 
 
