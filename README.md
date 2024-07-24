@@ -51,11 +51,10 @@ Install version 5.2 of the Espressif toolchain.
     ./esp-idf/install.sh
 ```
 
-
 ### Load binary
 
 The easy way:
-Clone and extract this repo and move into the esp32-S2 folder:
+Clone and extract this repo and move into the esp32-S3 folder:
 
 ```bash
 git clone https://github.com/stenjo/dot-matrix-calendar.git
@@ -63,6 +62,7 @@ cd dot-matrix-calendar
 git submodule update --init lib/micropython
 cd boards/LOLIN_S3_MINI
 ```
+
 Connect your esp32-S2 to your Mac via usb cable. Set the board into programming mode by holding button 0, pressing the reset button and releasing the button 0 when the board is connected.
 
 Ready built binary can be downloaded from the latest build from github, [latest release](https://github.com/stenjo/dot-matrix-calendar/releases/latest). Click `esp32-S3-binary` and download the zipped binary to the `boards/LOLIN_S3_MINI` folder, or run the following commands:
@@ -90,6 +90,13 @@ git clone https://github.com/stenjo/dot-matrix-calendar.git
 cd dot-matrix-calendar
 ```
 
+Initialize the micropython repo and run prepare script:
+
+```bash
+git submodule update --init lib/micropython
+make prepare
+```
+
 Check what usb port the board is connected to by running the following command:
 
 ```bash
@@ -108,11 +115,28 @@ make erase
 
 You should get a result something like this:
 ![erase result](resources/erasing-flash.png)
+In this example the board is a esp32s2 chip type and a Lolin S2 mini board. Change directory into the board type:
+
+```bash
+cd board/LOLIN_S3_MINI
+```
+
+Build the firmware:
+
+```bash
+make
+```
 
 Program the board flash with the `micropython.bin` file that you either downloaded from latest release or built locally:
 
 ```bash
 make deploy
+```
+
+To do all of removing old files, erasing the target flash, building the firmware and downloading it to the target:
+
+```bash
+make clean erase all deploy
 ```
 
 Reset the board by pressing the reset button.
@@ -152,6 +176,20 @@ Adding /pyboard/idle-timeout.txt
 Adding /pyboard/main.py
 Checking /pyboard/boot.py
 dot-matrix-calendar/src/boot.py is newer than /pyboard/boot.py - copying
+```
+
+Open pycom to view runtime info and get the REPL prompt (this is for S3 devices)
+
+```bash
+picocom /dev/cu.usbmodem1234561 --b 115200
+```
+
+If you do not get the REPL prompt (` >>> `), just press Control-C
+
+You can also do both the above steps this via make file:
+
+```bash
+make copy mon
 ```
 
 ### Build binary
