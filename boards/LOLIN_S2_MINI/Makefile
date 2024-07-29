@@ -44,7 +44,7 @@ deploy:
 
 merge:
 	$(ECHO) "Merge binary with src/ folder files"
-	$(Q)vfsmerge  --port esp32-s2 --firmware $(MPBIN)
+	$(Q)python3 -m ../../tools/vfs_merge/vfs_merge.py  --port esp32s2 --firmware $(MPBIN)
 	$(Q)esptool.py --chip esp32s2 merge_bin -o $(FWSRC) \
 	--flash_mode=$(FLASH_MODE) \
 	--flash_size=$(FLASH_SIZE) \

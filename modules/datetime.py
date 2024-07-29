@@ -730,6 +730,10 @@ class datetime:
 
     @classmethod
     def now(cls, tz=None):
+        if tz is None:
+            dt = cls(*_tmod.localtime()[:6], microsecond=0, tzinfo=tz)
+            return dt
+        
         return cls.fromtimestamp(_tmod.time(), tz)
 
     @classmethod
