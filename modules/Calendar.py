@@ -160,7 +160,7 @@ class Calendar(ICS):
         timeout = 20000
         response = None
         try:
-            response = mrequests.get(url, headers={b"accept": b"text/html"}, response_class=ResponseWithProgress)
+            response = mrequests.get(url, headers={b"accept": b"text/html"}, response_class=ResponseWithProgress, timeout=8)
         except Exception as e:
             print(f"Exception occurred during request: {e}")
             return 0
@@ -243,6 +243,8 @@ class Calendar(ICS):
     
     def start(self, startDate):
         self.setStartDate(toDtStr(startDate))
+        print("Start date: ", toDtStr(startDate))
         
     def end(self, endDate):
         self.setEndDate(toDtStr(endDate))
+        print("End date: ", toDtStr(endDate))

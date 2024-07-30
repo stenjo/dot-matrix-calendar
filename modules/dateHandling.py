@@ -9,7 +9,7 @@ def isNowInTimePeriod(startTime, endTime, nowTime):
         return nowTime >= startTime or nowTime <= endTime
 
 
-def dayText(event, today=datetime.now(timezone.utc)):
+def dayText(event, today=datetime.now(timezone.cet)):
 
     weekday = ["Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag"]
     text = ""
@@ -20,6 +20,8 @@ def dayText(event, today=datetime.now(timezone.utc)):
 
         tomorrow = today + timedelta(1)
         delta = dt - today
+        
+        print("Event date: ", dt.date(), ", todays date: ", today.date(), ", Event: ", event["summary"])
 
         if dt.date() == today.date():
             text = text + "I dag: "

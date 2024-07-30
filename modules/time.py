@@ -112,7 +112,9 @@ def localtime(secs: int | None = None) -> tuple[int, int, int, int, int, int, in
         # Return the time of the last sunday of the month
         return mktime((year, month, tpl[2] - offset, hour, minute, tpl[5], None, None))
 
-    utc = gmtime(secs)
+    utc = gmtime()
+    if secs != None:
+        utc = gmtime(secs)
 
     # Find start date for daylight saving, i.e. last Sunday in March (01:00 UTC)
     start_secs = last_sunday(year=utc[0], month=3, hour=1, minute=0)

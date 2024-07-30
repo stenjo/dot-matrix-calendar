@@ -82,9 +82,9 @@ class TestCalendar(unittest.TestCase):
         calendar.parseURL('https://calendar.google.com/calendar/ical/parterapeutene.no_e1or90m2lp6p523ma7u15v2pc0%40group.calendar.google.com/public/basic.ics')
         print(dayText(calendar.first()))
         
-        calendar.parseURL('webcal://files-f3.motorsportcalendars.com/no/f3-calendar_p_q_sprint_feature.ics')
-        count = calendar.parseURL('webcal://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics')
-        self.assertAlmostEqual(count, 25, delta=15)
+        calendar.parseURL('https://calendar.google.com/calendar/ical/ht3jlfaac5lfd6263ulfh4tql8%40group.calendar.google.com/public/basic.ics')
+        count = calendar.parseURL('https://calendar.google.com/calendar/ical/i_213.236.150.86%23sunrise%40group.v.calendar.google.com/public/basic.ics')
+        self.assertAlmostEqual(count, 60, delta=15)
         
     def test_parseURL_Days_Ahead(self):
         

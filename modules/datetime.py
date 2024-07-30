@@ -349,6 +349,7 @@ class timezone(tzinfo):
 
 
 timezone.utc = timezone(timedelta(0))
+timezone.cet = timezone(timedelta(hours=2))
 
 
 def _date(y, m, d):
