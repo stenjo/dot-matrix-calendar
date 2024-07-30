@@ -15,7 +15,7 @@ matrix.clear()
 
 # Get version
 utils.show_ip_and_version(matrix)
-clock = Clock(15, False)
+clock = Clock(15, True)
 
 calendar=Calendar(daysAhead=7)
 calendar.parseURL('webcal://files-f2.motorsportcalendars.com/no/f2-calendar_p_q_sprint_feature.ics')
