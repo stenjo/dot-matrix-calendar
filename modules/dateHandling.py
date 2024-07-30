@@ -21,7 +21,7 @@ def dayText(event, today=datetime.now(timezone.cet)):
         tomorrow = today + timedelta(1)
         delta = dt - today
         
-        print("Event date: ", dt.date(), ", todays date: ", today.date(), ", Event: ", event["summary"])
+        print("Event date:", dt.date(), " todays date:", today.date(), " Event:", event["summary"])
 
         if dt.date() == today.date():
             text = text + "I dag: "
