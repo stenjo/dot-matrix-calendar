@@ -356,8 +356,8 @@ void test_withLargeCalendar(void) {
     int count = parseFile(&ics, "test/basic.ics");
     sortEventsByStart(&ics);
 
-    TEST_ASSERT_EQUAL(24, count);
-    event_t *event = getEventAt(&ics, 6);
+    TEST_ASSERT_EQUAL(23, count);
+    event_t *event = getEventAt(&ics, 5);
 
     TEST_ASSERT_EQUAL_STRING("Service på bilen", event->summary);
     TEST_ASSERT_EQUAL_STRING("20240418T053000Z", event->dtstart);
@@ -417,7 +417,6 @@ void test_withMultipleCalendars(void) {
 
 
     getFirstEvent(&ics);
-    getNextEvent(&ics);
     getNextEvent(&ics);
     getNextEvent(&ics);
     getNextEvent(&ics);

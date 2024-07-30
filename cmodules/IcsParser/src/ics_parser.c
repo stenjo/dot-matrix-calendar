@@ -16,15 +16,15 @@
 
 
 static event_t * createRepeatEvent(event_t * event, time_t interval) {
-    event_t * revent = cloneEvent(event);
+    event_t * r_event = cloneEvent(event);
     
-    time_t duration = revent->tend - revent->tstart;
-    revent->tstart = revent->tstart + interval;
-    revent->tend = revent->tstart + duration;
-    updateDateStr(revent->dtstart, revent->tstart);
-    updateDateStr(revent->dtend, revent->tend);
+    time_t duration = r_event->tend - r_event->tstart;
+    r_event->tstart = r_event->tstart + interval;
+    r_event->tend = r_event->tstart + duration;
+    updateDateStr(r_event->dtstart, r_event->tstart);
+    updateDateStr(r_event->dtend, r_event->tend);
 
-    return revent;
+    return r_event;
 
 }
 
@@ -55,8 +55,10 @@ static time_t handleRRule(event_t *event, time_t filter_time) {
     if (event->interval != NULL && event->interval[0] != '\0') interval = atoi(event->interval);
 
     if (strstr(event->rrule, "WEEKLY")) {
+
         time_t interval_seconds = interval * 7 * 3600 * 24; // seconds
-        time_t event_age = filter_time - event->tstart; // timestamp
+        time_t filter_time_midnight = getMidnightTimeStamp(filter_time);
+        time_t event_age = filter_time_midnight - event->tstart; // timestamp
         time_t repeats = (event_age / interval_seconds) +1;
         time_t delta = interval_seconds * repeats;
         event->tstart = event->tstart + delta;
@@ -135,10 +137,10 @@ size_t parseIcs(ics_t *ics, const char *ics_data) {
         // Handle RRule
         time_t interval_seconds = handleRRule(event, ics->startTime);
 
-        double afterStartFilter = difftime(event->tstart, ics->startTime);
-        if (event->tend > event->tstart) {
-            afterStartFilter = difftime(event->tend, ics->startTime);
-        }
+        double afterStartFilter = difftime(event->tstart, getMidnightTimeStamp(ics->startTime));
+        // if (event->tend > event->tstart) {
+        //     afterStartFilter = difftime(event->tend, ics->startTime);
+        // }
         double beforeEndFilter = difftime(ics->endTime, event->tstart);
 
         if ((ics->startTime != 0 && afterStartFilter < 0) || (ics->endTime != 0 && beforeEndFilter < 0)) { 
@@ -159,29 +161,22 @@ size_t parseIcs(ics_t *ics, const char *ics_data) {
 
 time_t setStartDate(ics_t *ics, const char *start)
 {
-    struct tm tm_event_start = { 0};
-    if (parse_date_string(start, &tm_event_start)) {
-        time_t event_time = mktime(&tm_event_start);
-
-        ics->startTime = event_time;
-  
-        return event_time;
+    ics->startTime = getTimeStamp(start);
+    if (ics->startTime < 0) { 
+        printf("setTimeFailed with %s", start);
+        return 0;
     }
-    printf("setTimeFailed with %s", start);
-    return 0;
+    return ics->startTime;
 }
 
 time_t setEndDate(ics_t *ics, const char *end)
 {
-    struct tm tm_event_end = { 0 };
-    if (parse_date_string(end, &tm_event_end)) {
-        time_t event_time = mktime(&tm_event_end);
-
-        ics->endTime = event_time;
-    
-        return event_time;
+    ics->endTime = getTimeStamp(end);
+    if (ics->endTime < 0) {
+        printf("setTimeFailed with %s", end);
+        return 0;
     }
-    return 0;
+    return ics->endTime;
 }
 
 void initIcs(ics_t *ics) {

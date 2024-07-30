@@ -7,7 +7,8 @@
 bool parse_date_string(const char *date_string, struct tm *tm);
 int getYearFromTime(time_t timestamp);
 time_t getTimeStamp(const char *date_str);
-void updateDateStr(char * str, time_t time);
+char * updateDateStr(char * str, time_t time);
+time_t getMidnightTimeStamp(time_t time);
 void nukeChar(char s[], char c);
 
 #endif // ICS_UTILS_H

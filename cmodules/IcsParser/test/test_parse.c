@@ -169,11 +169,15 @@ void test_parse_should_handle_multiple_calls(void) {
     mock_event1.summary = strdup("Event 1");
     mock_event1.dtstart = strdup("20230615T090000");
     mock_event1.dtend = strdup("20230615T100000");
+    mock_event1.tstart = getTimeStamp(mock_event1.dtstart);
+    mock_event1.tend = getTimeStamp(mock_event1.dtend);
 
     event_t mock_event2;
     mock_event2.summary = strdup("Event 2");
     mock_event2.dtstart = strdup("20230616T090000");
     mock_event2.dtend = strdup("20230616T100000");
+    mock_event2.tstart = getTimeStamp(mock_event2.dtstart);
+    mock_event2.tend = getTimeStamp(mock_event2.dtend);
 
     // Initialize buffer with data1 and call getEvent
     updateBuffer_Expect(data1);
@@ -212,11 +216,15 @@ void test_parse_should_handle_multiple_calls_split_at_timestamp(void) {
     mock_event1.summary = strdup("Event 1");
     mock_event1.dtstart = strdup("20230615T090000");
     mock_event1.dtend = strdup("20230615T100000");
+    mock_event1.tstart = getTimeStamp(mock_event1.dtstart);
+    mock_event1.tend = getTimeStamp(mock_event1.dtend);
 
     event_t mock_event2;
     mock_event2.summary = strdup("Event 2");
     mock_event2.dtstart = strdup("20230616T090000");
     mock_event2.dtend = strdup("20230616T100000");
+    mock_event2.tstart = getTimeStamp(mock_event2.dtstart);
+    mock_event2.tend = getTimeStamp(mock_event2.dtend);
 
     // Initialize buffer with data1 and call getEvent
     updateBuffer_Expect(data1);

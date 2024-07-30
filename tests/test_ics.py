@@ -154,6 +154,14 @@ class TestCalendar(unittest.TestCase):
         print(dayText(calendar.first()))
       
         self.assertIsNone(calendar.next())
+        
+    def test_show_repeating_today(self):
+        calendar = Calendar(start="20240723T090000Z", end="20240731T090000Z")
+        count = calendar.parseFile('../../tests/repeating.ics')
+
+        print(dayText(calendar.first()))
+        self.assertEqual(count, 2)
+        
 
 if __name__ == "__main__":
     unittest.main()
