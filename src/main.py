@@ -41,7 +41,7 @@ try:
                 utils.boardTemp()
             
             if event:
-                matrix.marquee(dayText(event))
+                matrix.marquee(dayText(event, datetime.now(timezone.cet)))
                 
             event = calendar.next()
             scrollDone = False

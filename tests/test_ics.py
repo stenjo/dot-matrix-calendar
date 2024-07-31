@@ -160,6 +160,7 @@ class TestCalendar(unittest.TestCase):
         count = calendar.parseFile('../../tests/repeating.ics')
 
         print(dayText(calendar.first()))
+        print(dayText(calendar.next()))
         self.assertEqual(count, 2)
         
 
