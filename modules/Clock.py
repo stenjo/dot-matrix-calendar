@@ -23,7 +23,7 @@ class Clock:
         dtStr = ""
         if sec is not self.lastSec:
             if self.date == True:
-                dtStr = "{:02}/{:02}-{:02} ".format(day, month, year)
+                dtStr = "{:02}/{:02} ".format(day, month)
             
             if sec % 2 == 0:
                 matrix.write("{}{:02}:{:02}".format(dtStr, hour, min), True)
