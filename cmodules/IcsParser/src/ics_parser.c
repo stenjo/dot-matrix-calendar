@@ -65,6 +65,13 @@ static time_t handleRRule(event_t *event, time_t filter_time) {
         event->tend = event->tend + delta;
         updateDateStr(event->dtstart, event->tstart);
         updateDateStr(event->dtend, event->tend);
+        if (event->tstart <= filter_time && event->tstart > filter_time - 86400) {
+            char str[256] = "00000000000000000000";
+            printf("REvent: %s\n", event->summary);
+            printf("  filter_time:     %ld %s\n", (long)filter_time, updateDateStr(str, filter_time));
+            printf("  filter midnight: %ld %s\n", (long)filter_time_midnight, updateDateStr(str, filter_time_midnight));
+            printf("  event start:     %ld %s\n", (long)event->tstart, updateDateStr(str, event->tstart));
+        }
 
         return interval_seconds;
     }
