@@ -155,12 +155,11 @@ class Calendar(ICS):
         return self._parseChunks(url)
 
     def _parseChunks(self, url, chunkSize=1024):
-        print(f"Fetching URL in chunks: {url}")
         start = time.ticks_ms()
         timeout = 20000
         response = None
         try:
-            response = mrequests.get(url, headers={b"accept": b"text/html"}, response_class=ResponseWithProgress)
+            response = mrequests.get(url, headers={b"accept": b"text/html"}, response_class=ResponseWithProgress, timeout=8)
         except Exception as e:
             print(f"Exception occurred during request: {e}")
             return 0
@@ -173,9 +172,6 @@ class Calendar(ICS):
                         if not chunk or len(chunk) == 0:
                             break
                         try:
-                            # decoded_chunk = chunk.decode(encoding)
-                            # if contains_non_unicode_bytes(decoded_chunk):
-                            #     print("Non-Unicode bytes detected, skipping chunk")
                             count = self.parseIcs(chunk)
                             start = time.ticks_ms()
                         except UnicodeError as e:
@@ -187,7 +183,7 @@ class Calendar(ICS):
                 finally:
                     response.close()
                     
-                print(f"Parsed {count} items from URL in chunks")
+                # print(f"Parsed {count} items from URL in chunks")
                 return count
             
             else:
@@ -199,7 +195,6 @@ class Calendar(ICS):
     def refresh(self, start_date=None, end_date=None):
         print("Refreshing calendar")
         self.reset()
-        print("reset")
         items = 0
         if start_date is not None:
             self.start(start_date)
@@ -243,6 +238,8 @@ class Calendar(ICS):
     
     def start(self, startDate):
         self.setStartDate(toDtStr(startDate))
+        print("Start date: ", toDtStr(startDate))
         
     def end(self, endDate):
         self.setEndDate(toDtStr(endDate))
+        print("  End date: ", toDtStr(endDate))

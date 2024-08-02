@@ -2,6 +2,7 @@
 #define EVENT_H
 
 #include <time.h>
+#include <stdbool.h>
 
 // Define the structure to hold parsed event information
 typedef struct {

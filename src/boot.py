@@ -11,11 +11,11 @@ import ntptime
 import time
 
 from DotMatrix import Matrix8x8
-m = Matrix8x8(modules=4,host=1, cs=5)
+matrix = Matrix8x8(modules=8,host=1, cs=5)
 
-m.clear()
-m.init()
-m.write("setup-")
+matrix.clear()
+matrix.init()
+matrix.write("setup-")
 
 from wifi_setup.wifi_setup import WiFiSetup
 
@@ -23,8 +23,8 @@ ws = WiFiSetup("dot-matrix-calendar")
 sta = ws.connect_or_setup()
 del ws
 
-m.clear()
-m.init()
+matrix.clear()
+matrix.init()
 
 done = False
 #if needed, overwrite default time server

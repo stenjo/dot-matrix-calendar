@@ -349,6 +349,7 @@ class timezone(tzinfo):
 
 
 timezone.utc = timezone(timedelta(0))
+timezone.cet = timezone(timedelta(hours=2))
 
 
 def _date(y, m, d):
@@ -730,6 +731,10 @@ class datetime:
 
     @classmethod
     def now(cls, tz=None):
+        if tz is None:
+            dt = cls(*_tmod.localtime()[:6], microsecond=0, tzinfo=tz)
+            return dt
+        
         return cls.fromtimestamp(_tmod.time(), tz)
 
     @classmethod

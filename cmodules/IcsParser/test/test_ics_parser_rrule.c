@@ -128,6 +128,87 @@ void test_parse_with_start_and_end_dates_repeat(void) {
     freeIcs(&ics);
 }
 
+
+void test_parse_with_start_and_end_dates_repeat_today(void) {
+    ics_t ics;
+    initIcs(&ics);
+    initIcsDates(&ics);
+
+    const char *startDate = "20240730T190000Z";
+    const char *endDate   = "20240806T235959Z";
+    ics.startTime = setStartDate(&ics, startDate);
+    ics.endTime = setEndDate(&ics, endDate);
+
+    size_t count = parseIcs(&ics, ics_repeated_4weekly);
+    event_t * event;
+    while (!atEnd(&ics))  {
+        event = getNextEvent(&ics);
+        printf("%s %s %s\n", event->dtstart, event->dtend, event->summary);
+    }
+
+    TEST_ASSERT_EQUAL(1, count);
+    TEST_ASSERT_EQUAL_STRING("Restavfall", ics.events[0]->summary);
+    TEST_ASSERT_EQUAL_STRING("20240730", ics.events[0]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20240731", ics.events[0]->dtend);
+    TEST_ASSERT_EQUAL_STRING("WEEKLY", ics.events[0]->rrule);
+    TEST_ASSERT_EQUAL_STRING("4", ics.events[0]->interval);
+
+    freeIcs(&ics);
+}
+
+void test_parse_with_start_and_end_dates_repeat_today_2(void) {
+    ics_t ics;
+    initIcs(&ics);
+    initIcsDates(&ics);
+
+    char * ics_str =    "BEGIN:VCALENDAR\r\n"
+                    "VERSION:2.0\r\n"
+                    "BEGIN:VEVENT\r\n"
+                    "DTSTART;VALUE=DATE:20240109\r\n"
+                    "DTEND;VALUE=DATE:20240110\r\n"
+                    "RRULE:FREQ=WEEKLY;INTERVAL=2\r\n"
+                    "DTSTAMP:20240424T062905Z\r\n"
+                    "UID:90ocma42249tokq85a3nuljgl0@google.com\r\n"
+                    "CREATED:20240101T133719Z\r\n"
+                    "LAST-MODIFIED:20240415T073040Z\r\n"
+                    "SEQUENCE:0A\r\n"
+                    "STATUS:CONFIRMED\r\n"
+                    "SUMMARY:Matavfall\r\n"
+                    "TRANSP:TRANSPARENT\r\n"
+                    "BEGIN:VALARM\r\n"
+                    "ACTION:AUDIO\r\n"
+                    "TRIGGER:-PT15H\r\n"
+                    "ACKNOWLEDGED:20240415T073031Z\r\n"
+                    "ATTACH;VALUE=URI:Chord\r\n"
+                    "UID:604C15F2-C820-43EE-8559-A557C29BFC78\r\n"
+                    "X-APPLE-DEFAULT-ALARM:TRUE\r\n"
+                    "X-WR-ALARMUID:604C15F2-C820-43EE-8559-A557C29BFC78\r\n"
+                    "END:VALARM\r\n"
+                    "END:VEVENT\r\n"
+                    "END:VCALENDAR";
+
+    const char *startDate = "20240723T190000Z";
+    const char *endDate   = "20240806T235959Z";
+    ics.startTime = setStartDate(&ics, startDate);
+    ics.endTime = setEndDate(&ics, endDate);
+
+    size_t count = parseIcs(&ics, ics_str);
+    event_t * event;
+    while (!atEnd(&ics))  {
+        event = getNextEvent(&ics);
+        printf("%s %s %s\n", event->dtstart, event->dtend, event->summary);
+    }
+
+    TEST_ASSERT_EQUAL(2, count);
+    TEST_ASSERT_EQUAL_STRING("Matavfall", ics.events[0]->summary);
+    TEST_ASSERT_EQUAL_STRING("20240723", ics.events[0]->dtstart);
+    TEST_ASSERT_EQUAL_STRING("20240724", ics.events[0]->dtend);
+    TEST_ASSERT_EQUAL_STRING("WEEKLY", ics.events[0]->rrule);
+    TEST_ASSERT_EQUAL_STRING("2", ics.events[0]->interval);
+
+    freeIcs(&ics);
+}
+
 void test_parse_with_start_and_end_times_repeat(void) {
     ics_t ics;
     initIcs(&ics);
@@ -163,7 +244,7 @@ void test_parse_yearly_repeat(void) {
     initIcsDates(&ics);
 
     const char startDate[] = "20250724T070000Z";
-    const char endDate[] = "20250725";
+    const char endDate[] = "20250825TT080000Z";
 
     setStartDate(&ics, startDate);
     setEndDate(&ics, endDate);
