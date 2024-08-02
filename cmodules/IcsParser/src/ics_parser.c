@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <time.h>
+#include <esp_log.h>
 
 #include "ics_utils.h"
 #include "ics_event.h"
@@ -54,6 +55,7 @@ static time_t handleRRule(event_t *event, time_t filter_time) {
     time_t interval = 1;
     if (event->interval != NULL && event->interval[0] != '\0') interval = atoi(event->interval);
 
+    ESP_LOGI("DEBUG", "REvent: %s\n", event->summary);
     if (strstr(event->rrule, "WEEKLY")) {
 
         time_t interval_seconds = interval * 7 * 3600 * 24; // seconds
@@ -65,12 +67,11 @@ static time_t handleRRule(event_t *event, time_t filter_time) {
         event->tend = event->tend + delta;
         updateDateStr(event->dtstart, event->tstart);
         updateDateStr(event->dtend, event->tend);
-        if (event->tstart <= filter_time && event->tstart > filter_time - 86400) {
+        if (event->tstart <= filter_time && event->tstart > filter_time - 86400*2) {
             char str[256] = "00000000000000000000";
-            printf("REvent: %s\n", event->summary);
-            printf("  filter_time:     %ld %s\n", (long)filter_time, updateDateStr(str, filter_time));
-            printf("  filter midnight: %ld %s\n", (long)filter_time_midnight, updateDateStr(str, filter_time_midnight));
-            printf("  event start:     %ld %s\n", (long)event->tstart, updateDateStr(str, event->tstart));
+            ESP_LOGI("DEBUG", "  filter midnight: %ld %s\n", (long)filter_time_midnight, updateDateStr(str, filter_time_midnight));
+            ESP_LOGI("DEBUG", "  filter_time:     %ld %s\n", (long)filter_time, updateDateStr(str, filter_time));
+            ESP_LOGI("DEBUG", "  event start:     %ld %s\n\n", (long)event->tstart, updateDateStr(str, event->tstart));
         }
 
         return interval_seconds;
